@@ -3279,6 +3279,16 @@
                 sum + (t.data && t.data.resources ? t.data.resources.length : 0), 0
             );
             
+            // Moyenne d'heures par semaine
+            const totalHours = teachersData.reduce((sum, t) => 
+                sum + (parseInt(t.data?.professional?.weeklyHours) || 0), 0
+            );
+            const avgHours = teachersData.length > 0 ? Math.round(totalHours / teachersData.length * 10) / 10 : 0;
+            
+            // Nombre moyen de matières par enseignant
+            const totalSubjects = teachersData.reduce((sum, t) => sum + (t.subjectCount || 0), 0);
+            const avgSubjects = teachersData.length > 0 ? Math.round(totalSubjects / teachersData.length * 10) / 10 : 0;
+            
             const html = `
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -3298,6 +3308,14 @@
                         <div>Ressources</div>
                         <div class="stat-value">${totalResources}</div>
                     </div>
+                    <div class="stat-card">
+                        <div>Heures/semaine moy.</div>
+                        <div class="stat-value">${avgHours}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Matières moy./enseig.</div>
+                        <div class="stat-value">${avgSubjects}</div>
+                    </div>
                 </div>
             `;
             
@@ -3308,40 +3326,990 @@
             const container = document.getElementById('subjectsAnalysis');
             if (!container) return;
             
-            // Implémenter l'analyse des matières
-            container.innerHTML = '<p class="text-center">Analyse des matières en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les matières enseignées
+            const subjectsCount = {};
+            const subjectsByLevel = {};
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) {
+                            // Compter les matières
+                            subjectsCount[subject.name] = (subjectsCount[subject.name] || 0) + 1;
+                            
+                            // Grouper par niveau
+                            if (subject.level) {
+                                if (!subjectsByLevel[subject.level]) {
+                                    subjectsByLevel[subject.level] = new Set();
+                                }
+                                subjectsByLevel[subject.level].add(subject.name);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Trier les matières par fréquence
+            const sortedSubjects = Object.entries(subjectsCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 15);
+            
+            // Compter les matières par niveau
+            const levelStats = Object.entries(subjectsByLevel)
+                .map(([level, subjects]) => ({
+                    level,
+                    count: subjects.size,
+                    subjects: Array.from(subjects).join(', ')
+                }))
+                .sort((a, b) => b.count - a.count);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Matières les plus enseignées</h4>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Matière</th>
+                                    <th>Nombre d'enseignants</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            sortedSubjects.forEach(([subject, count]) => {
+                const percentage = Math.round((count / teachersData.length) * 100);
+                html += `
+                    <tr>
+                        <td>${subject}</td>
+                        <td>${count} (${percentage}%)</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-layer-group"></i> Répartition par niveau</h4>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Niveau</th>
+                                    <th>Matières uniques</th>
+                                    <th>Matières</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            levelStats.forEach(stat => {
+                html += `
+                    <tr>
+                        <td>${stat.level}</td>
+                        <td>${stat.count}</td>
+                        <td title="${stat.subjects}">${stat.subjects.length > 50 ? stat.subjects.substring(0, 50) + '...' : stat.subjects}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-lightbulb"></i> Recommandations</h4>
+                    <ul>
+                        <li>${sortedSubjects.length > 0 ? `La matière <strong>${sortedSubjects[0][0]}</strong> est la plus enseignée (${sortedSubjects[0][1]} enseignants)` : 'Aucune donnée de matière disponible'}</li>
+                        <li>${levelStats.length > 0 ? `Le niveau <strong>${levelStats[0].level}</strong> présente la plus grande diversité de matières (${levelStats[0].count} matières uniques)` : 'Aucune donnée de niveau disponible'}</li>
+                        <li>${teachersData.length > 0 ? `Moyenne de ${Math.round(Object.keys(subjectsCount).length / teachersData.length * 10) / 10} matières uniques par niveau scolaire` : ''}</li>
+                    </ul>
+                </div>
+            `;
+            
+            container.innerHTML = html;
         }
 
         function updateTimetableAnalysis() {
             const container = document.getElementById('timetableAnalysis');
             if (!container) return;
             
-            // Implémenter l'analyse des emplois du temps
-            container.innerHTML = '<p class="text-center">Analyse des emplois du temps en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les emplois du temps
+            const teachersWithTimetable = teachersData.filter(t => 
+                t.data && t.data.timetable && Object.keys(t.data.timetable).length > 0
+            );
+            
+            if (teachersWithTimetable.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucun emploi du temps disponible</p>';
+                return;
+            }
+            
+            // Analyser les jours de cours
+            const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const dayStats = {};
+            
+            daysOfWeek.forEach(day => {
+                dayStats[day] = 0;
+            });
+            
+            teachersWithTimetable.forEach(teacher => {
+                const timetable = teacher.data.timetable;
+                Object.keys(timetable).forEach(day => {
+                    if (timetable[day] && timetable[day].length > 0) {
+                        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+                        if (daysOfWeek.includes(dayName)) {
+                            dayStats[dayName] = (dayStats[dayName] || 0) + 1;
+                        }
+                    }
+                });
+            });
+            
+            // Analyser les heures de cours
+            const timeSlots = {};
+            
+            teachersWithTimetable.forEach(teacher => {
+                const timetable = teacher.data.timetable;
+                Object.values(timetable).forEach(sessions => {
+                    if (Array.isArray(sessions)) {
+                        sessions.forEach(session => {
+                            if (session && session.time) {
+                                const hour = session.time.split(':')[0];
+                                if (hour) {
+                                    const hourInt = parseInt(hour);
+                                    if (hourInt >= 8 && hourInt <= 18) {
+                                        timeSlots[hourInt] = (timeSlots[hourInt] || 0) + 1;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-calendar-day"></i> Jours de cours</h4>
+                        <div class="chart-container">
+                            <canvas id="daysChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-clock"></i> Horaires de cours</h4>
+                        <div class="chart-container">
+                            <canvas id="hoursDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-line"></i> Statistiques des emplois du temps</h4>
+                    <div class="stats-grid">
+            `;
+            
+            // Calculer les statistiques
+            const totalSessions = teachersWithTimetable.reduce((sum, teacher) => {
+                let sessions = 0;
+                const timetable = teacher.data.timetable;
+                Object.values(timetable).forEach(s => {
+                    if (Array.isArray(s)) sessions += s.length;
+                });
+                return sum + sessions;
+            }, 0);
+            
+            const avgSessionsPerTeacher = Math.round(totalSessions / teachersWithTimetable.length * 10) / 10;
+            const avgSessionsPerDay = Math.round(totalSessions / (daysOfWeek.length * teachersWithTimetable.length) * 10) / 10;
+            
+            // Jour le plus chargé
+            const busiestDay = Object.entries(dayStats).sort((a, b) => b[1] - a[1])[0];
+            // Heure la plus chargée
+            const busiestHour = Object.entries(timeSlots).sort((a, b) => b[1] - a[1])[0];
+            
+            html += `
+                        <div class="stat-card">
+                            <div>Enseignants avec EDT</div>
+                            <div class="stat-value">${teachersWithTimetable.length}</div>
+                            <div>${Math.round((teachersWithTimetable.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Sessions totales</div>
+                            <div class="stat-value">${totalSessions}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Sessions moy./enseig.</div>
+                            <div class="stat-value">${avgSessionsPerTeacher}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Jour le plus chargé</div>
+                            <div class="stat-value">${busiestDay ? busiestDay[0] : 'N/A'}</div>
+                            <div>${busiestDay ? busiestDay[1] : 0} enseignants</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des jours
+                const daysCtx = document.getElementById('daysChart');
+                if (daysCtx) {
+                    const daysChart = new Chart(daysCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: daysOfWeek,
+                            datasets: [{
+                                label: 'Nombre d\'enseignants',
+                                data: daysOfWeek.map(day => dayStats[day] || 0),
+                                backgroundColor: '#3498db'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Répartition par jour de la semaine'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre d\'enseignants'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.daysChart = daysChart;
+                }
+                
+                // Graphique des heures
+                const hoursCtx = document.getElementById('hoursDistributionChart');
+                if (hoursCtx) {
+                    const hoursData = [];
+                    const hourLabels = [];
+                    for (let hour = 8; hour <= 18; hour++) {
+                        hourLabels.push(`${hour}h`);
+                        hoursData.push(timeSlots[hour] || 0);
+                    }
+                    
+                    const hoursChart = new Chart(hoursCtx, {
+                        type: 'line',
+                        data: {
+                            labels: hourLabels,
+                            datasets: [{
+                                label: 'Nombre de sessions',
+                                data: hoursData,
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Distribution des horaires de cours'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de sessions'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.hoursDistributionChart = hoursChart;
+                }
+            }, 100);
         }
 
         function updateLessonsAnalysis() {
             const container = document.getElementById('lessonsAnalysis');
             if (!container) return;
             
-            // Implémenter l'analyse des leçons
-            container.innerHTML = '<p class="text-center">Analyse des leçons en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les leçons
+            const teachersWithLessons = teachersData.filter(t => t.lessonCount && t.lessonCount > 0);
+            
+            if (teachersWithLessons.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune leçon enregistrée</p>';
+                return;
+            }
+            
+            // Compter les leçons par mois
+            const lessonsByMonth = {};
+            const lessonTypes = {};
+            const lessonDurations = [];
+            
+            teachersWithLessons.forEach(teacher => {
+                if (teacher.data && teacher.data.lessons) {
+                    teacher.data.lessons.forEach(lesson => {
+                        if (lesson.date) {
+                            const date = new Date(lesson.date);
+                            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                            lessonsByMonth[monthKey] = (lessonsByMonth[monthKey] || 0) + 1;
+                        }
+                        
+                        if (lesson.type) {
+                            lessonTypes[lesson.type] = (lessonTypes[lesson.type] || 0) + 1;
+                        }
+                        
+                        if (lesson.duration) {
+                            const duration = parseInt(lesson.duration) || 0;
+                            if (duration > 0) lessonDurations.push(duration);
+                        }
+                    });
+                }
+            });
+            
+            // Statistiques de durée
+            const avgDuration = lessonDurations.length > 0 ? 
+                Math.round(lessonDurations.reduce((a, b) => a + b, 0) / lessonDurations.length) : 0;
+            const maxDuration = lessonDurations.length > 0 ? Math.max(...lessonDurations) : 0;
+            const minDuration = lessonDurations.length > 0 ? Math.min(...lessonDurations) : 0;
+            
+            // Trier les mois
+            const sortedMonths = Object.entries(lessonsByMonth)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .slice(-6); // Derniers 6 mois
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-line"></i> Évolution mensuelle</h4>
+                        <div class="chart-container">
+                            <canvas id="lessonsMonthlyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-pie"></i> Types de leçons</h4>
+                        <div class="chart-container">
+                            <canvas id="lessonTypesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-bar"></i> Statistiques des leçons</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div>Enseignants avec leçons</div>
+                            <div class="stat-value">${teachersWithLessons.length}</div>
+                            <div>${Math.round((teachersWithLessons.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Leçons totales</div>
+                            <div class="stat-value">${teachersWithLessons.reduce((sum, t) => sum + (t.lessonCount || 0), 0)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Durée moyenne</div>
+                            <div class="stat-value">${avgDuration}min</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Types différents</div>
+                            <div class="stat-value">${Object.keys(lessonTypes).length}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Dernières leçons enregistrées</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Enseignant</th>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Durée</th>
+                                <th>Classe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Récupérer les 10 dernières leçons
+            const allLessons = [];
+            teachersWithLessons.forEach(teacher => {
+                if (teacher.data && teacher.data.lessons) {
+                    teacher.data.lessons.forEach(lesson => {
+                        allLessons.push({
+                            ...lesson,
+                            teacher: teacher.fullName,
+                            dateObj: lesson.date ? new Date(lesson.date) : new Date(0)
+                        });
+                    });
+                }
+            });
+            
+            allLessons.sort((a, b) => b.dateObj - a.dateObj);
+            
+            allLessons.slice(0, 10).forEach(lesson => {
+                html += `
+                    <tr>
+                        <td>${lesson.date ? new Date(lesson.date).toLocaleDateString() : 'N/A'}</td>
+                        <td>${lesson.teacher}</td>
+                        <td>${lesson.title || 'Sans titre'}</td>
+                        <td>${lesson.type || 'N/A'}</td>
+                        <td>${lesson.duration || 'N/A'}</td>
+                        <td>${lesson.class || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique mensuel
+                const monthlyCtx = document.getElementById('lessonsMonthlyChart');
+                if (monthlyCtx && sortedMonths.length > 0) {
+                    const monthlyChart = new Chart(monthlyCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedMonths.map(([month]) => month),
+                            datasets: [{
+                                label: 'Nombre de leçons',
+                                data: sortedMonths.map(([, count]) => count),
+                                backgroundColor: '#2ecc71'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Leçons par mois'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de leçons'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.lessonsMonthlyChart = monthlyChart;
+                }
+                
+                // Graphique des types
+                const typesCtx = document.getElementById('lessonTypesChart');
+                if (typesCtx && Object.keys(lessonTypes).length > 0) {
+                    const typesData = Object.entries(lessonTypes)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 8);
+                    
+                    const typesChart = new Chart(typesCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: typesData.map(([type]) => type),
+                            datasets: [{
+                                data: typesData.map(([, count]) => count),
+                                backgroundColor: [
+                                    '#3498db', '#2ecc71', '#f39c12', '#e74c3c',
+                                    '#9b59b6', '#1abc9c', '#d35400', '#34495e'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Répartition par type'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.lessonTypesChart = typesChart;
+                }
+            }, 100);
         }
 
         function updateTPAnalysis() {
             const container = document.getElementById('tpAnalysis');
             if (!container) return;
             
-            // Implémenter l'analyse des TP
-            container.innerHTML = '<p class="text-center">Analyse des travaux pratiques en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les TP
+            const teachersWithTPs = teachersData.filter(t => t.tpCount && t.tpCount > 0);
+            
+            if (teachersWithTPs.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucun travail pratique enregistré</p>';
+                return;
+            }
+            
+            // Compter les TP par matière
+            const tpBySubject = {};
+            const tpByMonth = {};
+            
+            teachersWithTPs.forEach(teacher => {
+                if (teacher.data && teacher.data.tps) {
+                    teacher.data.tps.forEach(tp => {
+                        if (tp.subject) {
+                            tpBySubject[tp.subject] = (tpBySubject[tp.subject] || 0) + 1;
+                        }
+                        
+                        if (tp.date) {
+                            const date = new Date(tp.date);
+                            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                            tpByMonth[monthKey] = (tpByMonth[monthKey] || 0) + 1;
+                        }
+                    });
+                }
+            });
+            
+            // Trier les matières par nombre de TP
+            const sortedSubjects = Object.entries(tpBySubject)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            // Trier les mois
+            const sortedMonths = Object.entries(tpByMonth)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .slice(-6);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> TP par matière</h4>
+                        <div class="chart-container">
+                            <canvas id="tpBySubjectChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-line"></i> Évolution mensuelle</h4>
+                        <div class="chart-container">
+                            <canvas id="tpMonthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-pie"></i> Statistiques des TP</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div>Enseignants avec TP</div>
+                            <div class="stat-value">${teachersWithTPs.length}</div>
+                            <div>${Math.round((teachersWithTPs.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>TP totaux</div>
+                            <div class="stat-value">${teachersWithTPs.reduce((sum, t) => sum + (t.tpCount || 0), 0)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Matières avec TP</div>
+                            <div class="stat-value">${Object.keys(tpBySubject).length}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>TP/enseignant moy.</div>
+                            <div class="stat-value">${Math.round(teachersWithTPs.reduce((sum, t) => sum + (t.tpCount || 0), 0) / teachersWithTPs.length * 10) / 10}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Derniers TP enregistrés</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Enseignant</th>
+                                <th>Titre</th>
+                                <th>Matière</th>
+                                <th>Durée</th>
+                                <th>Équipement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Récupérer les 10 derniers TP
+            const allTPs = [];
+            teachersWithTPs.forEach(teacher => {
+                if (teacher.data && teacher.data.tps) {
+                    teacher.data.tps.forEach(tp => {
+                        allTPs.push({
+                            ...tp,
+                            teacher: teacher.fullName,
+                            dateObj: tp.date ? new Date(tp.date) : new Date(0)
+                        });
+                    });
+                }
+            });
+            
+            allTPs.sort((a, b) => b.dateObj - a.dateObj);
+            
+            allTPs.slice(0, 10).forEach(tp => {
+                html += `
+                    <tr>
+                        <td>${tp.date ? new Date(tp.date).toLocaleDateString() : 'N/A'}</td>
+                        <td>${tp.teacher}</td>
+                        <td>${tp.title || 'Sans titre'}</td>
+                        <td>${tp.subject || 'N/A'}</td>
+                        <td>${tp.duration || 'N/A'}</td>
+                        <td>${tp.equipment ? tp.equipment.join(', ') : 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique par matière
+                const subjectCtx = document.getElementById('tpBySubjectChart');
+                if (subjectCtx && sortedSubjects.length > 0) {
+                    const subjectChart = new Chart(subjectCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedSubjects.map(([subject]) => subject),
+                            datasets: [{
+                                label: 'Nombre de TP',
+                                data: sortedSubjects.map(([, count]) => count),
+                                backgroundColor: '#9b59b6'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'TP par matière'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de TP'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.tpBySubjectChart = subjectChart;
+                }
+                
+                // Graphique mensuel
+                const monthlyCtx = document.getElementById('tpMonthlyChart');
+                if (monthlyCtx && sortedMonths.length > 0) {
+                    const monthlyChart = new Chart(monthlyCtx, {
+                        type: 'line',
+                        data: {
+                            labels: sortedMonths.map(([month]) => month),
+                            datasets: [{
+                                label: 'Nombre de TP',
+                                data: sortedMonths.map(([, count]) => count),
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Évolution mensuelle des TP'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de TP'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.tpMonthlyChart = monthlyChart;
+                }
+            }, 100);
         }
 
         function updateResourcesAnalysis() {
             const container = document.getElementById('resourcesAnalysis');
             if (!container) return;
             
-            // Implémenter l'analyse des ressources
-            container.innerHTML = '<p class="text-center">Analyse des ressources pédagogiques en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les ressources pédagogiques
+            const teachersWithResources = teachersData.filter(t => 
+                t.data && t.data.resources && t.data.resources.length > 0
+            );
+            
+            if (teachersWithResources.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune ressource pédagogique enregistrée</p>';
+                return;
+            }
+            
+            // Compter les ressources par type
+            const resourcesByType = {};
+            const resourcesBySubject = {};
+            let totalResources = 0;
+            
+            teachersWithResources.forEach(teacher => {
+                if (teacher.data && teacher.data.resources) {
+                    teacher.data.resources.forEach(resource => {
+                        totalResources++;
+                        
+                        if (resource.type) {
+                            resourcesByType[resource.type] = (resourcesByType[resource.type] || 0) + 1;
+                        }
+                        
+                        if (resource.subject) {
+                            resourcesBySubject[resource.subject] = (resourcesBySubject[resource.subject] || 0) + 1;
+                        }
+                    });
+                }
+            });
+            
+            // Trier les types par fréquence
+            const sortedTypes = Object.entries(resourcesByType)
+                .sort((a, b) => b[1] - a[1]);
+            
+            // Trier les matières par fréquence
+            const sortedSubjects = Object.entries(resourcesBySubject)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-pie"></i> Répartition par type</h4>
+                        <div class="chart-container">
+                            <canvas id="resourcesTypeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Ressources par matière</h4>
+                        <div class="chart-container">
+                            <canvas id="resourcesSubjectChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-line"></i> Statistiques des ressources</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div>Enseignants avec ressources</div>
+                            <div class="stat-value">${teachersWithResources.length}</div>
+                            <div>${Math.round((teachersWithResources.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Ressources totales</div>
+                            <div class="stat-value">${totalResources}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Types de ressources</div>
+                            <div class="stat-value">${Object.keys(resourcesByType).length}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Ressources/enseignant moy.</div>
+                            <div class="stat-value">${Math.round(totalResources / teachersWithResources.length * 10) / 10}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Types de ressources disponibles</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nombre</th>
+                                <th>Pourcentage</th>
+                                <th>Exemples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedTypes.forEach(([type, count]) => {
+                const percentage = Math.round((count / totalResources) * 100);
+                let examples = '';
+                
+                switch(type.toLowerCase()) {
+                    case 'document':
+                    case 'pdf':
+                        examples = 'Cours PDF, exercices, évaluations';
+                        break;
+                    case 'présentation':
+                    case 'powerpoint':
+                        examples = 'Présentations PowerPoint, diaporamas';
+                        break;
+                    case 'vidéo':
+                        examples = 'Vidéos éducatives, tutoriels';
+                        break;
+                    case 'audio':
+                        examples = 'Enregistrements audio, podcasts';
+                        break;
+                    case 'lien':
+                    case 'url':
+                        examples = 'Liens web, sites éducatifs';
+                        break;
+                    case 'image':
+                        examples = 'Schémas, illustrations, photos';
+                        break;
+                    case 'logiciel':
+                    case 'application':
+                        examples = 'Logiciels éducatifs, applications';
+                        break;
+                    default:
+                        examples = 'Divers';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                        <td>${examples}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des types
+                const typeCtx = document.getElementById('resourcesTypeChart');
+                if (typeCtx && sortedTypes.length > 0) {
+                    const typeChart = new Chart(typeCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: sortedTypes.map(([type]) => type),
+                            datasets: [{
+                                data: sortedTypes.map(([, count]) => count),
+                                backgroundColor: [
+                                    '#3498db', '#2ecc71', '#f39c12', '#e74c3c',
+                                    '#9b59b6', '#1abc9c', '#d35400', '#34495e'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Types de ressources'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.resourcesTypeChart = typeChart;
+                }
+                
+                // Graphique par matière
+                const subjectCtx = document.getElementById('resourcesSubjectChart');
+                if (subjectCtx && sortedSubjects.length > 0) {
+                    const subjectChart = new Chart(subjectCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedSubjects.map(([subject]) => subject),
+                            datasets: [{
+                                label: 'Nombre de ressources',
+                                data: sortedSubjects.map(([, count]) => count),
+                                backgroundColor: '#1abc9c'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Ressources par matière'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de ressources'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.resourcesSubjectChart = subjectChart;
+                }
+            }, 100);
         }
 
         // Analyse formation
@@ -3353,8 +4321,1162 @@
             const container = document.getElementById('trainingStats');
             if (!container) return;
             
-            // Implémenter les statistiques de formation
-            container.innerHTML = '<p class="text-center">Statistiques de formation en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Calculer les statistiques de formation
+            const totalTrainings = teachersData.reduce((sum, t) => sum + (t.trainingCount || 0), 0);
+            
+            // Compter les enseignants avec diplômes
+            const teachersWithDiplomas = teachersData.filter(t => 
+                t.data && t.data.diplomas && t.data.diplomas.length > 0
+            ).length;
+            
+            // Compter les enseignants avec formations continues
+            const teachersWithContinuous = teachersData.filter(t => 
+                t.data && t.data.trainings && t.data.trainings.length > 0
+            ).length;
+            
+            // Compter les enseignants avec compétences linguistiques
+            const teachersWithLanguages = teachersData.filter(t => 
+                t.data && t.data.languages && t.data.languages.length > 0
+            ).length;
+            
+            // Compter les enseignants avec compétences IT
+            const teachersWithIT = teachersData.filter(t => 
+                t.data && t.data.itskills && t.data.itskills.length > 0
+            ).length;
+            
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Formations totales</div>
+                        <div class="stat-value">${totalTrainings}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Enseignants avec diplômes</div>
+                        <div class="stat-value">${teachersWithDiplomas}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithDiplomas / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Formations continues</div>
+                        <div class="stat-value">${teachersWithContinuous}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithContinuous / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Compétences linguistiques</div>
+                        <div class="stat-value">${teachersWithLanguages}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithLanguages / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Compétences informatiques</div>
+                        <div class="stat-value">${teachersWithIT}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithIT / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updateDiplomasAnalysis() {
+            const container = document.getElementById('diplomasAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les diplômes
+            const teachersWithDiplomas = teachersData.filter(t => 
+                t.data && t.data.diplomas && t.data.diplomas.length > 0
+            );
+            
+            if (teachersWithDiplomas.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucun diplôme enregistré</p>';
+                return;
+            }
+            
+            // Compter les diplômes par type
+            const diplomasByType = {};
+            const diplomasByYear = {};
+            const diplomasByLevel = {};
+            
+            teachersWithDiplomas.forEach(teacher => {
+                if (teacher.data && teacher.data.diplomas) {
+                    teacher.data.diplomas.forEach(diploma => {
+                        // Par type
+                        if (diploma.type) {
+                            diplomasByType[diploma.type] = (diplomasByType[diploma.type] || 0) + 1;
+                        }
+                        
+                        // Par année
+                        if (diploma.year) {
+                            diplomasByYear[diploma.year] = (diplomasByYear[diploma.year] || 0) + 1;
+                        }
+                        
+                        // Par niveau
+                        if (diploma.level) {
+                            diplomasByLevel[diploma.level] = (diplomasByLevel[diploma.level] || 0) + 1;
+                        }
+                    });
+                }
+            });
+            
+            // Trier les types par fréquence
+            const sortedTypes = Object.entries(diplomasByType)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            // Trier les années
+            const sortedYears = Object.entries(diplomasByYear)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .filter(([year]) => parseInt(year) > 2000)
+                .slice(-8);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Diplômes par type</h4>
+                        <div class="chart-container">
+                            <canvas id="diplomasTypeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-line"></i> Évolution par année</h4>
+                        <div class="chart-container">
+                            <canvas id="diplomasYearChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-pie"></i> Statistiques des diplômes</h4>
+                    <div class="stats-grid">
+            `;
+            
+            // Calculer les statistiques
+            const totalDiplomas = teachersWithDiplomas.reduce((sum, t) => 
+                sum + (t.data.diplomas ? t.data.diplomas.length : 0), 0
+            );
+            
+            const avgDiplomasPerTeacher = Math.round(totalDiplomas / teachersWithDiplomas.length * 10) / 10;
+            
+            // Niveau de formation le plus commun
+            const mostCommonLevel = Object.entries(diplomasByLevel)
+                .sort((a, b) => b[1] - a[1])[0];
+            
+            // Type de diplôme le plus commun
+            const mostCommonType = sortedTypes.length > 0 ? sortedTypes[0] : null;
+            
+            html += `
+                        <div class="stat-card">
+                            <div>Enseignants avec diplômes</div>
+                            <div class="stat-value">${teachersWithDiplomas.length}</div>
+                            <div>${Math.round((teachersWithDiplomas.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Diplômes totaux</div>
+                            <div class="stat-value">${totalDiplomas}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Diplômes/enseignant moy.</div>
+                            <div class="stat-value">${avgDiplomasPerTeacher}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Niveau le plus commun</div>
+                            <div class="stat-value">${mostCommonLevel ? mostCommonLevel[0] : 'N/A'}</div>
+                            <div>${mostCommonLevel ? mostCommonLevel[1] : 0}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Types de diplômes</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nombre</th>
+                                <th>Pourcentage</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedTypes.forEach(([type, count]) => {
+                const percentage = Math.round((count / totalDiplomas) * 100);
+                let description = '';
+                
+                switch(type.toLowerCase()) {
+                    case 'licence':
+                    case 'bachelor':
+                        description = 'Diplôme de niveau Licence (Bac+3)';
+                        break;
+                    case 'master':
+                        description = 'Diplôme de niveau Master (Bac+5)';
+                        break;
+                    case 'doctorat':
+                    case 'phd':
+                        description = 'Diplôme de niveau Doctorat (Bac+8)';
+                        break;
+                    case 'capes':
+                        description = 'Certificat d\'Aptitude au Professorat de l\'Enseignement du Second degré';
+                        break;
+                    case 'agrégation':
+                        description = 'Concours d\'agrégation pour l\'enseignement secondaire';
+                        break;
+                    case 'diplôme d\'état':
+                        description = 'Diplôme d\'État dans une spécialité';
+                        break;
+                    case 'certificat':
+                        description = 'Certificat de spécialisation ou de compétence';
+                        break;
+                    default:
+                        description = 'Diplôme académique ou professionnel';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                        <td>${description}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-award"></i> Enseignants avec les diplômes les plus élevés</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Enseignant</th>
+                                <th>Diplôme le plus élevé</th>
+                                <th>Année</th>
+                                <th>Établissement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Trouver les enseignants avec les diplômes les plus élevés
+            const teachersByHighestDiploma = teachersWithDiplomas
+                .map(teacher => {
+                    let highestLevel = 0;
+                    let highestDiploma = null;
+                    
+                    if (teacher.data.diplomas) {
+                        teacher.data.diplomas.forEach(diploma => {
+                            let level = 0;
+                            const diplomaName = diploma.name || '';
+                            const diplomaType = diploma.type || '';
+                            
+                            if (diplomaName.includes('Doctorat') || diplomaType.includes('Doctorat')) level = 3;
+                            else if (diplomaName.includes('Master') || diplomaType.includes('Master')) level = 2;
+                            else if (diplomaName.includes('Licence') || diplomaType.includes('Licence')) level = 1;
+                            
+                            if (level > highestLevel) {
+                                highestLevel = level;
+                                highestDiploma = diploma;
+                            }
+                        });
+                    }
+                    
+                    return {
+                        teacher,
+                        highestDiploma,
+                        highestLevel
+                    };
+                })
+                .filter(t => t.highestDiploma)
+                .sort((a, b) => b.highestLevel - a.highestLevel)
+                .slice(0, 10);
+            
+            teachersByHighestDiploma.forEach(item => {
+                const diploma = item.highestDiploma;
+                html += `
+                    <tr>
+                        <td>${item.teacher.fullName}</td>
+                        <td>${diploma.name || diploma.type || 'Diplôme'}</td>
+                        <td>${diploma.year || 'N/A'}</td>
+                        <td>${diploma.institution || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des types
+                const typeCtx = document.getElementById('diplomasTypeChart');
+                if (typeCtx && sortedTypes.length > 0) {
+                    const typeChart = new Chart(typeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedTypes.map(([type]) => type),
+                            datasets: [{
+                                label: 'Nombre de diplômes',
+                                data: sortedTypes.map(([, count]) => count),
+                                backgroundColor: '#3498db'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Types de diplômes'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de diplômes'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.diplomasTypeChart = typeChart;
+                }
+                
+                // Graphique par année
+                const yearCtx = document.getElementById('diplomasYearChart');
+                if (yearCtx && sortedYears.length > 0) {
+                    const yearChart = new Chart(yearCtx, {
+                        type: 'line',
+                        data: {
+                            labels: sortedYears.map(([year]) => year),
+                            datasets: [{
+                                label: 'Nombre de diplômes',
+                                data: sortedYears.map(([, count]) => count),
+                                borderColor: '#2ecc71',
+                                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Diplômes par année'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de diplômes'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.diplomasYearChart = yearChart;
+                }
+            }, 100);
+        }
+
+        function updateContinuousTrainingAnalysis() {
+            const container = document.getElementById('continuousTrainingAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les formations continues
+            const teachersWithTraining = teachersData.filter(t => 
+                t.data && t.data.trainings && t.data.trainings.length > 0
+            );
+            
+            if (teachersWithTraining.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune formation continue enregistrée</p>';
+                return;
+            }
+            
+            // Compter les formations par type
+            const trainingsByType = {};
+            const trainingsByYear = {};
+            const trainingsByDuration = { '≤ 1 jour': 0, '2-3 jours': 0, '4-7 jours': 0, '1-2 semaines': 0, '> 2 semaines': 0 };
+            
+            let totalDuration = 0;
+            let totalTrainings = 0;
+            
+            teachersWithTraining.forEach(teacher => {
+                if (teacher.data && teacher.data.trainings) {
+                    teacher.data.trainings.forEach(training => {
+                        totalTrainings++;
+                        
+                        // Par type
+                        if (training.type) {
+                            trainingsByType[training.type] = (trainingsByType[training.type] || 0) + 1;
+                        }
+                        
+                        // Par année
+                        if (training.year) {
+                            trainingsByYear[training.year] = (trainingsByYear[training.year] || 0) + 1;
+                        }
+                        
+                        // Par durée
+                        if (training.duration) {
+                            const duration = parseInt(training.duration) || 0;
+                            totalDuration += duration;
+                            
+                            if (duration <= 1) trainingsByDuration['≤ 1 jour']++;
+                            else if (duration <= 3) trainingsByDuration['2-3 jours']++;
+                            else if (duration <= 7) trainingsByDuration['4-7 jours']++;
+                            else if (duration <= 14) trainingsByDuration['1-2 semaines']++;
+                            else trainingsByDuration['> 2 semaines']++;
+                        }
+                    });
+                }
+            });
+            
+            // Trier les types par fréquence
+            const sortedTypes = Object.entries(trainingsByType)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            // Trier les années
+            const sortedYears = Object.entries(trainingsByYear)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .filter(([year]) => parseInt(year) > 2010)
+                .slice(-6);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Formations par type</h4>
+                        <div class="chart-container">
+                            <canvas id="trainingsTypeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-line"></i> Évolution par année</h4>
+                        <div class="chart-container">
+                            <canvas id="trainingsYearChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid mt-30">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-pie"></i> Durée des formations</h4>
+                        <div class="chart-container">
+                            <canvas id="trainingsDurationChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-area"></i> Statistiques</h4>
+                        <div class="stats-grid" style="grid-template-columns: 1fr;">
+            `;
+            
+            // Calculer les statistiques
+            const avgTrainingsPerTeacher = Math.round(totalTrainings / teachersWithTraining.length * 10) / 10;
+            const avgDuration = totalTrainings > 0 ? Math.round(totalDuration / totalTrainings * 10) / 10 : 0;
+            
+            // Type de formation le plus commun
+            const mostCommonType = sortedTypes.length > 0 ? sortedTypes[0] : null;
+            
+            html += `
+                            <div class="stat-card">
+                                <div>Enseignants formés</div>
+                                <div class="stat-value">${teachersWithTraining.length}</div>
+                                <div>${Math.round((teachersWithTraining.length / teachersData.length) * 100)}%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Formations totales</div>
+                                <div class="stat-value">${totalTrainings}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Formations/enseignant moy.</div>
+                                <div class="stat-value">${avgTrainingsPerTeacher}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Durée moyenne</div>
+                                <div class="stat-value">${avgDuration} jours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Types de formations</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nombre</th>
+                                <th>Pourcentage</th>
+                                <th>Thématiques courantes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedTypes.forEach(([type, count]) => {
+                const percentage = Math.round((count / totalTrainings) * 100);
+                let themes = '';
+                
+                switch(type.toLowerCase()) {
+                    case 'pédagogique':
+                        themes = 'Nouvelles méthodes pédagogiques, différenciation, évaluation';
+                        break;
+                    case 'numérique':
+                        themes = 'Outils numériques, TICE, plateformes éducatives';
+                        break;
+                    case 'disciplinaire':
+                        themes = 'Actualisation des connaissances disciplinaires';
+                        break;
+                    case 'gestion de classe':
+                        themes = 'Gestion des conflits, autorité, climat scolaire';
+                        break;
+                    case 'éducation inclusive':
+                        themes = 'Handicap, besoins éducatifs particuliers, inclusion';
+                        break;
+                    case 'sécurité':
+                        themes = 'Sécurité incendie, gestes de premiers secours, PPMS';
+                        break;
+                    case 'orientation':
+                        themes = 'Orientation scolaire, parcours Avenir';
+                        break;
+                    default:
+                        themes = 'Divers thématiques éducatives';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                        <td>${themes}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des types
+                const typeCtx = document.getElementById('trainingsTypeChart');
+                if (typeCtx && sortedTypes.length > 0) {
+                    const typeChart = new Chart(typeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedTypes.map(([type]) => type),
+                            datasets: [{
+                                label: 'Nombre de formations',
+                                data: sortedTypes.map(([, count]) => count),
+                                backgroundColor: '#f39c12'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Types de formations continues'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de formations'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.trainingsTypeChart = typeChart;
+                }
+                
+                // Graphique par année
+                const yearCtx = document.getElementById('trainingsYearChart');
+                if (yearCtx && sortedYears.length > 0) {
+                    const yearChart = new Chart(yearCtx, {
+                        type: 'line',
+                        data: {
+                            labels: sortedYears.map(([year]) => year),
+                            datasets: [{
+                                label: 'Nombre de formations',
+                                data: sortedYears.map(([, count]) => count),
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Évolution des formations par année'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de formations'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.trainingsYearChart = yearChart;
+                }
+                
+                // Graphique de durée
+                const durationCtx = document.getElementById('trainingsDurationChart');
+                if (durationCtx) {
+                    const durationChart = new Chart(durationCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(trainingsByDuration),
+                            datasets: [{
+                                data: Object.values(trainingsByDuration),
+                                backgroundColor: [
+                                    '#3498db', '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Durée des formations'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.trainingsDurationChart = durationChart;
+                }
+            }, 100);
+        }
+
+        function updateLanguagesAnalysis() {
+            const container = document.getElementById('languagesAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les compétences linguistiques
+            const teachersWithLanguages = teachersData.filter(t => 
+                t.data && t.data.languages && t.data.languages.length > 0
+            );
+            
+            if (teachersWithLanguages.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune compétence linguistique enregistrée</p>';
+                return;
+            }
+            
+            // Compter les langues
+            const languagesCount = {};
+            const languagesByLevel = {};
+            const teachersByNumberOfLanguages = { 1: 0, 2: 0, 3: 0, '4+': 0 };
+            
+            teachersWithLanguages.forEach(teacher => {
+                if (teacher.data && teacher.data.languages) {
+                    const numLanguages = teacher.data.languages.length;
+                    if (numLanguages === 1) teachersByNumberOfLanguages[1]++;
+                    else if (numLanguages === 2) teachersByNumberOfLanguages[2]++;
+                    else if (numLanguages === 3) teachersByNumberOfLanguages[3]++;
+                    else teachersByNumberOfLanguages['4+']++;
+                    
+                    teacher.data.languages.forEach(lang => {
+                        if (lang.name) {
+                            // Compter la langue
+                            languagesCount[lang.name] = (languagesCount[lang.name] || 0) + 1;
+                            
+                            // Compter par niveau
+                            if (lang.level) {
+                                if (!languagesByLevel[lang.name]) {
+                                    languagesByLevel[lang.name] = {};
+                                }
+                                languagesByLevel[lang.name][lang.level] = (languagesByLevel[lang.name][lang.level] || 0) + 1;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Trier les langues par fréquence
+            const sortedLanguages = Object.entries(languagesCount)
+                .sort((a, b) => b[1] - a[1]);
+            
+            // Préparer les données par niveau pour les principales langues
+            const topLanguages = sortedLanguages.slice(0, 6);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-globe"></i> Langues les plus maîtrisées</h4>
+                        <div class="chart-container">
+                            <canvas id="languagesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-layer-group"></i> Nombre de langues par enseignant</h4>
+                        <div class="chart-container">
+                            <canvas id="languagesPerTeacherChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-bar"></i> Statistiques linguistiques</h4>
+                    <div class="stats-grid">
+            `;
+            
+            // Calculer les statistiques
+            const totalLanguages = teachersWithLanguages.reduce((sum, t) => 
+                sum + (t.data.languages ? t.data.languages.length : 0), 0
+            );
+            
+            const avgLanguagesPerTeacher = Math.round(totalLanguages / teachersWithLanguages.length * 10) / 10;
+            
+            // Langue la plus courante
+            const mostCommonLanguage = sortedLanguages.length > 0 ? sortedLanguages[0] : null;
+            
+            // Pourcentage d'enseignants avec au moins 2 langues
+            const teachersWithMultipleLanguages = teachersByNumberOfLanguages[2] + teachersByNumberOfLanguages[3] + teachersByNumberOfLanguages['4+'];
+            const percentageMultiple = Math.round((teachersWithMultipleLanguages / teachersWithLanguages.length) * 100);
+            
+            html += `
+                        <div class="stat-card">
+                            <div>Enseignants avec langues</div>
+                            <div class="stat-value">${teachersWithLanguages.length}</div>
+                            <div>${Math.round((teachersWithLanguages.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Langues totales</div>
+                            <div class="stat-value">${totalLanguages}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Langues/enseignant moy.</div>
+                            <div class="stat-value">${avgLanguagesPerTeacher}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Langue la plus courante</div>
+                            <div class="stat-value">${mostCommonLanguage ? mostCommonLanguage[0] : 'N/A'}</div>
+                            <div>${mostCommonLanguage ? mostCommonLanguage[1] : 0} enseignants</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>≥ 2 langues</div>
+                            <div class="stat-value">${teachersWithMultipleLanguages}</div>
+                            <div>${percentageMultiple}%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Détail par langue</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Langue</th>
+                                <th>Nombre d'enseignants</th>
+                                <th>Pourcentage</th>
+                                <th>Niveaux (Débutant/Intermédiaire/Avancé)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedLanguages.forEach(([language, count]) => {
+                const percentage = Math.round((count / teachersWithLanguages.length) * 100);
+                const levelData = languagesByLevel[language] || {};
+                
+                const beginner = levelData['Débutant'] || levelData['A1'] || levelData['A2'] || 0;
+                const intermediate = levelData['Intermédiaire'] || levelData['B1'] || levelData['B2'] || 0;
+                const advanced = levelData['Avancé'] || levelData['C1'] || levelData['C2'] || 0;
+                
+                html += `
+                    <tr>
+                        <td><strong>${language}</strong></td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                        <td>${beginner}/${intermediate}/${advanced}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des langues
+                const languagesCtx = document.getElementById('languagesChart');
+                if (languagesCtx && sortedLanguages.length > 0) {
+                    const languagesChart = new Chart(languagesCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedLanguages.slice(0, 10).map(([lang]) => lang),
+                            datasets: [{
+                                label: 'Nombre d\'enseignants',
+                                data: sortedLanguages.slice(0, 10).map(([, count]) => count),
+                                backgroundColor: '#3498db'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Langues les plus maîtrisées'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre d\'enseignants'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.languagesChart = languagesChart;
+                }
+                
+                // Graphique du nombre de langues par enseignant
+                const perTeacherCtx = document.getElementById('languagesPerTeacherChart');
+                if (perTeacherCtx) {
+                    const perTeacherChart = new Chart(perTeacherCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['1 langue', '2 langues', '3 langues', '4 langues ou plus'],
+                            datasets: [{
+                                data: [
+                                    teachersByNumberOfLanguages[1],
+                                    teachersByNumberOfLanguages[2],
+                                    teachersByNumberOfLanguages[3],
+                                    teachersByNumberOfLanguages['4+']
+                                ],
+                                backgroundColor: [
+                                    '#3498db', '#2ecc71', '#f39c12', '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Nombre de langues par enseignant'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.languagesPerTeacherChart = perTeacherChart;
+                }
+            }, 100);
+        }
+
+        function updateITSkillsAnalysis() {
+            const container = document.getElementById('itSkillsAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les compétences informatiques
+            const teachersWithIT = teachersData.filter(t => 
+                t.data && t.data.itskills && t.data.itskills.length > 0
+            );
+            
+            if (teachersWithIT.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune compétence informatique enregistrée</p>';
+                return;
+            }
+            
+            // Compter les compétences par catégorie
+            const skillsByCategory = {};
+            const skillsByLevel = {};
+            const teachersByNumberOfSkills = { 1: 0, 2: 0, 3: 0, '4+': 0 };
+            
+            teachersWithIT.forEach(teacher => {
+                if (teacher.data && teacher.data.itskills) {
+                    const numSkills = teacher.data.itskills.length;
+                    if (numSkills === 1) teachersByNumberOfSkills[1]++;
+                    else if (numSkills === 2) teachersByNumberOfSkills[2]++;
+                    else if (numSkills === 3) teachersByNumberOfSkills[3]++;
+                    else teachersByNumberOfSkills['4+']++;
+                    
+                    teacher.data.itskills.forEach(skill => {
+                        if (skill.category) {
+                            // Compter par catégorie
+                            skillsByCategory[skill.category] = (skillsByCategory[skill.category] || 0) + 1;
+                            
+                            // Compter par niveau dans chaque catégorie
+                            if (skill.level) {
+                                if (!skillsByLevel[skill.category]) {
+                                    skillsByLevel[skill.category] = {};
+                                }
+                                skillsByLevel[skill.category][skill.level] = (skillsByLevel[skill.category][skill.level] || 0) + 1;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Trier les catégories par fréquence
+            const sortedCategories = Object.entries(skillsByCategory)
+                .sort((a, b) => b[1] - a[1]);
+            
+            // Catégories principales
+            const mainCategories = [
+                { name: 'Bureautique', skills: ['Word', 'Excel', 'PowerPoint', 'Outlook'] },
+                { name: 'Communication', skills: ['Email', 'Messagerie', 'Visioconférence', 'Réseaux sociaux'] },
+                { name: 'Pédagogie numérique', skills: ['ENT', 'LMS', 'Outils interactifs', 'Quiz en ligne'] },
+                { name: 'Multimédia', skills: ['Traitement image', 'Montage vidéo', 'Audio', 'Graphisme'] },
+                { name: 'Programmation', skills: ['HTML/CSS', 'Python', 'JavaScript', 'Algorithmique'] }
+            ];
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-laptop-code"></i> Compétences par catégorie</h4>
+                        <div class="chart-container">
+                            <canvas id="itSkillsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-pie"></i> Nombre de compétences par enseignant</h4>
+                        <div class="chart-container">
+                            <canvas id="itSkillsPerTeacherChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-bar"></i> Statistiques des compétences informatiques</h4>
+                    <div class="stats-grid">
+            `;
+            
+            // Calculer les statistiques
+            const totalSkills = teachersWithIT.reduce((sum, t) => 
+                sum + (t.data.itskills ? t.data.itskills.length : 0), 0
+            );
+            
+            const avgSkillsPerTeacher = Math.round(totalSkills / teachersWithIT.length * 10) / 10;
+            
+            // Catégorie la plus courante
+            const mostCommonCategory = sortedCategories.length > 0 ? sortedCategories[0] : null;
+            
+            html += `
+                        <div class="stat-card">
+                            <div>Enseignants avec compétences IT</div>
+                            <div class="stat-value">${teachersWithIT.length}</div>
+                            <div>${Math.round((teachersWithIT.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Compétences totales</div>
+                            <div class="stat-value">${totalSkills}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Compétences/enseignant moy.</div>
+                            <div class="stat-value">${avgSkillsPerTeacher}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Catégorie la plus courante</div>
+                            <div class="stat-value">${mostCommonCategory ? mostCommonCategory[0] : 'N/A'}</div>
+                            <div>${mostCommonCategory ? mostCommonCategory[1] : 0}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Catégories de compétences</h4>
+                    <div class="dashboard-grid">
+            `;
+            
+            // Afficher chaque catégorie principale
+            mainCategories.forEach(category => {
+                const categoryData = skillsByLevel[category.name] || {};
+                const totalInCategory = skillsByCategory[category.name] || 0;
+                const percentage = Math.round((totalInCategory / teachersWithIT.length) * 100);
+                
+                html += `
+                    <div class="dashboard-card">
+                        <h5><i class="fas fa-folder"></i> ${category.name}</h5>
+                        <p><strong>${totalInCategory}</strong> mentions (${percentage}% des enseignants)</p>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                `;
+                
+                // Afficher les niveaux
+                Object.entries(categoryData).forEach(([level, count]) => {
+                    const levelPercentage = Math.round((count / totalInCategory) * 100);
+                    html += `<li>${level}: ${count} (${levelPercentage}%)</li>`;
+                });
+                
+                html += `
+                        </ul>
+                        <p class="mt-10"><small>Compétences typiques: ${category.skills.join(', ')}</small></p>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-lightbulb"></i> Recommandations</h4>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h5><i class="fas fa-graduation-cap"></i> Formation recommandée</h5>
+                            <ul>
+                                <li>Développer les compétences en pédagogie numérique</li>
+                                <li>Former aux outils de visioconférence et collaboration</li>
+                                <li>Améliorer les compétences bureautiques avancées</li>
+                            </ul>
+                        </div>
+                        <div class="dashboard-card">
+                            <h5><i class="fas fa-tools"></i> Outils à promouvoir</h5>
+                            <ul>
+                                <li>Environnements Numériques de Travail (ENT)</li>
+                                <li>Plateformes d'apprentissage en ligne (LMS)</li>
+                                <li>Outils de création de contenu interactif</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des compétences
+                const skillsCtx = document.getElementById('itSkillsChart');
+                if (skillsCtx && sortedCategories.length > 0) {
+                    const skillsChart = new Chart(skillsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedCategories.slice(0, 8).map(([category]) => category),
+                            datasets: [{
+                                label: 'Nombre de mentions',
+                                data: sortedCategories.slice(0, 8).map(([, count]) => count),
+                                backgroundColor: '#2ecc71'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Compétences informatiques par catégorie'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de mentions'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.itSkillsChart = skillsChart;
+                }
+                
+                // Graphique du nombre de compétences par enseignant
+                const perTeacherCtx = document.getElementById('itSkillsPerTeacherChart');
+                if (perTeacherCtx) {
+                    const perTeacherChart = new Chart(perTeacherCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['1 compétence', '2 compétences', '3 compétences', '4 compétences ou plus'],
+                            datasets: [{
+                                data: [
+                                    teachersByNumberOfSkills[1],
+                                    teachersByNumberOfSkills[2],
+                                    teachersByNumberOfSkills[3],
+                                    teachersByNumberOfSkills['4+']
+                                ],
+                                backgroundColor: [
+                                    '#3498db', '#2ecc71', '#f39c12', '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Nombre de compétences par enseignant'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.itSkillsPerTeacherChart = perTeacherChart;
+                }
+            }, 100);
         }
 
         // Analyse projets
@@ -3366,8 +5488,909 @@
             const container = document.getElementById('projectsStats');
             if (!container) return;
             
-            // Implémenter les statistiques des projets
-            container.innerHTML = '<p class="text-center">Statistiques des projets en cours de développement...</p>';
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Calculer les statistiques des projets
+            const totalProjects = teachersData.reduce((sum, t) => sum + (t.projectCount || 0), 0);
+            
+            // Compter les enseignants avec projets pédagogiques
+            const teachersWithProjects = teachersData.filter(t => 
+                t.data && t.data.projects && t.data.projects.length > 0
+            ).length;
+            
+            // Compter les enseignants avec activités extrascolaires
+            const teachersWithActivities = teachersData.filter(t => 
+                t.data && t.data.activities && t.data.activities.length > 0
+            ).length;
+            
+            // Compter les enseignants avec réunions
+            const teachersWithMeetings = teachersData.filter(t => 
+                t.data && t.data.meetings && t.data.meetings.length > 0
+            ).length;
+            
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Projets totaux</div>
+                        <div class="stat-value">${totalProjects}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Enseignants avec projets</div>
+                        <div class="stat-value">${teachersWithProjects}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithProjects / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Activités extrascolaires</div>
+                        <div class="stat-value">${teachersWithActivities}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithActivities / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Réunions enregistrées</div>
+                        <div class="stat-value">${teachersWithMeetings}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithMeetings / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updatePedagogicalProjectsAnalysis() {
+            const container = document.getElementById('pedagogicalProjectsAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les projets pédagogiques
+            const teachersWithProjects = teachersData.filter(t => 
+                t.data && t.data.projects && t.data.projects.length > 0
+            );
+            
+            if (teachersWithProjects.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucun projet pédagogique enregistré</p>';
+                return;
+            }
+            
+            // Compter les projets par type
+            const projectsByType = {};
+            const projectsByStatus = {};
+            const projectsByDuration = { 'Court (≤ 1 mois)': 0, 'Moyen (1-3 mois)': 0, 'Long (> 3 mois)': 0 };
+            
+            let totalProjects = 0;
+            
+            teachersWithProjects.forEach(teacher => {
+                if (teacher.data && teacher.data.projects) {
+                    teacher.data.projects.forEach(project => {
+                        totalProjects++;
+                        
+                        // Par type
+                        if (project.type) {
+                            projectsByType[project.type] = (projectsByType[project.type] || 0) + 1;
+                        }
+                        
+                        // Par statut
+                        if (project.status) {
+                            projectsByStatus[project.status] = (projectsByStatus[project.status] || 0) + 1;
+                        }
+                        
+                        // Par durée
+                        if (project.duration) {
+                            const duration = project.duration.toLowerCase();
+                            if (duration.includes('court') || duration.includes('≤') || duration.includes('moins')) {
+                                projectsByDuration['Court (≤ 1 mois)']++;
+                            } else if (duration.includes('moyen') || duration.includes('1-3') || duration.includes('trimestre')) {
+                                projectsByDuration['Moyen (1-3 mois)']++;
+                            } else {
+                                projectsByDuration['Long (> 3 mois)']++;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Trier les types par fréquence
+            const sortedTypes = Object.entries(projectsByType)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Projets par type</h4>
+                        <div class="chart-container">
+                            <canvas id="projectsTypeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-pie"></i> Statut des projets</h4>
+                        <div class="chart-container">
+                            <canvas id="projectsStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid mt-30">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-clock"></i> Durée des projets</h4>
+                        <div class="chart-container">
+                            <canvas id="projectsDurationChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-area"></i> Statistiques</h4>
+                        <div class="stats-grid" style="grid-template-columns: 1fr;">
+            `;
+            
+            // Calculer les statistiques
+            const avgProjectsPerTeacher = Math.round(totalProjects / teachersWithProjects.length * 10) / 10;
+            
+            // Type de projet le plus commun
+            const mostCommonType = sortedTypes.length > 0 ? sortedTypes[0] : null;
+            
+            // Pourcentage de projets terminés
+            const completedProjects = projectsByStatus['Terminé'] || projectsByStatus['Complété'] || 0;
+            const completionRate = Math.round((completedProjects / totalProjects) * 100);
+            
+            html += `
+                            <div class="stat-card">
+                                <div>Enseignants avec projets</div>
+                                <div class="stat-value">${teachersWithProjects.length}</div>
+                                <div>${Math.round((teachersWithProjects.length / teachersData.length) * 100)}%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Projets totaux</div>
+                                <div class="stat-value">${totalProjects}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Projets/enseignant moy.</div>
+                                <div class="stat-value">${avgProjectsPerTeacher}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Taux de complétion</div>
+                                <div class="stat-value">${completionRate}%</div>
+                                <div>${completedProjects}/${totalProjects}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Types de projets pédagogiques</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nombre</th>
+                                <th>Pourcentage</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedTypes.forEach(([type, count]) => {
+                const percentage = Math.round((count / totalProjects) * 100);
+                let description = '';
+                
+                switch(type.toLowerCase()) {
+                    case 'interdisciplinaire':
+                        description = 'Projet impliquant plusieurs matières';
+                        break;
+                    case 'artistique':
+                        description = 'Projet à dominante artistique ou culturelle';
+                        break;
+                    case 'scientifique':
+                        description = 'Projet de recherche ou expérimentation scientifique';
+                        break;
+                    case 'citoyen':
+                        description = 'Projet d\'éducation civique ou citoyenne';
+                        break;
+                    case 'numérique':
+                        description = 'Projet utilisant le numérique comme support';
+                        break;
+                    case 'environnemental':
+                        description = 'Projet lié au développement durable ou écologie';
+                        break;
+                    case 'international':
+                        description = 'Projet avec dimension internationale (échanges)';
+                        break;
+                    default:
+                        description = 'Projet pédagogique innovant';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                        <td>${description}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des types
+                const typeCtx = document.getElementById('projectsTypeChart');
+                if (typeCtx && sortedTypes.length > 0) {
+                    const typeChart = new Chart(typeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedTypes.map(([type]) => type),
+                            datasets: [{
+                                label: 'Nombre de projets',
+                                data: sortedTypes.map(([, count]) => count),
+                                backgroundColor: '#9b59b6'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Types de projets pédagogiques'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de projets'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.projectsTypeChart = typeChart;
+                }
+                
+                // Graphique des statuts
+                const statusCtx = document.getElementById('projectsStatusChart');
+                if (statusCtx && Object.keys(projectsByStatus).length > 0) {
+                    const statusChart = new Chart(statusCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(projectsByStatus),
+                            datasets: [{
+                                data: Object.values(projectsByStatus),
+                                backgroundColor: [
+                                    '#2ecc71', '#f39c12', '#e74c3c', '#3498db'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Statut des projets'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.projectsStatusChart = statusChart;
+                }
+                
+                // Graphique de durée
+                const durationCtx = document.getElementById('projectsDurationChart');
+                if (durationCtx) {
+                    const durationChart = new Chart(durationCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(projectsByDuration),
+                            datasets: [{
+                                data: Object.values(projectsByDuration),
+                                backgroundColor: [
+                                    '#3498db', '#f39c12', '#e74c3c'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Durée des projets'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.projectsDurationChart = durationChart;
+                }
+            }, 100);
+        }
+
+        function updateActivitiesAnalysis() {
+            const container = document.getElementById('activitiesAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les activités extrascolaires
+            const teachersWithActivities = teachersData.filter(t => 
+                t.data && t.data.activities && t.data.activities.length > 0
+            );
+            
+            if (teachersWithActivities.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune activité extrascolaire enregistrée</p>';
+                return;
+            }
+            
+            // Compter les activités par type
+            const activitiesByType = {};
+            const activitiesByFrequency = {};
+            const participationByActivity = {};
+            
+            let totalActivities = 0;
+            let totalParticipants = 0;
+            
+            teachersWithActivities.forEach(teacher => {
+                if (teacher.data && teacher.data.activities) {
+                    teacher.data.activities.forEach(activity => {
+                        totalActivities++;
+                        
+                        // Par type
+                        if (activity.type) {
+                            activitiesByType[activity.type] = (activitiesByType[activity.type] || 0) + 1;
+                        }
+                        
+                        // Par fréquence
+                        if (activity.frequency) {
+                            activitiesByFrequency[activity.frequency] = (activitiesByFrequency[activity.frequency] || 0) + 1;
+                        }
+                        
+                        // Compter les participants
+                        if (activity.name) {
+                            if (!participationByActivity[activity.name]) {
+                                participationByActivity[activity.name] = {
+                                    count: 0,
+                                    teachers: []
+                                };
+                            }
+                            participationByActivity[activity.name].count++;
+                            participationByActivity[activity.name].teachers.push(teacher.fullName);
+                        }
+                        
+                        // Total des participants estimés
+                        if (activity.participants) {
+                            totalParticipants += parseInt(activity.participants) || 0;
+                        }
+                    });
+                }
+            });
+            
+            // Trier les types par fréquence
+            const sortedTypes = Object.entries(activitiesByType)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            
+            // Trier les activités par participation
+            const sortedActivities = Object.entries(participationByActivity)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 10);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Activités par type</h4>
+                        <div class="chart-container">
+                            <canvas id="activitiesTypeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-pie"></i> Fréquence des activités</h4>
+                        <div class="chart-container">
+                            <canvas id="activitiesFrequencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-chart-line"></i> Statistiques des activités</h4>
+                    <div class="stats-grid">
+            `;
+            
+            // Calculer les statistiques
+            const avgActivitiesPerTeacher = Math.round(totalActivities / teachersWithActivities.length * 10) / 10;
+            
+            // Type d'activité le plus commun
+            const mostCommonType = sortedTypes.length > 0 ? sortedTypes[0] : null;
+            
+            // Estimation de participation totale
+            const avgParticipantsPerActivity = Math.round(totalParticipants / totalActivities);
+            
+            html += `
+                        <div class="stat-card">
+                            <div>Enseignants impliqués</div>
+                            <div class="stat-value">${teachersWithActivities.length}</div>
+                            <div>${Math.round((teachersWithActivities.length / teachersData.length) * 100)}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Activités totales</div>
+                            <div class="stat-value">${totalActivities}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Activités/enseignant moy.</div>
+                            <div class="stat-value">${avgActivitiesPerTeacher}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Participants estimés</div>
+                            <div class="stat-value">${totalParticipants}</div>
+                            <div>${avgParticipantsPerActivity}/activité</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-trophy"></i> Activités les plus populaires</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Activité</th>
+                                <th>Nombre d'enseignants</th>
+                                <th>Enseignants impliqués</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedActivities.forEach(([activity, data]) => {
+                const teachersList = data.teachers.length > 3 ? 
+                    `${data.teachers.slice(0, 3).join(', ')}...` : 
+                    data.teachers.join(', ');
+                
+                // Trouver le type de cette activité
+                let activityType = 'Divers';
+                teachersWithActivities.forEach(teacher => {
+                    if (teacher.data && teacher.data.activities) {
+                        const found = teacher.data.activities.find(a => a.name === activity);
+                        if (found && found.type) {
+                            activityType = found.type;
+                        }
+                    }
+                });
+                
+                html += `
+                    <tr>
+                        <td><strong>${activity}</strong></td>
+                        <td>${data.count}</td>
+                        <td title="${data.teachers.join(', ')}">${teachersList}</td>
+                        <td>${activityType}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-lightbulb"></i> Recommandations</h4>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h5><i class="fas fa-plus-circle"></i> Activités à développer</h5>
+                            <ul>
+                                <li>Clubs scientifiques et technologiques</li>
+                                <li>Activités artistiques et culturelles</li>
+                                <li>Sports collectifs et tournois</li>
+                                <li>Activités de développement durable</li>
+                            </ul>
+                        </div>
+                        <div class="dashboard-card">
+                            <h5><i class="fas fa-chart-line"></i> Mesures d'accompagnement</h5>
+                            <ul>
+                                <li>Formation à l'animation d'activités</li>
+                                <li>Budget dédié aux activités extrascolaires</li>
+                                <li>Reconnaissance du temps d'engagement</li>
+                                <li>Création d'un calendrier annuel</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des types
+                const typeCtx = document.getElementById('activitiesTypeChart');
+                if (typeCtx && sortedTypes.length > 0) {
+                    const typeChart = new Chart(typeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedTypes.map(([type]) => type),
+                            datasets: [{
+                                label: 'Nombre d\'activités',
+                                data: sortedTypes.map(([, count]) => count),
+                                backgroundColor: '#1abc9c'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Types d\'activités extrascolaires'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre d\'activités'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.activitiesTypeChart = typeChart;
+                }
+                
+                // Graphique de fréquence
+                const frequencyCtx = document.getElementById('activitiesFrequencyChart');
+                if (frequencyCtx && Object.keys(activitiesByFrequency).length > 0) {
+                    const frequencyChart = new Chart(frequencyCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(activitiesByFrequency),
+                            datasets: [{
+                                data: Object.values(activitiesByFrequency),
+                                backgroundColor: [
+                                    '#3498db', '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Fréquence des activités'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.activitiesFrequencyChart = frequencyChart;
+                }
+            }, 100);
+        }
+
+        function updateMeetingsAnalysis() {
+            const container = document.getElementById('meetingsAnalysis');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Analyser les réunions
+            const teachersWithMeetings = teachersData.filter(t => 
+                t.data && t.data.meetings && t.data.meetings.length > 0
+            );
+            
+            if (teachersWithMeetings.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune réunion enregistrée</p>';
+                return;
+            }
+            
+            // Compter les réunions par type
+            const meetingsByType = {};
+            const meetingsByMonth = {};
+            const meetingsByDuration = { '≤ 1h': 0, '1-2h': 0, '2-3h': 0, '> 3h': 0 };
+            
+            let totalMeetings = 0;
+            let totalDuration = 0;
+            
+            teachersWithMeetings.forEach(teacher => {
+                if (teacher.data && teacher.data.meetings) {
+                    teacher.data.meetings.forEach(meeting => {
+                        totalMeetings++;
+                        
+                        // Par type
+                        if (meeting.type) {
+                            meetingsByType[meeting.type] = (meetingsByType[meeting.type] || 0) + 1;
+                        }
+                        
+                        // Par mois
+                        if (meeting.date) {
+                            const date = new Date(meeting.date);
+                            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                            meetingsByMonth[monthKey] = (meetingsByMonth[monthKey] || 0) + 1;
+                        }
+                        
+                        // Par durée
+                        if (meeting.duration) {
+                            const duration = parseInt(meeting.duration) || 0;
+                            totalDuration += duration;
+                            
+                            if (duration <= 60) meetingsByDuration['≤ 1h']++;
+                            else if (duration <= 120) meetingsByDuration['1-2h']++;
+                            else if (duration <= 180) meetingsByDuration['2-3h']++;
+                            else meetingsByDuration['> 3h']++;
+                        }
+                    });
+                }
+            });
+            
+            // Trier les types par fréquence
+            const sortedTypes = Object.entries(meetingsByType)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            
+            // Trier les mois
+            const sortedMonths = Object.entries(meetingsByMonth)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .slice(-6);
+            
+            let html = `
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-bar"></i> Réunions par type</h4>
+                        <div class="chart-container">
+                            <canvas id="meetingsTypeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-line"></i> Évolution mensuelle</h4>
+                        <div class="chart-container">
+                            <canvas id="meetingsMonthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid mt-30">
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-clock"></i> Durée des réunions</h4>
+                        <div class="chart-container">
+                            <canvas id="meetingsDurationChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h4><i class="fas fa-chart-area"></i> Statistiques</h4>
+                        <div class="stats-grid" style="grid-template-columns: 1fr;">
+            `;
+            
+            // Calculer les statistiques
+            const avgMeetingsPerTeacher = Math.round(totalMeetings / teachersWithMeetings.length * 10) / 10;
+            const avgDuration = Math.round(totalDuration / totalMeetings);
+            
+            // Type de réunion le plus commun
+            const mostCommonType = sortedTypes.length > 0 ? sortedTypes[0] : null;
+            
+            // Temps total passé en réunions (en heures)
+            const totalHours = Math.round(totalDuration / 60);
+            
+            html += `
+                            <div class="stat-card">
+                                <div>Enseignants avec réunions</div>
+                                <div class="stat-value">${teachersWithMeetings.length}</div>
+                                <div>${Math.round((teachersWithMeetings.length / teachersData.length) * 100)}%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Réunions totales</div>
+                                <div class="stat-value">${totalMeetings}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Réunions/enseignant moy.</div>
+                                <div class="stat-value">${avgMeetingsPerTeacher}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Durée moyenne</div>
+                                <div class="stat-value">${avgDuration}min</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Temps total</div>
+                                <div class="stat-value">${totalHours}h</div>
+                                <div>${totalDuration} minutes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section mt-30">
+                    <h4><i class="fas fa-list"></i> Types de réunions</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nombre</th>
+                                <th>Pourcentage</th>
+                                <th>Objectifs principaux</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            sortedTypes.forEach(([type, count]) => {
+                const percentage = Math.round((count / totalMeetings) * 100);
+                let objectives = '';
+                
+                switch(type.toLowerCase()) {
+                    case 'conseil de classe':
+                        objectives = 'Bilan de classe, orientation, conseils disciplinaires';
+                        break;
+                    case 'réunion pédagogique':
+                        objectives = 'Coordination pédagogique, projets, évaluations';
+                        break;
+                    case 'conseil d\'enseignement':
+                        objectives = 'Coordination par matière, programmations';
+                        break;
+                    case 'conseil d\'établissement':
+                        objectives = 'Gestion de l\'établissement, projets, budget';
+                        break;
+                    case 'réunion parents':
+                        objectives = 'Échanges avec les familles, bilans individuels';
+                        break;
+                    case 'formation continue':
+                        objectives = 'Formation en établissement, partage de pratiques';
+                        break;
+                    case 'commission':
+                        objectives = 'Travail en commission sur des projets spécifiques';
+                        break;
+                    default:
+                        objectives = 'Coordination et travail d\'équipe';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                        <td>${objectives}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Créer les graphiques
+            setTimeout(() => {
+                // Graphique des types
+                const typeCtx = document.getElementById('meetingsTypeChart');
+                if (typeCtx && sortedTypes.length > 0) {
+                    const typeChart = new Chart(typeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedTypes.map(([type]) => type),
+                            datasets: [{
+                                label: 'Nombre de réunions',
+                                data: sortedTypes.map(([, count]) => count),
+                                backgroundColor: '#e74c3c'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Types de réunions'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de réunions'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.meetingsTypeChart = typeChart;
+                }
+                
+                // Graphique mensuel
+                const monthlyCtx = document.getElementById('meetingsMonthlyChart');
+                if (monthlyCtx && sortedMonths.length > 0) {
+                    const monthlyChart = new Chart(monthlyCtx, {
+                        type: 'line',
+                        data: {
+                            labels: sortedMonths.map(([month]) => month),
+                            datasets: [{
+                                label: 'Nombre de réunions',
+                                data: sortedMonths.map(([, count]) => count),
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Évolution mensuelle des réunions'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de réunions'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.meetingsMonthlyChart = monthlyChart;
+                }
+                
+                // Graphique de durée
+                const durationCtx = document.getElementById('meetingsDurationChart');
+                if (durationCtx) {
+                    const durationChart = new Chart(durationCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(meetingsByDuration),
+                            datasets: [{
+                                data: Object.values(meetingsByDuration),
+                                backgroundColor: [
+                                    '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Durée des réunions'
+                                },
+                                legend: {
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                    charts.meetingsDurationChart = durationChart;
+                }
+            }, 100);
         }
 
         // Analyse retraite
@@ -3468,6 +6491,44 @@
             
             upcomingHtml += '</tbody></table>';
             upcomingContainer.innerHTML = upcomingHtml;
+            
+            // Créer le graphique des retraites par année
+            setTimeout(() => {
+                const retirementYearCtx = document.getElementById('retirementYearChart');
+                if (retirementYearCtx && Object.keys(retirementByYear).length > 0) {
+                    const sortedYears = Object.keys(retirementByYear).sort();
+                    const retirementYearChart = new Chart(retirementYearCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedYears,
+                            datasets: [{
+                                label: 'Nombre de retraites',
+                                data: sortedYears.map(year => retirementByYear[year]),
+                                backgroundColor: '#e74c3c'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Répartition des retraites par année'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Nombre de retraites'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    charts.retirementYearChart = retirementYearChart;
+                }
+            }, 100);
         }
 
         // Export Excel
@@ -3568,6 +6629,43 @@
             const retirementSheet = XLSX.utils.aoa_to_sheet(retirementSheetData);
             XLSX.utils.book_append_sheet(wb, retirementSheet, 'Retraites');
             
+            // Feuille 4: Statistiques pédagogiques
+            const pedagogySheetData = [
+                ['Enseignant', 'Leçons', 'TP', 'Ressources', 'Matières', 'Heures/semaine']
+            ];
+            
+            teachersData.forEach(teacher => {
+                pedagogySheetData.push([
+                    teacher.fullName,
+                    teacher.lessonCount || 0,
+                    teacher.tpCount || 0,
+                    teacher.data && teacher.data.resources ? teacher.data.resources.length : 0,
+                    teacher.subjectCount || 0,
+                    teacher.data && teacher.data.professional ? teacher.data.professional.weeklyHours || 0 : 0
+                ]);
+            });
+            
+            const pedagogySheet = XLSX.utils.aoa_to_sheet(pedagogySheetData);
+            XLSX.utils.book_append_sheet(wb, pedagogySheet, 'Pédagogie');
+            
+            // Feuille 5: Formation
+            const trainingSheetData = [
+                ['Enseignant', 'Diplômes', 'Formations continues', 'Langues', 'Compétences IT']
+            ];
+            
+            teachersData.forEach(teacher => {
+                trainingSheetData.push([
+                    teacher.fullName,
+                    teacher.data && teacher.data.diplomas ? teacher.data.diplomas.length : 0,
+                    teacher.trainingCount || 0,
+                    teacher.data && teacher.data.languages ? teacher.data.languages.length : 0,
+                    teacher.data && teacher.data.itskills ? teacher.data.itskills.length : 0
+                ]);
+            });
+            
+            const trainingSheet = XLSX.utils.aoa_to_sheet(trainingSheetData);
+            XLSX.utils.book_append_sheet(wb, trainingSheet, 'Formation');
+            
             // Générer le fichier Excel
             const fileName = `analyse-enseignants-${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, fileName);
@@ -3627,19 +6725,377 @@
         }
 
         function exportPedagogyToExcel() {
-            showNotification('Export pédagogique à implémenter', 'info');
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille 1: Synthèse pédagogique
+            const summaryData = [
+                ['SYNTHÈSE PÉDAGOGIQUE'],
+                [''],
+                ['Enseignants analysés:', teachersData.length],
+                ['Leçons totales:', teachersData.reduce((sum, t) => sum + (t.lessonCount || 0), 0)],
+                ['TP totaux:', teachersData.reduce((sum, t) => sum + (t.tpCount || 0), 0)],
+                ['Ressources totales:', teachersData.reduce((sum, t) => sum + (t.data && t.data.resources ? t.data.resources.length : 0), 0)],
+                [''],
+                ['DÉTAIL PAR ENSEIGNANT']
+            ];
+            
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summarySheet, 'Synthèse');
+            
+            // Feuille 2: Détail pédagogique
+            const detailData = [
+                ['Enseignant', 'Établissement', 'Matière principale', 'Heures/semaine', 
+                 'Leçons', 'TP', 'Ressources', 'Emploi du temps']
+            ];
+            
+            teachersData.forEach(teacher => {
+                const hasTimetable = teacher.data && teacher.data.timetable && 
+                    Object.keys(teacher.data.timetable).length > 0 ? 'Oui' : 'Non';
+                const mainSubject = teacher.data && teacher.data.subjects && teacher.data.subjects.length > 0 ? 
+                    teacher.data.subjects[0].name : '';
+                const establishment = teacher.data && teacher.data.establishment ? 
+                    teacher.data.establishment.name : '';
+                
+                detailData.push([
+                    teacher.fullName,
+                    establishment,
+                    mainSubject,
+                    teacher.data && teacher.data.professional ? teacher.data.professional.weeklyHours || 0 : 0,
+                    teacher.lessonCount || 0,
+                    teacher.tpCount || 0,
+                    teacher.data && teacher.data.resources ? teacher.data.resources.length : 0,
+                    hasTimetable
+                ]);
+            });
+            
+            const detailSheet = XLSX.utils.aoa_to_sheet(detailData);
+            XLSX.utils.book_append_sheet(wb, detailSheet, 'Détail pédagogique');
+            
+            // Feuille 3: Matières
+            const subjectsMap = new Map();
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) {
+                            const key = subject.name;
+                            if (!subjectsMap.has(key)) {
+                                subjectsMap.set(key, { teachers: [], hours: 0 });
+                            }
+                            const data = subjectsMap.get(key);
+                            data.teachers.push(teacher.fullName);
+                            data.hours += parseInt(subject.hours) || 0;
+                        }
+                    });
+                }
+            });
+            
+            const subjectsData = [['Matière', 'Nombre d\'enseignants', 'Heures totales', 'Enseignants']];
+            subjectsMap.forEach((data, subject) => {
+                subjectsData.push([subject, data.teachers.length, data.hours, data.teachers.join(', ')]);
+            });
+            
+            const subjectsSheet = XLSX.utils.aoa_to_sheet(subjectsData);
+            XLSX.utils.book_append_sheet(wb, subjectsSheet, 'Matières');
+            
+            const fileName = `pedagogie-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showLoader(false);
+            showNotification('Données pédagogiques exportées avec succès', 'success');
         }
 
         function exportTrainingToExcel() {
-            showNotification('Export des formations à implémenter', 'info');
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille 1: Synthèse formation
+            const summaryData = [
+                ['SYNTHÈSE FORMATION'],
+                [''],
+                ['Enseignants analysés:', teachersData.length],
+                ['Diplômes totaux:', teachersData.reduce((sum, t) => sum + (t.data && t.data.diplomas ? t.data.diplomas.length : 0), 0)],
+                ['Formations continues:', teachersData.reduce((sum, t) => sum + (t.trainingCount || 0), 0)],
+                ['Langues déclarées:', teachersData.reduce((sum, t) => sum + (t.data && t.data.languages ? t.data.languages.length : 0), 0)],
+                ['Compétences IT:', teachersData.reduce((sum, t) => sum + (t.data && t.data.itskills ? t.data.itskills.length : 0), 0)],
+                [''],
+                ['DÉTAIL PAR ENSEIGNANT']
+            ];
+            
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summarySheet, 'Synthèse');
+            
+            // Feuille 2: Détail formation
+            const detailData = [
+                ['Enseignant', 'Diplômes', 'Niveau max', 'Formations continues', 
+                 'Langues', 'Niveau langue max', 'Compétences IT', 'Catégories IT']
+            ];
+            
+            teachersData.forEach(teacher => {
+                // Trouver le niveau de diplôme le plus élevé
+                let maxDiplomaLevel = '';
+                if (teacher.data && teacher.data.diplomas) {
+                    teacher.data.diplomas.forEach(diploma => {
+                        const level = diploma.level || '';
+                        if (level.includes('Doctorat') || level.includes('PhD')) maxDiplomaLevel = 'Doctorat';
+                        else if (level.includes('Master') && maxDiplomaLevel !== 'Doctorat') maxDiplomaLevel = 'Master';
+                        else if (level.includes('Licence') && !maxDiplomaLevel) maxDiplomaLevel = 'Licence';
+                    });
+                }
+                
+                // Trouver le niveau de langue le plus élevé
+                let maxLanguageLevel = '';
+                if (teacher.data && teacher.data.languages) {
+                    teacher.data.languages.forEach(lang => {
+                        const level = lang.level || '';
+                        if (level.includes('C2') || level.includes('Avancé')) maxLanguageLevel = 'C2/Avancé';
+                        else if (level.includes('C1') && maxLanguageLevel !== 'C2/Avancé') maxLanguageLevel = 'C1';
+                        else if (level.includes('B2') && !maxLanguageLevel) maxLanguageLevel = 'B2';
+                    });
+                }
+                
+                // Catégories IT uniques
+                const itCategories = new Set();
+                if (teacher.data && teacher.data.itskills) {
+                    teacher.data.itskills.forEach(skill => {
+                        if (skill.category) itCategories.add(skill.category);
+                    });
+                }
+                
+                detailData.push([
+                    teacher.fullName,
+                    teacher.data && teacher.data.diplomas ? teacher.data.diplomas.length : 0,
+                    maxDiplomaLevel,
+                    teacher.trainingCount || 0,
+                    teacher.data && teacher.data.languages ? teacher.data.languages.length : 0,
+                    maxLanguageLevel,
+                    teacher.data && teacher.data.itskills ? teacher.data.itskills.length : 0,
+                    Array.from(itCategories).join(', ')
+                ]);
+            });
+            
+            const detailSheet = XLSX.utils.aoa_to_sheet(detailData);
+            XLSX.utils.book_append_sheet(wb, detailSheet, 'Détail formation');
+            
+            // Feuille 3: Diplômes détaillés
+            const diplomasData = [['Enseignant', 'Diplôme', 'Type', 'Niveau', 'Année', 'Établissement']];
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.diplomas) {
+                    teacher.data.diplomas.forEach(diploma => {
+                        diplomasData.push([
+                            teacher.fullName,
+                            diploma.name || '',
+                            diploma.type || '',
+                            diploma.level || '',
+                            diploma.year || '',
+                            diploma.institution || ''
+                        ]);
+                    });
+                }
+            });
+            
+            if (diplomasData.length > 1) {
+                const diplomasSheet = XLSX.utils.aoa_to_sheet(diplomasData);
+                XLSX.utils.book_append_sheet(wb, diplomasSheet, 'Diplômes');
+            }
+            
+            const fileName = `formation-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showLoader(false);
+            showNotification('Données de formation exportées avec succès', 'success');
         }
 
         function exportRetirementToExcel() {
-            showNotification('Export des retraites à implémenter', 'info');
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille 1: Planification retraite
+            const retirementData = [
+                ['PLANIFICATION DES RETRAITES'],
+                [''],
+                ['Enseignants analysés:', teachersData.length],
+                ['Avec date de retraite:', teachersData.filter(t => t.data && t.data.professional && t.data.professional.retirementDate).length],
+                ['Retraites ≤ 1 an:', teachersData.filter(t => t.yearsToRetirement !== null && t.yearsToRetirement <= 1).length],
+                ['Retraites 2-5 ans:', teachersData.filter(t => t.yearsToRetirement !== null && t.yearsToRetirement > 1 && t.yearsToRetirement <= 5).length],
+                ['Retraites > 5 ans:', teachersData.filter(t => t.yearsToRetirement !== null && t.yearsToRetirement > 5).length],
+                [''],
+                ['DÉTAIL PAR ENSEIGNANT']
+            ];
+            
+            const retirementSheet = XLSX.utils.aoa_to_sheet(retirementData);
+            XLSX.utils.book_append_sheet(wb, retirementSheet, 'Synthèse retraites');
+            
+            // Feuille 2: Détail retraite
+            const detailData = [
+                ['Enseignant', 'Date de retraite', 'Années restantes', 'Âge actuel', 
+                 'Années de service', 'Catégorie', 'Établissement', 'Matière principale']
+            ];
+            
+            teachersData
+                .filter(t => t.data && t.data.professional && t.data.professional.retirementDate)
+                .sort((a, b) => new Date(a.data.professional.retirementDate) - new Date(b.data.professional.retirementDate))
+                .forEach(teacher => {
+                    const retirementDate = new Date(teacher.data.professional.retirementDate);
+                    const today = new Date();
+                    const yearsLeft = Math.max(0, retirementDate.getFullYear() - today.getFullYear());
+                    const mainSubject = teacher.data && teacher.data.subjects && teacher.data.subjects.length > 0 ? 
+                        teacher.data.subjects[0].name : '';
+                    const establishment = teacher.data && teacher.data.establishment ? 
+                        teacher.data.establishment.name : '';
+                    
+                    detailData.push([
+                        teacher.fullName,
+                        retirementDate.toISOString().split('T')[0],
+                        yearsLeft,
+                        teacher.age || '',
+                        teacher.serviceYears || '',
+                        teacher.data.professional.professionalCategory || '',
+                        establishment,
+                        mainSubject
+                    ]);
+                });
+            
+            const detailSheet = XLSX.utils.aoa_to_sheet(detailData);
+            XLSX.utils.book_append_sheet(wb, detailSheet, 'Détail retraites');
+            
+            // Feuille 3: Analyse par année
+            const retirementByYear = {};
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.professional && teacher.data.professional.retirementDate) {
+                    const year = new Date(teacher.data.professional.retirementDate).getFullYear();
+                    retirementByYear[year] = (retirementByYear[year] || 0) + 1;
+                }
+            });
+            
+            const yearData = [['Année', 'Nombre de retraites', 'Pourcentage']];
+            const sortedYears = Object.keys(retirementByYear).sort();
+            const totalWithRetirement = teachersData.filter(t => 
+                t.data && t.data.professional && t.data.professional.retirementDate
+            ).length;
+            
+            sortedYears.forEach(year => {
+                const count = retirementByYear[year];
+                const percentage = Math.round((count / totalWithRetirement) * 100);
+                yearData.push([year, count, `${percentage}%`]);
+            });
+            
+            const yearSheet = XLSX.utils.aoa_to_sheet(yearData);
+            XLSX.utils.book_append_sheet(wb, yearSheet, 'Analyse par année');
+            
+            const fileName = `retraites-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showLoader(false);
+            showNotification('Planification retraite exportée avec succès', 'success');
         }
 
         function exportProjectsToExcel() {
-            showNotification('Export des projets à implémenter', 'info');
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille 1: Synthèse projets
+            const summaryData = [
+                ['SYNTHÈSE PROJETS ET ACTIVITÉS'],
+                [''],
+                ['Enseignants analysés:', teachersData.length],
+                ['Projets pédagogiques:', teachersData.reduce((sum, t) => sum + (t.projectCount || 0), 0)],
+                ['Activités extrascolaires:', teachersData.reduce((sum, t) => sum + (t.data && t.data.activities ? t.data.activities.length : 0), 0)],
+                ['Réunions:', teachersData.reduce((sum, t) => sum + (t.data && t.data.meetings ? t.data.meetings.length : 0), 0)],
+                [''],
+                ['DÉTAIL PAR ENSEIGNANT']
+            ];
+            
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summarySheet, 'Synthèse projets');
+            
+            // Feuille 2: Projets pédagogiques
+            const projectsData = [
+                ['Enseignant', 'Projet', 'Type', 'Statut', 'Durée', 
+                 'Date début', 'Date fin', 'Participants', 'Description']
+            ];
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.projects) {
+                    teacher.data.projects.forEach(project => {
+                        projectsData.push([
+                            teacher.fullName,
+                            project.name || '',
+                            project.type || '',
+                            project.status || '',
+                            project.duration || '',
+                            project.startDate || '',
+                            project.endDate || '',
+                            project.participants || '',
+                            project.description || ''
+                        ]);
+                    });
+                }
+            });
+            
+            if (projectsData.length > 1) {
+                const projectsSheet = XLSX.utils.aoa_to_sheet(projectsData);
+                XLSX.utils.book_append_sheet(wb, projectsSheet, 'Projets pédagogiques');
+            }
+            
+            // Feuille 3: Activités extrascolaires
+            const activitiesData = [
+                ['Enseignant', 'Activité', 'Type', 'Fréquence', 
+                 'Participants', 'Lieu', 'Responsable', 'Objectifs']
+            ];
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.activities) {
+                    teacher.data.activities.forEach(activity => {
+                        activitiesData.push([
+                            teacher.fullName,
+                            activity.name || '',
+                            activity.type || '',
+                            activity.frequency || '',
+                            activity.participants || '',
+                            activity.location || '',
+                            activity.responsible || '',
+                            activity.objectives || ''
+                        ]);
+                    });
+                }
+            });
+            
+            if (activitiesData.length > 1) {
+                const activitiesSheet = XLSX.utils.aoa_to_sheet(activitiesData);
+                XLSX.utils.book_append_sheet(wb, activitiesSheet, 'Activités extrascolaires');
+            }
+            
+            const fileName = `projets-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showLoader(false);
+            showNotification('Projets et activités exportés avec succès', 'success');
         }
 
         function exportTeacherToExcel(index) {
@@ -3872,35 +7328,6 @@
 
         function generateReport() {
             showNotification('Génération de rapport PDF à implémenter', 'info');
-        }
-
-        // Fonctions pour les autres analyses
-        function updateDiplomasAnalysis() {
-            // À implémenter
-        }
-
-        function updateContinuousTrainingAnalysis() {
-            // À implémenter
-        }
-
-        function updateLanguagesAnalysis() {
-            // À implémenter
-        }
-
-        function updateITSkillsAnalysis() {
-            // À implémenter
-        }
-
-        function updatePedagogicalProjectsAnalysis() {
-            // À implémenter
-        }
-
-        function updateActivitiesAnalysis() {
-            // À implémenter
-        }
-
-        function updateMeetingsAnalysis() {
-            // À implémenter
         }
 
         // Initialisation finale
