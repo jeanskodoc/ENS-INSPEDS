@@ -560,9 +560,9 @@
                                 <li>Statistiques globales</li>
                                 <li>Supervision des activités</li>
                             </ul>
-                            <button class="btn btn-warning" onclick="accessInspectorInterface()">
+                            <a href="INSPECTEUR-EDS.html" class="btn btn-warning">
                                 <i class="fas fa-sign-in-alt"></i> Accéder à l'interface Inspecteurs
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -668,14 +668,14 @@
                 </p>
                 
                 <div style="margin: 40px 0;">
-                    <a href="INSPECTION-EDS.html" class="btn btn-primary" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
+                    <a href="INSPECTEUR-EDS.html" class="btn btn-warning" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
                         <i class="fas fa-external-link-alt"></i> Ouvrir l'interface Inspecteurs
                     </a>
                 </div>
                 
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
                     <p><i class="fas fa-info-circle" style="color: var(--warning-color);"></i> 
-                    <strong>Note :</strong> L'interface Inspecteurs est en cours de développement. Certaines fonctionnalités pourraient ne pas être encore disponibles.</p>
+                    <strong>Note :</strong> Assurez-vous que le fichier INSPECTEUR-EDS.html est bien présent dans le même répertoire que cette page.</p>
                 </div>
             </div>
 
@@ -699,6 +699,9 @@
                                 <li>Formations et compétences</li>
                                 <li>Dates de retraite calculées</li>
                             </ul>
+                            <a href="INSPECTEUR-EDS.html" class="btn btn-primary" style="margin-top: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Ouvrir l'interface
+                            </a>
                         </div>
                     </div>
                     
@@ -715,6 +718,9 @@
                                 <li>Projections des départs à la retraite</li>
                                 <li>Évaluation des besoins en formation</li>
                             </ul>
+                            <a href="INSPECTEUR-EDS.html" class="btn btn-success" style="margin-top: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Ouvrir l'interface
+                            </a>
                         </div>
                     </div>
                     
@@ -731,6 +737,9 @@
                                 <li>Évaluation des projets pédagogiques</li>
                                 <li>Recommandations et commentaires</li>
                             </ul>
+                            <a href="INSPECTEUR-EDS.html" class="btn btn-warning" style="margin-top: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Ouvrir l'interface
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -821,10 +830,10 @@
     <footer>
         <div class="footer-content">
             <div class="footer-links">
-                <a href="#home">Accueil</a>
-                <a href="#teachers">Enseignants</a>
-                <a href="#inspectors">Inspecteurs</a>
-                <a href="#about">À propos</a>
+                <a href="#" data-tab="home">Accueil</a>
+                <a href="#" data-tab="teachers">Enseignants</a>
+                <a href="#" data-tab="inspectors">Inspecteurs</a>
+                <a href="#" data-tab="about">À propos</a>
             </div>
             <p>Plateforme de Gestion Pédagogique Complète - Version 1.0</p>
             <p class="copyright">
@@ -861,6 +870,17 @@
                     switchNavigationTab(tabId);
                 });
             });
+            
+            // Gestion des liens du footer
+            document.querySelectorAll('.footer-links a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+                    if (tabId) {
+                        switchNavigationTab(tabId);
+                    }
+                });
+            });
         }
 
         function switchNavigationTab(tabId) {
@@ -877,16 +897,22 @@
         }
 
         function initEvents() {
-            // Aucun événement supplémentaire nécessaire pour l'instant
+            // Vérifier si le fichier INSPECTEUR-EDS.html existe
+            checkInspectorFile();
         }
 
-        function accessInspectorInterface() {
-            // Pour l'instant, rediriger vers la même page avec un message
-            // Dans une version future, cela pourrait ouvrir une interface spécifique
-            alert("L'interface Inspecteurs est en cours de développement. Pour le moment, vous pouvez accéder à l'interface Enseignants pour voir les fonctionnalités disponibles.");
-            
-            // Optionnel : Rediriger vers l'interface enseignants avec un mode "inspecteur"
-            // window.location.href = "ECOLE-EDS.html?mode=inspector";
+        function checkInspectorFile() {
+            // Cette fonction peut être utilisée pour vérifier si le fichier existe
+            // et afficher un message d'avertissement s'il n'existe pas
+            fetch('INSPECTEUR-EDS.html')
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn('Le fichier INSPECTEUR-EDS.html n\'a pas été trouvé. Assurez-vous qu\'il est bien présent dans le même répertoire.');
+                    }
+                })
+                .catch(error => {
+                    console.warn('Impossible de vérifier l\'existence du fichier INSPECTEUR-EDS.html:', error);
+                });
         }
 
         // Navigation par ancres
@@ -898,12 +924,6 @@
                 
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
-                    // Si c'est un onglet, activer l'onglet correspondant
-                    if (targetId === '#home' || targetId === '#teachers' || targetId === '#inspectors' || targetId === '#about') {
-                        const tabId = targetId.substring(1); // Enlever le #
-                        switchNavigationTab(tabId);
-                    }
-                    
                     // Faire défiler vers l'élément
                     window.scrollTo({
                         top: targetElement.offsetTop - 100,
