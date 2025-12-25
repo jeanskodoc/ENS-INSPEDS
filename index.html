@@ -261,6 +261,17 @@
             box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
         /* Section Features */
         .features-section {
             margin-top: 50px;
@@ -372,6 +383,99 @@
             line-height: 1.8;
         }
 
+        /* Modal d'authentification */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--warning-color), #e67e22);
+            color: white;
+            text-align: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--warning-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+        }
+
+        .error-message {
+            background-color: #ffeaea;
+            color: var(--danger-color);
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             header h1 {
@@ -399,6 +503,10 @@
             .features-section {
                 padding: 25px 15px;
             }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -412,6 +520,10 @@
             
             .card-header i {
                 font-size: 2.5rem;
+            }
+            
+            .modal-body {
+                padding: 20px 15px;
             }
         }
 
@@ -560,9 +672,9 @@
                                 <li>Statistiques globales</li>
                                 <li>Supervision des activités</li>
                             </ul>
-                            <a href="INSPECTEUR-EDS.html" class="btn btn-warning">
+                            <button id="inspectorAccessBtn" class="btn btn-warning">
                                 <i class="fas fa-sign-in-alt"></i> Accéder à l'interface Inspecteurs
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -668,14 +780,14 @@
                 </p>
                 
                 <div style="margin: 40px 0;">
-                    <a href="INSPECTEUR-EDS.html" class="btn btn-warning" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
+                    <button id="inspectorAccessBtn2" class="btn btn-warning" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
                         <i class="fas fa-external-link-alt"></i> Ouvrir l'interface Inspecteurs
-                    </a>
+                    </button>
                 </div>
                 
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
                     <p><i class="fas fa-info-circle" style="color: var(--warning-color);"></i> 
-                    <strong>Note :</strong> Assurez-vous que le fichier INSPECTEUR-EDS.html est bien présent dans le même répertoire que cette page.</p>
+                    <strong>Note :</strong> L'accès à l'interface Inspecteurs est sécurisé. Identifiant requis : <strong>inspecteur</strong> / Mot de passe : <strong>KOLA</strong></p>
                 </div>
             </div>
 
@@ -699,9 +811,9 @@
                                 <li>Formations et compétences</li>
                                 <li>Dates de retraite calculées</li>
                             </ul>
-                            <a href="INSPECTEUR-EDS.html" class="btn btn-primary" style="margin-top: 10px;">
+                            <button id="inspectorAccessBtn3" class="btn btn-primary" style="margin-top: 10px;">
                                 <i class="fas fa-external-link-alt"></i> Ouvrir l'interface
-                            </a>
+                            </button>
                         </div>
                     </div>
                     
@@ -718,9 +830,9 @@
                                 <li>Projections des départs à la retraite</li>
                                 <li>Évaluation des besoins en formation</li>
                             </ul>
-                            <a href="INSPECTEUR-EDS.html" class="btn btn-success" style="margin-top: 10px;">
+                            <button id="inspectorAccessBtn4" class="btn btn-success" style="margin-top: 10px;">
                                 <i class="fas fa-external-link-alt"></i> Ouvrir l'interface
-                            </a>
+                            </button>
                         </div>
                     </div>
                     
@@ -737,9 +849,9 @@
                                 <li>Évaluation des projets pédagogiques</li>
                                 <li>Recommandations et commentaires</li>
                             </ul>
-                            <a href="INSPECTEUR-EDS.html" class="btn btn-warning" style="margin-top: 10px;">
+                            <button id="inspectorAccessBtn5" class="btn btn-warning" style="margin-top: 10px;">
                                 <i class="fas fa-external-link-alt"></i> Ouvrir l'interface
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -843,6 +955,41 @@
         </div>
     </footer>
 
+    <!-- Modal d'authentification -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-shield"></i> Authentification Inspecteur</h3>
+            </div>
+            <div class="modal-body">
+                <div id="authError" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i> <span id="errorText">Identifiant ou mot de passe incorrect</span>
+                </div>
+                
+                <form id="authForm">
+                    <div class="form-group">
+                        <label for="username"><i class="fas fa-user"></i> Identifiant</label>
+                        <input type="text" id="username" class="form-control" placeholder="Entrez votre identifiant" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-key"></i> Mot de passe</label>
+                        <input type="password" id="password" class="form-control" placeholder="Entrez votre mot de passe" required>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-warning" style="flex: 1;">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                        </button>
+                        <button type="button" id="cancelAuth" class="btn btn-danger" style="flex: 1;">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -857,6 +1004,9 @@
             
             // Gestion des onglets de navigation
             initNavigationTabs();
+            
+            // Initialiser l'authentification
+            initAuthentication();
             
             // Initialiser les événements
             initEvents();
@@ -896,6 +1046,101 @@
             window.scrollTo(0, 0);
         }
 
+        function initAuthentication() {
+            const authModal = document.getElementById('authModal');
+            const authForm = document.getElementById('authForm');
+            const cancelAuthBtn = document.getElementById('cancelAuth');
+            const authError = document.getElementById('authError');
+            const errorText = document.getElementById('errorText');
+            
+            // Gérer tous les boutons d'accès inspecteur
+            const inspectorBtns = [
+                'inspectorAccessBtn',
+                'inspectorAccessBtn2',
+                'inspectorAccessBtn3',
+                'inspectorAccessBtn4',
+                'inspectorAccessBtn5'
+            ];
+            
+            inspectorBtns.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        authError.classList.remove('active');
+                        authModal.classList.add('active');
+                        document.getElementById('username').focus();
+                    });
+                }
+            });
+            
+            // Gestion du formulaire d'authentification
+            authForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                // Vérification des identifiants
+                if (username === 'inspecteur' && password === 'KOLA') {
+                    // Authentification réussie
+                    authModal.classList.remove('active');
+                    
+                    // Redirection vers INSPECTEUR-EDS.html
+                    window.location.href = 'INSPECTEUR-EDS.html';
+                } else {
+                    // Authentification échouée
+                    errorText.textContent = 'Identifiant ou mot de passe incorrect';
+                    authError.classList.add('active');
+                    
+                    // Effacer le mot de passe
+                    document.getElementById('password').value = '';
+                    
+                    // Vibration pour indiquer une erreur
+                    if (navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
+                    
+                    // Mettre le focus sur le champ d'identifiant
+                    document.getElementById('username').focus();
+                }
+            });
+            
+            // Gestion de l'annulation
+            cancelAuthBtn.addEventListener('click', function() {
+                authModal.classList.remove('active');
+                authForm.reset();
+                authError.classList.remove('active');
+            });
+            
+            // Fermer le modal en cliquant en dehors
+            authModal.addEventListener('click', function(e) {
+                if (e.target === authModal) {
+                    authModal.classList.remove('active');
+                    authForm.reset();
+                    authError.classList.remove('active');
+                }
+            });
+            
+            // Fermer le modal avec la touche Échap
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && authModal.classList.contains('active')) {
+                    authModal.classList.remove('active');
+                    authForm.reset();
+                    authError.classList.remove('active');
+                }
+            });
+            
+            // Gérer l'auto-remplissage pour faciliter le test
+            document.getElementById('username').addEventListener('focus', function() {
+                // Pré-remplir pour faciliter la démonstration (à supprimer en production)
+                if (this.value === '') {
+                    this.value = 'inspecteur';
+                    document.getElementById('password').value = 'KOLA';
+                }
+            });
+        }
+
         function initEvents() {
             // Vérifier si le fichier INSPECTEUR-EDS.html existe
             checkInspectorFile();
@@ -903,7 +1148,6 @@
 
         function checkInspectorFile() {
             // Cette fonction peut être utilisée pour vérifier si le fichier existe
-            // et afficher un message d'avertissement s'il n'existe pas
             fetch('INSPECTEUR-EDS.html')
                 .then(response => {
                     if (!response.ok) {
