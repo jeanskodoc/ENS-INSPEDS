@@ -1,0 +1,4122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiche Administrative Enseignant - Gestion Pédagogique Complète</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables CSS */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #9b59b6;
+            --dark-color: #2c3e50;
+            --light-color: #f5f5f5;
+            --gray-color: #7f8c8d;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            padding: 20px;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            position: relative;
+        }
+
+        .school-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .school-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .academic-year {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        header h1 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        /* Navigation */
+        .tabs-container {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .tabs {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            min-width: 600px;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-color);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background-color: white;
+        }
+
+        /* Contenu des onglets */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Sections */
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .form-section h2 {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin: -25px -25px 25px -25px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        /* Formulaires */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Éléments dynamiques */
+        .dynamic-item {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .dynamic-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        /* Matières et pédagogie */
+        .subject-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .theme-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .lesson-container, .tp-container, .evaluation-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--info-color);
+        }
+
+        .tp-container {
+            border-left-color: var(--warning-color);
+        }
+
+        .evaluation-container {
+            border-left-color: var(--success-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        /* Boutons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d68910;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+
+        .btn-light {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-light:hover {
+            background-color: #e9ecef;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-xs {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Actions */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .tab-actions {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Navigation */
+        .btn-retour {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 0 20px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-retour:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Tableaux */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Onglets secondaires */
+        .sub-tabs {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 25px;
+        }
+
+        .sub-tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-color);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .sub-tab:hover {
+            color: var(--dark-color);
+        }
+
+        .sub-tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        /* Sous-contenus des onglets */
+        .sub-tab-content {
+            display: none;
+        }
+
+        .sub-tab-content.active {
+            display: block;
+        }
+
+        /* Indicateurs */
+        .counter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            margin-right: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-primary {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+        }
+
+        .badge-success {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background-color: #fff3e0;
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background-color: #ffebee;
+            color: var(--danger-color);
+        }
+
+        .badge-info {
+            background-color: #f3e5f5;
+            color: var(--info-color);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        .notification.info {
+            background: var(--info-color);
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 0;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions, .tab-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .subject-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .sub-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .sub-tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab-content {
+                padding: 15px;
+            }
+            
+            .form-section {
+                padding: 15px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .school-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Print */
+        @media print {
+            .btn-retour, .form-actions, button, .tabs-container, .tab-actions,
+            .section-actions, .modal, .notification {
+                display: none !important;
+            }
+            
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .tab-content {
+                display: block !important;
+                padding: 0;
+            }
+            
+            .form-section {
+                break-inside: avoid;
+            }
+        }
+
+        /* Utilitaires */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-30 {
+            margin-bottom: 30px;
+        }
+
+        .mt-30 {
+            margin-top: 30px;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-10 {
+            gap: 10px;
+        }
+
+        .gap-15 {
+            gap: 15px;
+        }
+
+        .gap-20 {
+            gap: 20px;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        /* Améliorations spécifiques */
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .rating-stars i {
+            color: #ffd700;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--success-color);
+            transition: width 0.3s;
+        }
+
+        .calendar-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .calendar-day {
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .calendar-day.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .attachment-list {
+            margin: 15px 0;
+        }
+
+        .attachment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        /* Sélecteurs de couleur */
+        .color-picker {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-option.active {
+            border-color: var(--dark-color);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -23px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        /* Filtres */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+        }
+
+        .search-box input {
+            padding-left: 40px;
+        }
+
+        /* Tags */
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 45px;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.8rem;
+        }
+
+        .tags-input input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Modal générique -->
+    <div class="modal" id="genericModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle" id="notificationIcon"></i>
+        <span id="notificationMessage"></span>
+    </div>
+
+    <!-- Bouton retour -->
+    <button class="btn-retour" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    
+    <!-- Container principal -->
+    <div class="container">
+        <header>
+            <div class="school-info">
+                <div class="school-name">
+                    <i class="fas fa-school"></i>
+                    <span id="schoolName">Établissement Scolaire</span>
+                </div>
+                <div class="academic-year">
+                    <i class="fas fa-calendar-alt"></i>
+                    Année scolaire: <span id="currentYear"></span>
+                </div>
+            </div>
+            <h1><i class="fas fa-id-card"></i> FICHE ADMINISTRATIVE DE L'ENSEIGNANT</h1>
+            <p>Système complet de gestion pédagogique et administrative</p>
+        </header>
+
+        <!-- Navigation principale -->
+        <div class="tabs-container">
+            <ul class="tabs">
+                <li class="tab active" data-tab="tab1">
+                    <i class="fas fa-user-tie"></i> Informations Générales
+                </li>
+                <li class="tab" data-tab="tab2">
+                    <i class="fas fa-chalkboard-teacher"></i> Enseignement & Pédagogie
+                </li>
+                <li class="tab" data-tab="tab3">
+                    <i class="fas fa-graduation-cap"></i> Formation & Compétences
+                </li>
+                <li class="tab" data-tab="tab4">
+                    <i class="fas fa-chart-line"></i> Évaluations & Statistiques
+                </li>
+                <li class="tab" data-tab="tab5">
+                    <i class="fas fa-project-diagram"></i> Projets & Activités
+                </li>
+                <li class="tab" data-tab="tab6">
+                    <i class="fas fa-database"></i> Données & Archives
+                </li>
+                <li class="tab" data-tab="tab7">
+                    <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                </li>
+            </ul>
+        </div>
+
+        <form id="teacherForm">
+            <!-- Onglet 1: Informations Générales -->
+            <div id="tab1" class="tab-content active">
+                <div class="tab-actions">
+                    <button type="button" class="btn btn-info" onclick="exportJSON('tab1')">
+                        <i class="fas fa-file-export"></i> Exporter
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="importJSON('tab1')">
+                        <i class="fas fa-file-import"></i> Importer
+                    </button>
+                    <button type="button" class="btn btn-light" onclick="generateQRCode()">
+                        <i class="fas fa-qrcode"></i> QR Code
+                    </button>
+                </div>
+
+                <!-- Établissement -->
+                <div class="form-section">
+                    <h2><i class="fas fa-university"></i> I. INFORMATION DE L'ÉTABLISSEMENT</h2>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="establishmentName"><i class="fas fa-school"></i> Nom de l'établissement *</label>
+                                <input type="text" id="establishmentName" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="establishmentType"><i class="fas fa-building"></i> Type d'établissement</label>
+                                <select id="establishmentType">
+                                    <option value="">Sélectionner</option>
+                                    <option value="college">Collège</option>
+                                    <option value="lycee">Lycée</option>
+                                    <option value="lycee_pro">Lycée Professionnel</option>
+                                    <option value="lycee_tech">Lycée Technique</option>
+                                    <option value="ecole">École Primaire</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="establishmentAddress"><i class="fas fa-map-marker-alt"></i> Adresse</label>
+                                <input type="text" id="establishmentAddress">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="establishmentPhone"><i class="fas fa-phone"></i> Téléphone</label>
+                                <input type="tel" id="establishmentPhone">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="establishmentEmail"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" id="establishmentEmail">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="establishmentWebsite"><i class="fas fa-globe"></i> Site web</label>
+                                <input type="text" id="establishmentWebsite">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations personnelles -->
+                <div class="form-section">
+                    <h2><i class="fas fa-user"></i> II. INFORMATIONS PERSONNELLES</h2>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="lastName"><i class="fas fa-signature"></i> Nom *</label>
+                                <input type="text" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="firstName"><i class="fas fa-user"></i> Prénoms *</label>
+                                <input type="text" id="firstName" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="gender"><i class="fas fa-venus-mars"></i> Sexe</label>
+                                <select id="gender">
+                                    <option value="">Sélectionner</option>
+                                    <option value="M">Masculin</option>
+                                    <option value="F">Féminin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="birthDate"><i class="fas fa-birthday-cake"></i> Date de naissance *</label>
+                                <input type="date" id="birthDate" required onchange="calculateRetirementDate()">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="birthMonth"><i class="fas fa-calendar"></i> Mois de naissance</label>
+                                <select id="birthMonth" onchange="calculateRetirementDate()">
+                                    <option value="">Sélectionner</option>
+                                    <option value="1">Janvier</option>
+                                    <option value="2">Février</option>
+                                    <option value="3">Mars</option>
+                                    <option value="4">Avril</option>
+                                    <option value="5">Mai</option>
+                                    <option value="6">Juin</option>
+                                    <option value="7">Juillet</option>
+                                    <option value="8">Août</option>
+                                    <option value="9">Septembre</option>
+                                    <option value="10">Octobre</option>
+                                    <option value="11">Novembre</option>
+                                    <option value="12">Décembre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="birthPlace"><i class="fas fa-map-marker-alt"></i> Lieu de naissance *</label>
+                                <input type="text" id="birthPlace" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="nationality"><i class="fas fa-flag"></i> Nationalité</label>
+                                <input type="text" id="nationality">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="address"><i class="fas fa-home"></i> Adresse personnelle</label>
+                                <input type="text" id="address">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="personalPhone"><i class="fas fa-mobile-alt"></i> Téléphone personnel</label>
+                                <input type="tel" id="personalPhone">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="personalEmail"><i class="fas fa-envelope"></i> Email personnel</label>
+                                <input type="email" id="personalEmail">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="cin"><i class="fas fa-id-card"></i> CIN/Passport</label>
+                                <input type="text" id="cin">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="maritalStatus"><i class="fas fa-heart"></i> Situation familiale</label>
+                                <select id="maritalStatus">
+                                    <option value="">Sélectionner</option>
+                                    <option value="celibataire">Célibataire</option>
+                                    <option value="marie">Marié(e)</option>
+                                    <option value="divorce">Divorcé(e)</option>
+                                    <option value="veuf">Veuf/Veuve</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="childrenNumber"><i class="fas fa-child"></i> Nombre d'enfants</label>
+                                <input type="number" id="childrenNumber" min="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations professionnelles -->
+                <div class="form-section">
+                    <h2><i class="fas fa-briefcase"></i> III. INFORMATIONS PROFESSIONNELLES</h2>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="matricule"><i class="fas fa-id-badge"></i> Numéro matricule *</label>
+                                <input type="text" id="matricule" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="position"><i class="fas fa-user-tag"></i> Fonction *</label>
+                                <select id="position" required>
+                                    <option value="">Sélectionner</option>
+                                    <option value="professeur">Professeur</option>
+                                    <option value="prof_agrege">Professeur Agrégé</option>
+                                    <option value="prof_certifie">Professeur Certifié</option>
+                                    <option value="charge_cours">Chargé de Cours</option>
+                                    <option value="vacataire">Vacataire</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="grade"><i class="fas fa-award"></i> Grade</label>
+                                <input type="text" id="grade">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="professionalCategory"><i class="fas fa-layer-group"></i> Catégorie professionnelle</label>
+                                <select id="professionalCategory" onchange="calculateRetirementDate()">
+                                    <option value="">Sélectionner</option>
+                                    <option value="A1">A1 (Cadres supérieurs)</option>
+                                    <option value="A2">A2 (Cadres)</option>
+                                    <option value="B">B (Techniciens supérieurs)</option>
+                                    <option value="C">C (Techniciens)</option>
+                                    <option value="D">D (Adjoints techniques)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="engagementDate"><i class="fas fa-handshake"></i> Date d'engagement *</label>
+                                <input type="date" id="engagementDate" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="regionServiceDate"><i class="fas fa-calendar-alt"></i> Date de prise de service dans la région *</label>
+                                <input type="date" id="regionServiceDate" required onchange="calculateServiceYears('regionServiceDate', 'yearsInRegion')">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="inspectionServiceDate"><i class="fas fa-calendar-check"></i> Date de prise de service dans l'inspection *</label>
+                                <input type="date" id="inspectionServiceDate" required onchange="calculateServiceYears('inspectionServiceDate', 'yearsInInspection')">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="yearsInRegion"><i class="fas fa-history"></i> Années dans la région</label>
+                                <input type="number" id="yearsInRegion" readonly>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="yearsInInspection"><i class="fas fa-clock"></i> Années dans l'inspection</label>
+                                <input type="number" id="yearsInInspection" readonly>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="retirementDate"><i class="fas fa-umbrella-beach"></i> Date de retraite</label>
+                                <input type="date" id="retirementDate" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Détails du calcul de la retraite -->
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div id="retirementDetails">
+                                <!-- Les détails du calcul s'afficheront ici -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="currentClass"><i class="fas fa-chalkboard"></i> Classe(s) actuelle(s)</label>
+                                <input type="text" id="currentClass" placeholder="Ex: 3ème A, Terminale C...">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="weeklyHours"><i class="fas fa-clock"></i> Heures/semaine</label>
+                                <input type="number" id="weeklyHours" min="0" max="40">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matières enseignées -->
+                <div class="form-section">
+                    <h2><i class="fas fa-book"></i> IV. MATIÈRES ENSEIGNÉES</h2>
+                    <div id="subjectsContainer">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="mainSubject"><i class="fas fa-star"></i> Matière principale *</label>
+                                    <input type="text" id="mainSubject" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="secondarySubject"><i class="fas fa-star-half-alt"></i> Matière secondaire</label>
+                                    <input type="text" id="secondarySubject">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addSubjectField()">
+                        <i class="fas fa-plus"></i> Ajouter une matière supplémentaire
+                    </button>
+                </div>
+            </div>
+
+            <!-- Onglet 2: Enseignement & Pédagogie -->
+            <div id="tab2" class="tab-content">
+                <!-- Navigation secondaire -->
+                <div class="sub-tabs mb-30">
+                    <div class="sub-tab active" data-subtab="planning">Planning & Emploi du temps</div>
+                    <div class="sub-tab" data-subtab="themes">Thèmes & Programmes</div>
+                    <div class="sub-tab" data-subtab="lessons">Leçons & Séances</div>
+                    <div class="sub-tab" data-subtab="tp">TP & Expériences</div>
+                    <div class="sub-tab" data-subtab="resources">Ressources & Supports</div>
+                </div>
+
+                <div class="tab-actions">
+                    <button type="button" class="btn btn-info" onclick="exportJSON('tab2')">
+                        <i class="fas fa-file-export"></i> Exporter données pédagogiques
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="importJSON('tab2')">
+                        <i class="fas fa-file-import"></i> Importer données
+                    </button>
+                    <button type="button" class="btn btn-light" onclick="generatePlanningPDF()">
+                        <i class="fas fa-file-pdf"></i> Générer PDF
+                    </button>
+                </div>
+
+                <!-- Contenu des sous-onglets -->
+                <div class="sub-tab-content active" data-subtab="planning">
+                    <div class="form-section">
+                        <h2><i class="fas fa-calendar-alt"></i> EMPLOI DU TEMPS HEBDOMADAIRE</h2>
+                        <div class="form-group">
+                            <label><i class="fas fa-info-circle"></i> Sélectionnez la matière et les créneaux</label>
+                            <div id="timetableContainer">
+                                <!-- L'emploi du temps sera généré dynamiquement -->
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-20" onclick="generateTimetable()">
+                                <i class="fas fa-table"></i> Générer l'emploi du temps
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="themes">
+                    <div class="form-section">
+                        <h2><i class="fas fa-sitemap"></i> THÈMES ET PROGRAMMES PAR MATIÈRE</h2>
+                        <div class="form-group">
+                            <label><i class="fas fa-book-open"></i> Sélectionnez la matière</label>
+                            <select id="subjectSelector" onchange="loadSubjectThemes(this.value)">
+                                <option value="">-- Sélectionner une matière --</option>
+                            </select>
+                        </div>
+                        <div id="themesContainer">
+                            <!-- Les thèmes seront chargés dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="lessons">
+                    <div class="form-section">
+                        <h2><i class="fas fa-chalkboard"></i> GESTION DES LEÇONS</h2>
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Rechercher une leçon..." id="lessonSearch">
+                            </div>
+                            <select id="lessonFilterSubject">
+                                <option value="">Toutes les matières</option>
+                            </select>
+                            <select id="lessonFilterClass">
+                                <option value="">Toutes les classes</option>
+                            </select>
+                        </div>
+                        <div id="lessonsContainer">
+                            <!-- Liste des leçons -->
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="addNewLesson()">
+                            <i class="fas fa-plus-circle"></i> Nouvelle leçon
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="tp">
+                    <div class="form-section">
+                        <h2><i class="fas fa-flask"></i> TRAVAUX PRATIQUES & EXPÉRIENCES</h2>
+                        <div id="tpContainer">
+                            <!-- TP seront ajoutés ici -->
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="addNewTP()">
+                            <i class="fas fa-plus-circle"></i> Nouveau TP/Expérience
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="resources">
+                    <div class="form-section">
+                        <h2><i class="fas fa-folder-open"></i> RESSOURCES PÉDAGOGIQUES</h2>
+                        <div class="form-group">
+                            <label><i class="fas fa-upload"></i> Ajouter des ressources</label>
+                            <input type="file" id="resourceUpload" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.png,.mp4,.mp3">
+                            <div class="attachment-list" id="resourcesList">
+                                <!-- Liste des ressources -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet 3: Formation & Compétences -->
+            <div id="tab3" class="tab-content">
+                <div class="tab-actions">
+                    <button type="button" class="btn btn-info" onclick="exportJSON('tab3')">
+                        <i class="fas fa-file-export"></i> Exporter
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="importJSON('tab3')">
+                        <i class="fas fa-file-import"></i> Importer
+                    </button>
+                </div>
+
+                <!-- Diplômes académiques -->
+                <div class="form-section">
+                    <h2><i class="fas fa-graduation-cap"></i> DIPLÔMES ACADÉMIQUES</h2>
+                    <div id="academicDiplomas">
+                        <!-- Diplômes seront ajoutés dynamiquement -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addAcademicDiploma()">
+                        <i class="fas fa-plus"></i> Ajouter un diplôme
+                    </button>
+                </div>
+
+                <!-- Diplômes professionnels -->
+                <div class="form-section">
+                    <h2><i class="fas fa-award"></i> DIPLÔMES PROFESSIONNELS</h2>
+                    <div id="professionalDiplomas">
+                        <!-- Diplômes professionnels -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addProfessionalDiploma()">
+                        <i class="fas fa-plus"></i> Ajouter un diplôme
+                    </button>
+                </div>
+
+                <!-- Formations continues -->
+                <div class="form-section">
+                    <h2><i class="fas fa-chalkboard-teacher"></i> FORMATIONS CONTINUES</h2>
+                    <div id="trainingContainer">
+                        <!-- Formations -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addTraining()">
+                        <i class="fas fa-plus"></i> Ajouter une formation
+                    </button>
+                </div>
+
+                <!-- Compétences linguistiques -->
+                <div class="form-section">
+                    <h2><i class="fas fa-language"></i> COMPÉTENCES LINGUISTIQUES</h2>
+                    <div id="languagesContainer">
+                        <!-- Langues -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addLanguage()">
+                        <i class="fas fa-plus"></i> Ajouter une langue
+                    </button>
+                </div>
+
+                <!-- Compétences informatiques -->
+                <div class="form-section">
+                    <h2><i class="fas fa-laptop-code"></i> COMPÉTENCES INFORMATIQUES</h2>
+                    <div id="itSkillsContainer">
+                        <!-- Compétences IT -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addITSkill()">
+                        <i class="fas fa-plus"></i> Ajouter une compétence
+                    </button>
+                </div>
+            </div>
+
+            <!-- Onglet 4: Évaluations & Statistiques -->
+            <div id="tab4" class="tab-content">
+                <div class="tab-actions">
+                    <button type="button" class="btn btn-info" onclick="exportJSON('tab4')">
+                        <i class="fas fa-file-export"></i> Exporter
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="importJSON('tab4')">
+                        <i class="fas fa-file-import"></i> Importer
+                    </button>
+                    <button type="button" class="btn btn-light" onclick="showStatistics()">
+                        <i class="fas fa-chart-bar"></i> Statistiques
+                    </button>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-chart-line"></i> Performances des élèves</h3>
+                        <div class="chart-container" id="performanceChart"></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-tasks"></i> Progression du programme</h3>
+                        <div class="chart-container" id="progressChart"></div>
+                    </div>
+                </div>
+
+                <!-- Évaluations -->
+                <div class="form-section">
+                    <h2><i class="fas fa-clipboard-check"></i> ÉVALUATIONS</h2>
+                    <div id="evaluationsContainer">
+                        <!-- Évaluations -->
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addEvaluation()">
+                        <i class="fas fa-plus"></i> Nouvelle évaluation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Onglet 5: Projets & Activités -->
+            <div id="tab5" class="tab-content">
+                <div class="tab-actions">
+                    <button type="button" class="btn btn-info" onclick="exportJSON('tab5')">
+                        <i class="fas fa-file-export"></i> Exporter
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="importJSON('tab5')">
+                        <i class="fas fa-file-import"></i> Importer
+                    </button>
+                </div>
+
+                <!-- Projets pédagogiques -->
+                <div class="form-section">
+                    <h2><i class="fas fa-project-diagram"></i> PROJETS PÉDAGOGIQUES</h2>
+                    <div id="projectsContainer">
+                        <!-- Projets -->
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addProject()">
+                        <i class="fas fa-plus"></i> Nouveau projet
+                    </button>
+                </div>
+
+                <!-- Activités extrascolaires -->
+                <div class="form-section">
+                    <h2><i class="fas fa-futbol"></i> ACTIVITÉS EXTRASCOLAIRES</h2>
+                    <div id="activitiesContainer">
+                        <!-- Activités -->
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addActivity()">
+                        <i class="fas fa-plus"></i> Nouvelle activité
+                    </button>
+                </div>
+
+                <!-- Réunions et conseils -->
+                <div class="form-section">
+                    <h2><i class="fas fa-users"></i> RÉUNIONS & CONSEILS</h2>
+                    <div id="meetingsContainer">
+                        <!-- Réunions -->
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addMeeting()">
+                        <i class="fas fa-plus"></i> Nouvelle réunion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Onglet 6: Données & Archives -->
+            <div id="tab6" class="tab-content">
+                <div class="tab-actions">
+                    <button type="button" class="btn btn-info" onclick="backupData()">
+                        <i class="fas fa-save"></i> Sauvegarder
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="restoreData()">
+                        <i class="fas fa-undo"></i> Restaurer
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> Effacer tout
+                    </button>
+                </div>
+
+                <!-- Import/Export -->
+                <div class="form-section">
+                    <h2><i class="fas fa-exchange-alt"></i> IMPORT/EXPORT DE DONNÉES</h2>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-file-export"></i> Exporter toutes les données</label>
+                                <button type="button" class="btn btn-warning w-100" onclick="exportAllJSON()">
+                                    <i class="fas fa-download"></i> Exporter JSON complet
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-file-import"></i> Importer des données</label>
+                                <input type="file" id="importFile" accept=".json" class="mb-10">
+                                <button type="button" class="btn btn-info w-100" onclick="importAllJSON()">
+                                    <i class="fas fa-upload"></i> Importer JSON
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sauvegardes -->
+                <div class="form-section">
+                    <h2><i class="fas fa-history"></i> HISTORIQUE DES SAUVEGARDES</h2>
+                    <div id="backupHistory">
+                        <!-- Historique -->
+                    </div>
+                </div>
+
+                <!-- Logs -->
+                <div class="form-section">
+                    <h2><i class="fas fa-clipboard-list"></i> JOURNAL DES ACTIVITÉS</h2>
+                    <div id="activityLogs">
+                        <!-- Logs -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet 7: Tableau de bord -->
+            <div id="tab7" class="tab-content">
+                <div class="dashboard-grid">
+                    <!-- Cartes de synthèse -->
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-user-circle"></i> Profil complet</h3>
+                        <div id="profileSummary"></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-chart-pie"></i> Répartition par matière</h3>
+                        <div class="chart-container" id="subjectDistribution"></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-calendar-check"></i> Activité récente</h3>
+                        <div id="recentActivity"></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <div id="notificationsList"></div>
+                    </div>
+                </div>
+
+                <!-- Statistiques détaillées -->
+                <div class="form-section">
+                    <h2><i class="fas fa-chart-bar"></i> STATISTIQUES DÉTAILLÉES</h2>
+                    <div class="stats-grid" id="detailedStats">
+                        <!-- Statistiques -->
+                    </div>
+                </div>
+
+                <!-- Rapports rapides -->
+                <div class="form-section">
+                    <h2><i class="fas fa-file-alt"></i> RAPPORTS RAPIDES</h2>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <button type="button" class="btn btn-primary w-100" onclick="generateTeachingReport()">
+                                <i class="fas fa-chalkboard-teacher"></i> Rapport d'enseignement
+                            </button>
+                        </div>
+                        <div class="form-col">
+                            <button type="button" class="btn btn-success w-100" onclick="generateEvaluationReport()">
+                                <i class="fas fa-clipboard-check"></i> Rapport d'évaluation
+                            </button>
+                        </div>
+                        <div class="form-col">
+                            <button type="button" class="btn btn-info w-100" onclick="generateActivityReport()">
+                                <i class="fas fa-project-diagram"></i> Rapport d'activités
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Règles de départ à la retraite -->
+                <div class="form-section" id="retirementRulesSection">
+                    <h2><i class="fas fa-umbrella-beach"></i> RÈGLES DE DÉPART À LA RETRAITE</h2>
+                    <div style="background: white; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                            <i class="fas fa-info-circle"></i> Tableau des catégories
+                        </h4>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Âge de départ</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>A1 & A2</strong></td>
+                                    <td><span class="badge badge-info">60 ans</span></td>
+                                    <td>Cadres supérieurs et Cadres</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>B & C</strong></td>
+                                    <td><span class="badge badge-warning">58 ans</span></td>
+                                    <td>Techniciens supérieurs et Techniciens</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>D</strong></td>
+                                    <td><span class="badge badge-success">55 ans</span></td>
+                                    <td>Adjoints techniques</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                            <h5 style="color: var(--warning-color); margin-bottom: 10px;">
+                                <i class="fas fa-calendar-alt"></i> Règles spécifiques pour 58 ans
+                            </h5>
+                            <ul style="margin-bottom: 0;">
+                                <li><strong>Né(e) entre Janvier et Mars:</strong> Départ le 1er Avril</li>
+                                <li><strong>Né(e) entre Avril et Septembre:</strong> Départ le 1er Octobre</li>
+                                <li><strong>Né(e) entre Octobre et Décembre:</strong> Départ le 1er Janvier suivant</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px; border-left: 4px solid var(--success-color);">
+                            <h5 style="color: var(--success-color); margin-bottom: 10px;">
+                                <i class="fas fa-calculator"></i> Formule de calcul
+                            </h5>
+                            <p><strong>Date de départ = Année de naissance + Âge selon catégorie</strong></p>
+                            <p>Exemple: Né en 1970, catégorie B → 1970 + 58 = 2028</p>
+                            <p>Le mois de départ dépend du mois de naissance selon les règles spécifiques ci-dessus.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions globales -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-light" onclick="printForm()">
+                    <i class="fas fa-print"></i> Imprimer
+                </button>
+                <button type="reset" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Sauvegarder tout
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentData = {
+            establishment: {},
+            personal: {},
+            professional: {},
+            subjects: [],
+            themes: {},
+            lessons: [],
+            tps: [],
+            evaluations: [],
+            diplomas: [],
+            trainings: [],
+            projects: [],
+            activities: [],
+            backups: [],
+            logs: []
+        };
+
+        let currentTab = 'tab1';
+        let counters = {
+            subject: 0,
+            theme: 0,
+            lesson: 0,
+            tp: 0,
+            evaluation: 0,
+            project: 0,
+            activity: 0,
+            meeting: 0
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+
+        function initApp() {
+            // Initialiser l'année scolaire
+            const currentYear = new Date().getFullYear();
+            document.getElementById('currentYear').textContent = `${currentYear}-${currentYear + 1}`;
+            
+            // Gestion des onglets principaux
+            initTabs();
+            
+            // Gestion des sous-onglets
+            initSubTabs();
+            
+            // Charger les données sauvegardées
+            loadSavedData();
+            
+            // Initialiser les événements
+            initEvents();
+            
+            // Mettre à jour l'interface
+            updateUI();
+            
+            showNotification('Application chargée avec succès', 'success');
+        }
+
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        function initSubTabs() {
+            const subTabs = document.querySelectorAll('.sub-tab');
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const subtabId = this.getAttribute('data-subtab');
+                    switchSubTab(subtabId);
+                });
+            });
+        }
+
+        function switchTab(tabId) {
+            // Désactiver tous les onglets
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activer l'onglet sélectionné
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            currentTab = tabId;
+            
+            // Mettre à jour l'interface spécifique à l'onglet
+            updateTabUI(tabId);
+        }
+
+        function switchSubTab(subtabId) {
+            // Désactiver tous les sous-onglets
+            document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activer le sous-onglet sélectionné
+            const subTabElement = document.querySelector(`.sub-tab[data-subtab="${subtabId}"]`);
+            const subTabContent = document.querySelector(`.sub-tab-content[data-subtab="${subtabId}"]`);
+            
+            if (subTabElement) subTabElement.classList.add('active');
+            if (subTabContent) subTabContent.classList.add('active');
+        }
+
+        function initEvents() {
+            // Écouter les changements sur les champs importants
+            const establishmentName = document.getElementById('establishmentName');
+            if (establishmentName) {
+                establishmentName.addEventListener('change', updateSchoolName);
+            }
+            
+            const birthDate = document.getElementById('birthDate');
+            if (birthDate) {
+                birthDate.addEventListener('change', function() {
+                    // Synchroniser le mois de naissance avec la date
+                    const birthDate = new Date(this.value);
+                    const birthMonth = birthDate.getMonth() + 1;
+                    const birthMonthSelect = document.getElementById('birthMonth');
+                    if (birthMonthSelect) {
+                        birthMonthSelect.value = birthMonth;
+                    }
+                    calculateRetirementDate();
+                });
+            }
+            
+            const birthMonth = document.getElementById('birthMonth');
+            if (birthMonth) {
+                birthMonth.addEventListener('change', calculateRetirementDate);
+            }
+            
+            const professionalCategory = document.getElementById('professionalCategory');
+            if (professionalCategory) {
+                professionalCategory.addEventListener('change', calculateRetirementDate);
+            }
+            
+            const regionServiceDate = document.getElementById('regionServiceDate');
+            if (regionServiceDate) {
+                regionServiceDate.addEventListener('change', () => {
+                    calculateServiceYears('regionServiceDate', 'yearsInRegion');
+                });
+            }
+            
+            const inspectionServiceDate = document.getElementById('inspectionServiceDate');
+            if (inspectionServiceDate) {
+                inspectionServiceDate.addEventListener('change', () => {
+                    calculateServiceYears('inspectionServiceDate', 'yearsInInspection');
+                });
+            }
+            
+            // Gestion du formulaire
+            const teacherForm = document.getElementById('teacherForm');
+            if (teacherForm) {
+                teacherForm.addEventListener('submit', handleSubmit);
+            }
+            
+            // Recherche
+            const lessonSearch = document.getElementById('lessonSearch');
+            if (lessonSearch) {
+                lessonSearch.addEventListener('input', filterLessons);
+            }
+            
+            // Upload de fichiers
+            const resourceUpload = document.getElementById('resourceUpload');
+            if (resourceUpload) {
+                resourceUpload.addEventListener('change', handleResourceUpload);
+            }
+            
+            const importFile = document.getElementById('importFile');
+            if (importFile) {
+                importFile.addEventListener('change', handleFileSelect);
+            }
+        }
+
+        function updateSchoolName() {
+            const name = document.getElementById('establishmentName').value;
+            const schoolNameElement = document.getElementById('schoolName');
+            if (name && schoolNameElement) {
+                schoolNameElement.textContent = name;
+            }
+        }
+
+        function calculateRetirementDate() {
+            const birthDateInput = document.getElementById('birthDate');
+            const birthMonthInput = document.getElementById('birthMonth');
+            const professionalCategoryInput = document.getElementById('professionalCategory');
+            const retirementDateInput = document.getElementById('retirementDate');
+            
+            if (!birthDateInput || !birthDateInput.value || !retirementDateInput) {
+                return;
+            }
+            
+            const birthDate = new Date(birthDateInput.value);
+            let birthMonth = birthDate.getMonth() + 1; // Janvier = 1, Décembre = 12
+            
+            // Si le mois de naissance est défini dans le sélecteur, l'utiliser
+            if (birthMonthInput && birthMonthInput.value) {
+                birthMonth = parseInt(birthMonthInput.value);
+            }
+            
+            const birthYear = birthDate.getFullYear();
+            
+            // Récupérer la catégorie professionnelle
+            const professionalCategory = professionalCategoryInput ? professionalCategoryInput.value : '';
+            
+            // Âge de départ à la retraite selon la catégorie
+            let retirementAge = 60; // Valeur par défaut
+            
+            if (professionalCategory === 'A1' || professionalCategory === 'A2') {
+                retirementAge = 60;
+            } else if (professionalCategory === 'B' || professionalCategory === 'C') {
+                retirementAge = 58;
+            } else if (professionalCategory === 'D') {
+                retirementAge = 55;
+            }
+            
+            // Calculer l'année de départ
+            let retirementYear = birthYear + retirementAge;
+            
+            // Déterminer le mois de départ selon les règles du document
+            let retirementMonth = 1; // Par défaut, janvier
+            
+            if (retirementAge === 58) {
+                // Règle spéciale pour 58 ans selon le document
+                if (birthMonth >= 1 && birthMonth <= 3) { // Janvier à Mars
+                    retirementMonth = 4; // Avril
+                } else if (birthMonth >= 4 && birthMonth <= 9) { // Avril à Septembre
+                    retirementMonth = 10; // Octobre
+                } else { // Octobre à Décembre
+                    retirementMonth = 1; // Janvier suivant
+                    retirementYear += 1; // L'année suivante
+                }
+            } else if (retirementAge === 55) {
+                // Pour 55 ans, départ le 1er du mois suivant l'anniversaire
+                retirementMonth = birthMonth + 1;
+                if (retirementMonth > 12) {
+                    retirementMonth = 1;
+                    retirementYear += 1;
+                }
+            } else if (retirementAge === 60) {
+                // Pour 60 ans, départ le 1er du mois suivant l'anniversaire
+                retirementMonth = birthMonth + 1;
+                if (retirementMonth > 12) {
+                    retirementMonth = 1;
+                    retirementYear += 1;
+                }
+            }
+            
+            // Formater la date de départ
+            const retirementDate = new Date(retirementYear, retirementMonth - 1, 1);
+            
+            // Afficher la date formatée
+            const formattedDate = retirementDate.toISOString().split('T')[0];
+            retirementDateInput.value = formattedDate;
+            
+            // Mettre à jour l'affichage détaillé
+            updateRetirementDetails(birthYear, birthMonth, retirementAge, retirementYear, retirementMonth, professionalCategory);
+        }
+
+        function updateRetirementDetails(birthYear, birthMonth, retirementAge, retirementYear, retirementMonth, professionalCategory) {
+            const detailsContainer = document.getElementById('retirementDetails');
+            if (!detailsContainer) return;
+            
+            const monthNames = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ];
+            
+            const birthMonthName = monthNames[birthMonth - 1];
+            const retirementMonthName = monthNames[retirementMonth - 1];
+            
+            let detailsHTML = `
+                <div class="retirement-info" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                    <h4 style="margin-bottom: 10px; color: var(--primary-color);">
+                        <i class="fas fa-info-circle"></i> Détails du calcul
+                    </h4>
+                    <div style="font-size: 0.9rem;">
+                        <p><strong>Année de naissance:</strong> ${birthYear}</p>
+                        <p><strong>Mois de naissance:</strong> ${birthMonthName}</p>
+                        <p><strong>Catégorie:</strong> ${professionalCategory || 'Non définie'}</p>
+                        <p><strong>Âge de départ:</strong> ${retirementAge} ans</p>
+                        <p><strong>Calcul:</strong> ${birthYear} + ${retirementAge} = ${retirementYear}</p>
+                        <p><strong>Date de départ:</strong> 1er ${retirementMonthName} ${retirementYear}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Ajouter les règles spécifiques pour 58 ans
+            if (retirementAge === 58) {
+                let ruleText = '';
+                if (birthMonth >= 1 && birthMonth <= 3) {
+                    ruleText = 'Né(e) entre Janvier et Mars → Départ le 1er Avril';
+                } else if (birthMonth >= 4 && birthMonth <= 9) {
+                    ruleText = 'Né(e) entre Avril et Septembre → Départ le 1er Octobre';
+                } else {
+                    ruleText = 'Né(e) entre Octobre et Décembre → Départ le 1er Janvier suivant';
+                }
+                
+                detailsHTML += `
+                    <div class="retirement-rules" style="background: #fff3e0; padding: 15px; border-radius: 5px; margin-top: 10px; border-left: 4px solid var(--warning-color);">
+                        <h5 style="margin-bottom: 10px; color: var(--warning-color);">
+                            <i class="fas fa-exclamation-circle"></i> Règle appliquée
+                        </h5>
+                        <div style="font-size: 0.85rem;">
+                            <p>${ruleText}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            detailsContainer.innerHTML = detailsHTML;
+        }
+
+        function calculateServiceYears(dateFieldId, yearsFieldId) {
+            const dateField = document.getElementById(dateFieldId);
+            const yearsField = document.getElementById(yearsFieldId);
+            
+            if (dateField && dateField.value && yearsField) {
+                const startDate = new Date(dateField.value);
+                const today = new Date();
+                
+                let years = today.getFullYear() - startDate.getFullYear();
+                const monthDiff = today.getMonth() - startDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < startDate.getDate())) {
+                    years--;
+                }
+                
+                yearsField.value = Math.max(years, 0);
+            }
+        }
+
+        // Fonctions pour ajouter des éléments dynamiques
+        function addSubjectField() {
+            const container = document.getElementById('subjectsContainer');
+            counters.subject++;
+            
+            const newSubject = document.createElement('div');
+            newSubject.className = 'form-row';
+            newSubject.innerHTML = `
+                <div class="form-col">
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> Matière supplémentaire ${counters.subject}</label>
+                        <input type="text" placeholder="Nom de la matière" id="subject_${counters.subject}">
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Heures/semaine</label>
+                        <input type="number" min="0" max="20" id="subject_hours_${counters.subject}">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newSubject);
+        }
+
+        function addAcademicDiploma() {
+            const container = document.getElementById('academicDiplomas');
+            const diplomaId = `diploma_${Date.now()}`;
+            
+            const diplomaHTML = `
+                <div class="dynamic-item" id="${diplomaId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-certificate"></i> Diplôme</label>
+                                <input type="text" placeholder="Ex: Licence, Master, Doctorat..." required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-university"></i> Établissement</label>
+                                <input type="text" placeholder="Nom de l'université">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Année d'obtention</label>
+                                <input type="number" min="1900" max="2100">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-file-pdf"></i> Fichier joint</label>
+                                <input type="file" accept=".pdf,.jpg,.png">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${diplomaId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', diplomaHTML);
+        }
+
+        function addProfessionalDiploma() {
+            const container = document.getElementById('professionalDiplomas');
+            const diplomaId = `pro_diploma_${Date.now()}`;
+            
+            const diplomaHTML = `
+                <div class="dynamic-item" id="${diplomaId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-award"></i> Diplôme/Certification</label>
+                                <input type="text" placeholder="Ex: CAPES, Agrégation, Certification..." required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date d'obtention</label>
+                                <input type="date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-id-card"></i> Numéro de certification</label>
+                                <input type="text" placeholder="Numéro officiel">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-file-pdf"></i> Fichier joint</label>
+                                <input type="file" accept=".pdf,.jpg,.png">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${diplomaId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', diplomaHTML);
+        }
+
+        function addTraining() {
+            const container = document.getElementById('trainingContainer');
+            const trainingId = `training_${Date.now()}`;
+            
+            const trainingHTML = `
+                <div class="dynamic-item" id="${trainingId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-chalkboard-teacher"></i> Formation</label>
+                                <input type="text" placeholder="Titre de la formation" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> Organisateur</label>
+                                <input type="text" placeholder="Organisme formateur">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date de début</label>
+                                <input type="date">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-check"></i> Date de fin</label>
+                                <input type="date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Description</label>
+                        <textarea rows="3" placeholder="Objectifs et contenu de la formation"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${trainingId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', trainingHTML);
+        }
+
+        function addLanguage() {
+            const container = document.getElementById('languagesContainer');
+            const languageId = `language_${Date.now()}`;
+            
+            const languageHTML = `
+                <div class="dynamic-item" id="${languageId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-language"></i> Langue</label>
+                                <select>
+                                    <option value="">Sélectionner</option>
+                                    <option value="french">Français</option>
+                                    <option value="english">Anglais</option>
+                                    <option value="spanish">Espagnol</option>
+                                    <option value="german">Allemand</option>
+                                    <option value="arabic">Arabe</option>
+                                    <option value="other">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-comment"></i> Niveau oral</label>
+                                <select>
+                                    <option value="">Niveau</option>
+                                    <option value="beginner">Débutant</option>
+                                    <option value="intermediate">Intermédiaire</option>
+                                    <option value="advanced">Avancé</option>
+                                    <option value="fluent">Courant</option>
+                                    <option value="native">Langue maternelle</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-pen"></i> Niveau écrit</label>
+                                <select>
+                                    <option value="">Niveau</option>
+                                    <option value="beginner">Débutant</option>
+                                    <option value="intermediate">Intermédiaire</option>
+                                    <option value="advanced">Avancé</option>
+                                    <option value="fluent">Courant</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${languageId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', languageHTML);
+        }
+
+        function addITSkill() {
+            const container = document.getElementById('itSkillsContainer');
+            const skillId = `itskill_${Date.now()}`;
+            
+            const skillHTML = `
+                <div class="dynamic-item" id="${skillId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-laptop-code"></i> Compétence</label>
+                                <input type="text" placeholder="Ex: Word, Excel, PowerPoint, Moodle..." required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-star"></i> Niveau</label>
+                                <select>
+                                    <option value="">Sélectionner</option>
+                                    <option value="beginner">Débutant</option>
+                                    <option value="intermediate">Intermédiaire</option>
+                                    <option value="advanced">Avancé</option>
+                                    <option value="expert">Expert</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-certificate"></i> Certification</label>
+                        <input type="text" placeholder="Certification obtenue (optionnel)">
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${skillId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', skillHTML);
+        }
+
+        function addNewLesson() {
+            const lessonId = `lesson_${Date.now()}`;
+            const lessonHTML = `
+                <div class="lesson-container" id="${lessonId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Titre de la leçon</label>
+                                <input type="text" placeholder="Titre de la leçon" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Durée (heures)</label>
+                                <input type="number" min="0.5" max="4" step="0.5" value="1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Classe</label>
+                                <input type="text" placeholder="Ex: 3ème A">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs pédagogiques</label>
+                        <textarea rows="3" placeholder="Objectifs spécifiques de la leçon"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tasks"></i> Déroulement</label>
+                        <textarea rows="4" placeholder="Plan détaillé de la séance"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tools"></i> Matériel utilisé</label>
+                        <textarea rows="2" placeholder="Matériel et supports pédagogiques"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-exclamation-triangle"></i> Difficultés rencontrées</label>
+                                <textarea rows="2" placeholder="Problèmes rencontrés"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-lightbulb"></i> Solutions apportées</label>
+                                <textarea rows="2" placeholder="Solutions mises en place"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${lessonId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${lessonId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const lessonsContainer = document.getElementById('lessonsContainer');
+            if (lessonsContainer) {
+                lessonsContainer.insertAdjacentHTML('beforeend', lessonHTML);
+            }
+        }
+
+        function addNewTP() {
+            const tpId = `tp_${Date.now()}`;
+            const tpHTML = `
+                <div class="tp-container" id="${tpId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-flask"></i> Titre du TP/Expérience</label>
+                                <input type="text" placeholder="Titre de l'expérience" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs spécifiques</label>
+                        <textarea rows="2" placeholder="Objectifs pédagogiques du TP"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-vial"></i> Description de l'expérience</label>
+                        <textarea rows="3" placeholder="Protocole expérimental détaillé"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tools"></i> Matériel et équipement</label>
+                        <textarea rows="2" placeholder="Liste du matériel nécessaire"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-exclamation-triangle"></i> Problèmes rencontrés</label>
+                                <textarea rows="2" placeholder="Difficultés techniques ou sécurité"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-chart-line"></i> Résultats obtenus</label>
+                                <textarea rows="2" placeholder="Observations et résultats"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Durée (heures)</label>
+                                <input type="number" min="1" max="6" value="2">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Nombre d'élèves</label>
+                                <input type="number" min="1" max="40">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-user-shield"></i> Sécurité</label>
+                                <select>
+                                    <option value="low">Faible risque</option>
+                                    <option value="medium">Risque modéré</option>
+                                    <option value="high">Risque élevé</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${tpId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${tpId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const tpContainer = document.getElementById('tpContainer');
+            if (tpContainer) {
+                tpContainer.insertAdjacentHTML('beforeend', tpHTML);
+            }
+        }
+
+        function addEvaluation() {
+            const evalId = `eval_${Date.now()}`;
+            const evalHTML = `
+                <div class="evaluation-container" id="${evalId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clipboard-check"></i> Type d'évaluation</label>
+                                <select>
+                                    <option value="">Sélectionner</option>
+                                    <option value="controle">Contrôle</option>
+                                    <option value="devoir">Devoir surveillé</option>
+                                    <option value="interro">Interrogation</option>
+                                    <option value="oral">Oral</option>
+                                    <option value="tp">Évaluation de TP</option>
+                                    <option value="projet">Projet</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Matière</label>
+                                <input type="text" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Classe</label>
+                                <input type="text" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Sujet/Thème</label>
+                        <textarea rows="2" placeholder="Description du sujet d'évaluation"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-chart-bar"></i> Résultats (moyenne)</label>
+                                <input type="number" min="0" max="20" step="0.5" placeholder="Moyenne de la classe">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-percentage"></i> Taux de réussite</label>
+                                <input type="number" min="0" max="100" placeholder="%">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-comment"></i> Commentaires</label>
+                        <textarea rows="3" placeholder="Analyse des résultats"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${evalId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${evalId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const evaluationsContainer = document.getElementById('evaluationsContainer');
+            if (evaluationsContainer) {
+                evaluationsContainer.insertAdjacentHTML('beforeend', evalHTML);
+            }
+        }
+
+        function addProject() {
+            const projectId = `project_${Date.now()}`;
+            const projectHTML = `
+                <div class="dynamic-item" id="${projectId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-project-diagram"></i> Titre du projet</label>
+                                <input type="text" placeholder="Nom du projet" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Période</label>
+                                <input type="text" placeholder="Ex: Année scolaire 2023-2024">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs</label>
+                        <textarea rows="3" placeholder="Objectifs pédagogiques du projet"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tasks"></i> Description</label>
+                        <textarea rows="4" placeholder="Description détaillée du projet"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Participants</label>
+                                <input type="text" placeholder="Classes/élèves concernés">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-euro-sign"></i> Budget</label>
+                                <input type="number" placeholder="Budget alloué">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-line"></i> Résultats et impact</label>
+                        <textarea rows="3" placeholder="Bilan du projet"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${projectId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${projectId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const projectsContainer = document.getElementById('projectsContainer');
+            if (projectsContainer) {
+                projectsContainer.insertAdjacentHTML('beforeend', projectHTML);
+            }
+        }
+
+        function addActivity() {
+            const activityId = `activity_${Date.now()}`;
+            const activityHTML = `
+                <div class="dynamic-item" id="${activityId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-futbol"></i> Activité</label>
+                                <input type="text" placeholder="Nom de l'activité" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Fréquence</label>
+                                <select>
+                                    <option value="">Sélectionner</option>
+                                    <option value="weekly">Hebdomadaire</option>
+                                    <option value="monthly">Mensuelle</option>
+                                    <option value="quarterly">Trimestrielle</option>
+                                    <option value="yearly">Annuelle</option>
+                                    <option value="occasional">Occasionnelle</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs</label>
+                        <textarea rows="2" placeholder="Objectifs de l'activité"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-users"></i> Participants</label>
+                        <textarea rows="2" placeholder="Élèves et encadrants"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-line"></i> Bilan</label>
+                        <textarea rows="3" placeholder="Résultats et observations"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${activityId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${activityId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const activitiesContainer = document.getElementById('activitiesContainer');
+            if (activitiesContainer) {
+                activitiesContainer.insertAdjacentHTML('beforeend', activityHTML);
+            }
+        }
+
+        function addMeeting() {
+            const meetingId = `meeting_${Date.now()}`;
+            const meetingHTML = `
+                <div class="dynamic-item" id="${meetingId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Type de réunion</label>
+                                <select>
+                                    <option value="">Sélectionner</option>
+                                    <option value="conseil_classe">Conseil de classe</option>
+                                    <option value="conseil_enseignement">Conseil d'enseignement</option>
+                                    <option value="conseil_etablissement">Conseil d'établissement</option>
+                                    <option value="reunion_parents">Réunion parents-professeurs</option>
+                                    <option value="commission">Commission</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Ordre du jour</label>
+                        <textarea rows="3" placeholder="Points à aborder"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clipboard-list"></i> Compte-rendu</label>
+                        <textarea rows="4" placeholder="Décisions et actions"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${meetingId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${meetingId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const meetingsContainer = document.getElementById('meetingsContainer');
+            if (meetingsContainer) {
+                meetingsContainer.insertAdjacentHTML('beforeend', meetingHTML);
+            }
+        }
+
+        function saveElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                showNotification('Élément sauvegardé avec succès', 'success');
+            }
+        }
+
+        function removeElement(elementId) {
+            if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.remove();
+                    showNotification('Élément supprimé avec succès', 'success');
+                }
+            }
+        }
+
+        // Fonctions d'emploi du temps
+        function generateTimetable() {
+            const container = document.getElementById('timetableContainer');
+            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const hours = ['8h-9h', '9h-10h', '10h-11h', '11h-12h', '14h-15h', '15h-16h', '16h-17h'];
+            
+            let timetableHTML = `
+                <div class="form-group mb-20">
+                    <label><i class="fas fa-cog"></i> Paramètres de l'emploi du temps</label>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <input type="number" min="1" max="10" value="6" id="timetableDays" placeholder="Nombre de jours">
+                        </div>
+                        <div class="form-col">
+                            <input type="number" min="1" max="10" value="7" id="timetableHours" placeholder="Nombre de créneaux">
+                        </div>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Heures/Jours</th>
+            `;
+            
+            // En-têtes des jours
+            for (let i = 0; i < 6; i++) {
+                timetableHTML += `<th>${days[i]}</th>`;
+            }
+            
+            timetableHTML += `</tr></thead><tbody>`;
+            
+            // Lignes des heures
+            for (let i = 0; i < hours.length; i++) {
+                timetableHTML += `<tr><td>${hours[i]}</td>`;
+                
+                for (let j = 0; j < 6; j++) {
+                    timetableHTML += `
+                        <td>
+                            <select class="timetable-cell" data-day="${j}" data-hour="${i}">
+                                <option value="">-- Vide --</option>
+                                <option value="main">Matière principale</option>
+                                <option value="secondary">Matière secondaire</option>
+                                <option value="other">Autre matière</option>
+                                <option value="tp">TP/Labo</option>
+                                <option value="meeting">Réunion</option>
+                                <option value="free">Disponible</option>
+                            </select>
+                        </td>
+                    `;
+                }
+                
+                timetableHTML += `</tr>`;
+            }
+            
+            timetableHTML += `</tbody></table>`;
+            
+            container.innerHTML = timetableHTML;
+            
+            // Ajouter les événements aux cellules
+            document.querySelectorAll('.timetable-cell').forEach(cell => {
+                cell.addEventListener('change', function() {
+                    updateTimetableCell(this);
+                });
+            });
+        }
+
+        function updateTimetableCell(cell) {
+            const value = cell.value;
+            
+            // Mettre à jour le style selon le type d'activité
+            switch(value) {
+                case 'main':
+                    cell.style.backgroundColor = '#e3f2fd';
+                    break;
+                case 'secondary':
+                    cell.style.backgroundColor = '#e8f5e9';
+                    break;
+                case 'tp':
+                    cell.style.backgroundColor = '#fff3e0';
+                    break;
+                case 'meeting':
+                    cell.style.backgroundColor = '#f3e5f5';
+                    break;
+                case 'free':
+                    cell.style.backgroundColor = '#f5f5f5';
+                    break;
+                default:
+                    cell.style.backgroundColor = '';
+            }
+        }
+
+        function loadSubjectThemes(subject) {
+            const container = document.getElementById('themesContainer');
+            if (!container) return;
+            
+            if (!subject) {
+                container.innerHTML = '<p class="text-center">Veuillez sélectionner une matière</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="theme-container">
+                    <h4>Thèmes pour ${subject}</h4>
+                    <div class="form-group">
+                        <label>Ajouter un nouveau thème</label>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <input type="text" id="newThemeName" placeholder="Nom du thème">
+                            </div>
+                            <div class="form-col">
+                                <button type="button" class="btn btn-secondary" onclick="addTheme('${subject}')">
+                                    <i class="fas fa-plus"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="themesList"></div>
+                </div>
+            `;
+        }
+
+        function addTheme(subject) {
+            const themeNameInput = document.getElementById('newThemeName');
+            if (!themeNameInput || !themeNameInput.value) {
+                showNotification('Veuillez entrer un nom de thème', 'warning');
+                return;
+            }
+            
+            const themesList = document.getElementById('themesList');
+            if (themesList) {
+                const themeId = `theme_${Date.now()}`;
+                const themeHTML = `
+                    <div class="dynamic-item" id="${themeId}">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Thème: ${themeNameInput.value}</label>
+                                    <textarea rows="2" placeholder="Description du thème"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-actions">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${themeId}')">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+                themesList.insertAdjacentHTML('beforeend', themeHTML);
+                themeNameInput.value = '';
+            }
+        }
+
+        // Fonctions de recherche et filtrage
+        function filterLessons() {
+            const searchTerm = document.getElementById('lessonSearch').value.toLowerCase();
+            const lessons = document.querySelectorAll('.lesson-container');
+            
+            lessons.forEach(lesson => {
+                const text = lesson.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    lesson.style.display = 'block';
+                } else {
+                    lesson.style.display = 'none';
+                }
+            });
+        }
+
+        // Gestion des ressources
+        function handleResourceUpload(event) {
+            const files = event.target.files;
+            const container = document.getElementById('resourcesList');
+            
+            if (!container) return;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const resourceId = `resource_${Date.now()}_${i}`;
+                
+                const resourceHTML = `
+                    <div class="attachment-item" id="${resourceId}">
+                        <div>
+                            <i class="fas fa-file"></i>
+                            <span>${file.name}</span>
+                            <small>(${formatFileSize(file.size)})</small>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-xs btn-light" onclick="previewResource('${resourceId}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-xs btn-danger" onclick="removeElement('${resourceId}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', resourceHTML);
+            }
+            
+            showNotification(`${files.length} ressource(s) ajoutée(s)`, 'success');
+        }
+
+        function previewResource(resourceId) {
+            showNotification('Prévisualisation non disponible pour le moment', 'info');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Import/Export
+        function exportJSON(tabId) {
+            const data = getTabData(tabId);
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fiche-enseignant-${tabId}-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Données exportées avec succès', 'success');
+        }
+
+        function importJSON(tabId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        setTabData(tabId, data);
+                        showNotification('Données importées avec succès', 'success');
+                    } catch (error) {
+                        showNotification('Erreur lors de l\'importation', 'error');
+                        console.error(error);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function exportAllJSON() {
+            const data = getAllData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fiche-enseignant-complete-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Toutes les données exportées avec succès', 'success');
+        }
+
+        function importAllJSON() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput) return;
+            
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('Veuillez sélectionner un fichier', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    setAllData(data);
+                    showNotification('Données importées avec succès', 'success');
+                } catch (error) {
+                    showNotification('Erreur lors de l\'importation', 'error');
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                showNotification(`Fichier sélectionné: ${file.name}`, 'info');
+            }
+        }
+
+        // Sauvegarde/Restauration
+        function backupData() {
+            const data = getAllData();
+            const backup = {
+                timestamp: new Date().toISOString(),
+                data: data
+            };
+            
+            try {
+                // Sauvegarder dans localStorage
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                backups.push(backup);
+                localStorage.setItem('backups', JSON.stringify(backups.slice(-10))); // Garder les 10 dernières
+                
+                // Sauvegarder les données courantes
+                localStorage.setItem('currentData', JSON.stringify(data));
+                
+                showNotification('Sauvegarde effectuée avec succès', 'success');
+                updateBackupHistory();
+            } catch (error) {
+                showNotification('Erreur lors de la sauvegarde', 'error');
+                console.error(error);
+            }
+        }
+
+        function restoreData() {
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                if (backups.length === 0) {
+                    showNotification('Aucune sauvegarde disponible', 'warning');
+                    return;
+                }
+                
+                // Demander quelle sauvegarde restaurer
+                const backupList = backups.map((b, i) => 
+                    `${i + 1}. ${new Date(b.timestamp).toLocaleString()}`
+                ).join('\n');
+                
+                const choice = prompt(`Sauvegardes disponibles:\n${backupList}\n\nEntrez le numéro de la sauvegarde (1-${backups.length}):`);
+                const index = parseInt(choice) - 1;
+                
+                if (index >= 0 && index < backups.length) {
+                    setAllData(backups[index].data);
+                    showNotification('Données restaurées avec succès', 'success');
+                } else {
+                    showNotification('Numéro invalide', 'warning');
+                }
+            } catch (error) {
+                showNotification('Erreur lors de la restauration', 'error');
+                console.error(error);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible.')) {
+                try {
+                    localStorage.clear();
+                    location.reload();
+                } catch (error) {
+                    showNotification('Erreur lors de la suppression des données', 'error');
+                }
+            }
+        }
+
+        // Gestion des données
+        function getAllData() {
+            // Collecter toutes les données du formulaire
+            const data = {
+                establishment: getEstablishmentData(),
+                personal: getPersonalData(),
+                professional: getProfessionalData(),
+                subjects: getSubjectsData(),
+                themes: getThemesData(),
+                lessons: getLessonsData(),
+                tps: getTPsData(),
+                evaluations: getEvaluationsData(),
+                diplomas: getDiplomasData(),
+                trainings: getTrainingsData(),
+                languages: getLanguagesData(),
+                itskills: getITSkillsData(),
+                projects: getProjectsData(),
+                activities: getActivitiesData(),
+                meetings: getMeetingsData()
+            };
+            
+            return data;
+        }
+
+        function getEstablishmentData() {
+            return {
+                name: document.getElementById('establishmentName')?.value || '',
+                type: document.getElementById('establishmentType')?.value || '',
+                address: document.getElementById('establishmentAddress')?.value || '',
+                phone: document.getElementById('establishmentPhone')?.value || '',
+                email: document.getElementById('establishmentEmail')?.value || '',
+                website: document.getElementById('establishmentWebsite')?.value || ''
+            };
+        }
+
+        function getPersonalData() {
+            return {
+                lastName: document.getElementById('lastName')?.value || '',
+                firstName: document.getElementById('firstName')?.value || '',
+                gender: document.getElementById('gender')?.value || '',
+                birthDate: document.getElementById('birthDate')?.value || '',
+                birthMonth: document.getElementById('birthMonth')?.value || '',
+                birthPlace: document.getElementById('birthPlace')?.value || '',
+                nationality: document.getElementById('nationality')?.value || '',
+                address: document.getElementById('address')?.value || '',
+                personalPhone: document.getElementById('personalPhone')?.value || '',
+                personalEmail: document.getElementById('personalEmail')?.value || '',
+                cin: document.getElementById('cin')?.value || '',
+                maritalStatus: document.getElementById('maritalStatus')?.value || '',
+                childrenNumber: document.getElementById('childrenNumber')?.value || ''
+            };
+        }
+
+        function getProfessionalData() {
+            return {
+                matricule: document.getElementById('matricule')?.value || '',
+                position: document.getElementById('position')?.value || '',
+                grade: document.getElementById('grade')?.value || '',
+                professionalCategory: document.getElementById('professionalCategory')?.value || '',
+                engagementDate: document.getElementById('engagementDate')?.value || '',
+                regionServiceDate: document.getElementById('regionServiceDate')?.value || '',
+                inspectionServiceDate: document.getElementById('inspectionServiceDate')?.value || '',
+                yearsInRegion: document.getElementById('yearsInRegion')?.value || '',
+                yearsInInspection: document.getElementById('yearsInInspection')?.value || '',
+                retirementDate: document.getElementById('retirementDate')?.value || '',
+                currentClass: document.getElementById('currentClass')?.value || '',
+                weeklyHours: document.getElementById('weeklyHours')?.value || ''
+            };
+        }
+
+        function getSubjectsData() {
+            const subjects = [];
+            const mainSubject = document.getElementById('mainSubject')?.value;
+            const secondarySubject = document.getElementById('secondarySubject')?.value;
+            
+            if (mainSubject) {
+                subjects.push({ name: mainSubject, type: 'main', hours: document.getElementById('weeklyHours')?.value || '' });
+            }
+            if (secondarySubject) {
+                subjects.push({ name: secondarySubject, type: 'secondary' });
+            }
+            
+            // Récupérer les matières supplémentaires
+            for (let i = 1; i <= counters.subject; i++) {
+                const subjectName = document.getElementById(`subject_${i}`)?.value;
+                const subjectHours = document.getElementById(`subject_hours_${i}`)?.value;
+                if (subjectName) {
+                    subjects.push({ name: subjectName, type: 'additional', hours: subjectHours });
+                }
+            }
+            
+            return subjects;
+        }
+
+        function getTabData(tabId) {
+            switch(tabId) {
+                case 'tab1':
+                    return {
+                        establishment: getEstablishmentData(),
+                        personal: getPersonalData(),
+                        professional: getProfessionalData(),
+                        subjects: getSubjectsData()
+                    };
+                case 'tab2':
+                    return {
+                        themes: getThemesData(),
+                        lessons: getLessonsData(),
+                        tps: getTPsData()
+                    };
+                case 'tab3':
+                    return {
+                        diplomas: getDiplomasData(),
+                        trainings: getTrainingsData(),
+                        languages: getLanguagesData(),
+                        itskills: getITSkillsData()
+                    };
+                case 'tab4':
+                    return {
+                        evaluations: getEvaluationsData()
+                    };
+                case 'tab5':
+                    return {
+                        projects: getProjectsData(),
+                        activities: getActivitiesData(),
+                        meetings: getMeetingsData()
+                    };
+                default:
+                    return {};
+            }
+        }
+
+        function setTabData(tabId, data) {
+            // Implémenter selon la structure de chaque onglet
+            switch(tabId) {
+                case 'tab1':
+                    setEstablishmentData(data.establishment || {});
+                    setPersonalData(data.personal || {});
+                    setProfessionalData(data.professional || {});
+                    setSubjectsData(data.subjects || []);
+                    break;
+                // Les autres onglets peuvent être implémentés de manière similaire
+            }
+        }
+
+        function setAllData(data) {
+            setEstablishmentData(data.establishment || {});
+            setPersonalData(data.personal || {});
+            setProfessionalData(data.professional || {});
+            setSubjectsData(data.subjects || []);
+            // ... autres données peuvent être implémentées
+        }
+
+        function setEstablishmentData(data) {
+            if (!data) return;
+            setValue('establishmentName', data.name);
+            setValue('establishmentType', data.type);
+            setValue('establishmentAddress', data.address);
+            setValue('establishmentPhone', data.phone);
+            setValue('establishmentEmail', data.email);
+            setValue('establishmentWebsite', data.website);
+            updateSchoolName();
+        }
+
+        function setPersonalData(data) {
+            if (!data) return;
+            setValue('lastName', data.lastName);
+            setValue('firstName', data.firstName);
+            setValue('gender', data.gender);
+            setValue('birthDate', data.birthDate);
+            setValue('birthMonth', data.birthMonth);
+            setValue('birthPlace', data.birthPlace);
+            setValue('nationality', data.nationality);
+            setValue('address', data.address);
+            setValue('personalPhone', data.personalPhone);
+            setValue('personalEmail', data.personalEmail);
+            setValue('cin', data.cin);
+            setValue('maritalStatus', data.maritalStatus);
+            setValue('childrenNumber', data.childrenNumber);
+            
+            // Recalculer la retraite
+            if (data.birthDate) calculateRetirementDate();
+        }
+
+        function setProfessionalData(data) {
+            if (!data) return;
+            setValue('matricule', data.matricule);
+            setValue('position', data.position);
+            setValue('grade', data.grade);
+            setValue('professionalCategory', data.professionalCategory);
+            setValue('engagementDate', data.engagementDate);
+            setValue('regionServiceDate', data.regionServiceDate);
+            setValue('inspectionServiceDate', data.inspectionServiceDate);
+            setValue('currentClass', data.currentClass);
+            setValue('weeklyHours', data.weeklyHours);
+            
+            // Recalculer les valeurs dérivées
+            if (data.birthDate) calculateRetirementDate();
+            if (data.regionServiceDate) calculateServiceYears('regionServiceDate', 'yearsInRegion');
+            if (data.inspectionServiceDate) calculateServiceYears('inspectionServiceDate', 'yearsInInspection');
+        }
+
+        function setValue(id, value) {
+            const element = document.getElementById(id);
+            if (element && value !== undefined) {
+                element.value = value;
+            }
+        }
+
+        function setSubjectsData(subjects) {
+            if (!subjects) return;
+            
+            // Réinitialiser
+            counters.subject = 0;
+            const container = document.getElementById('subjectsContainer');
+            
+            if (!container) return;
+            
+            // Nettoyer les champs supplémentaires (garder le premier row)
+            const formRows = container.querySelectorAll('.form-row');
+            for (let i = 1; i < formRows.length; i++) {
+                formRows[i].remove();
+            }
+            
+            // Remplir les matières principales
+            subjects.forEach((subject, index) => {
+                if (index === 0) {
+                    setValue('mainSubject', subject.name);
+                } else if (index === 1) {
+                    setValue('secondarySubject', subject.name);
+                } else {
+                    counters.subject++;
+                    const newSubject = document.createElement('div');
+                    newSubject.className = 'form-row';
+                    newSubject.innerHTML = `
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Matière supplémentaire ${counters.subject}</label>
+                                <input type="text" value="${subject.name || ''}" id="subject_${counters.subject}">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Heures/semaine</label>
+                                <input type="number" value="${subject.hours || ''}" id="subject_hours_${counters.subject}">
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(newSubject);
+                }
+            });
+        }
+
+        // Fonctions pour récupérer les autres données (simplifiées)
+        function getThemesData() { 
+            const themes = [];
+            const themeElements = document.querySelectorAll('.theme-container .dynamic-item');
+            themeElements.forEach(theme => {
+                const name = theme.querySelector('label')?.textContent?.replace('Thème: ', '') || '';
+                const description = theme.querySelector('textarea')?.value || '';
+                if (name) {
+                    themes.push({ name, description });
+                }
+            });
+            return themes;
+        }
+
+        function getLessonsData() { 
+            const lessons = [];
+            const lessonElements = document.querySelectorAll('.lesson-container');
+            lessonElements.forEach(lesson => {
+                const title = lesson.querySelector('input[type="text"]')?.value || '';
+                const date = lesson.querySelector('input[type="date"]')?.value || '';
+                if (title) {
+                    lessons.push({ title, date });
+                }
+            });
+            return lessons;
+        }
+
+        function getTPsData() { 
+            const tps = [];
+            const tpElements = document.querySelectorAll('.tp-container');
+            tpElements.forEach(tp => {
+                const title = tp.querySelector('input[type="text"]')?.value || '';
+                const date = tp.querySelector('input[type="date"]')?.value || '';
+                if (title) {
+                    tps.push({ title, date });
+                }
+            });
+            return tps;
+        }
+
+        function getEvaluationsData() { 
+            const evaluations = [];
+            const evalElements = document.querySelectorAll('.evaluation-container');
+            evalElements.forEach(eval => {
+                const type = eval.querySelector('select')?.value || '';
+                const date = eval.querySelector('input[type="date"]')?.value || '';
+                if (type || date) {
+                    evaluations.push({ type, date });
+                }
+            });
+            return evaluations;
+        }
+
+        function getDiplomasData() { return []; }
+        function getTrainingsData() { return []; }
+        function getLanguagesData() { return []; }
+        function getITSkillsData() { return []; }
+        function getProjectsData() { return []; }
+        function getActivitiesData() { return []; }
+        function getMeetingsData() { return []; }
+
+        // Gestion du formulaire
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Validation
+            if (!validateForm()) {
+                showNotification('Veuillez remplir tous les champs obligatoires', 'error');
+                return;
+            }
+            
+            // Sauvegarder
+            backupData();
+            
+            // Afficher confirmation
+            showNotification('Données sauvegardées avec succès', 'success');
+        }
+
+        function validateForm() {
+            const requiredFields = [
+                'establishmentName',
+                'lastName',
+                'firstName',
+                'birthDate',
+                'birthPlace',
+                'matricule',
+                'mainSubject',
+                'position',
+                'engagementDate',
+                'regionServiceDate',
+                'inspectionServiceDate'
+            ];
+            
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && !field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--danger-color)';
+                    
+                    // Retirer la couleur d'erreur après 2 secondes
+                    setTimeout(() => {
+                        if (field) {
+                            field.style.borderColor = '';
+                        }
+                    }, 2000);
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Mise à jour de l'interface
+        function updateUI() {
+            updateSchoolName();
+            updateBackupHistory();
+            updateActivityLogs();
+            updateDashboard();
+        }
+
+        function updateTabUI(tabId) {
+            switch(tabId) {
+                case 'tab2':
+                    updateSubjectsSelector();
+                    break;
+                case 'tab7':
+                    updateDashboard();
+                    break;
+            }
+        }
+
+        function updateSubjectsSelector() {
+            const selector = document.getElementById('subjectSelector');
+            if (!selector) return;
+            
+            const subjects = getSubjectsData();
+            
+            selector.innerHTML = '<option value="">-- Sélectionner une matière --</option>';
+            
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                selector.appendChild(option);
+            });
+        }
+
+        function updateBackupHistory() {
+            const container = document.getElementById('backupHistory');
+            if (!container) return;
+            
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                
+                if (backups.length === 0) {
+                    container.innerHTML = '<p class="text-center">Aucune sauvegarde disponible</p>';
+                    return;
+                }
+                
+                let html = '<table class="data-table"><thead><tr><th>Date</th><th>Taille</th><th>Actions</th></tr></thead><tbody>';
+                
+                backups.slice().reverse().forEach((backup, index) => {
+                    const date = new Date(backup.timestamp);
+                    const size = JSON.stringify(backup).length;
+                    
+                    html += `
+                        <tr>
+                            <td>${date.toLocaleString()}</td>
+                            <td>${formatFileSize(size)}</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-info" onclick="restoreBackup(${backups.length - 1 - index})">
+                                    <i class="fas fa-undo"></i> Restaurer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p class="text-center">Erreur lors du chargement de l\'historique</p>';
+                console.error(error);
+            }
+        }
+
+        function restoreBackup(index) {
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                if (index >= 0 && index < backups.length) {
+                    if (confirm('Restaurer cette sauvegarde ? Les données actuelles seront perdues.')) {
+                        setAllData(backups[index].data);
+                        showNotification('Sauvegarde restaurée avec succès', 'success');
+                    }
+                }
+            } catch (error) {
+                showNotification('Erreur lors de la restauration', 'error');
+                console.error(error);
+            }
+        }
+
+        function updateActivityLogs() {
+            const container = document.getElementById('activityLogs');
+            if (!container) return;
+            
+            try {
+                const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+                
+                if (logs.length === 0) {
+                    container.innerHTML = '<p class="text-center">Aucune activité récente</p>';
+                    return;
+                }
+                
+                let html = '<div class="timeline">';
+                
+                logs.slice(-10).reverse().forEach(log => {
+                    const date = new Date(log.timestamp);
+                    html += `
+                        <div class="timeline-item">
+                            <strong>${date.toLocaleString()}</strong>
+                            <p>${log.message}</p>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p class="text-center">Erreur lors du chargement du journal</p>';
+                console.error(error);
+            }
+        }
+
+        function updateDashboard() {
+            updateProfileSummary();
+            updateRecentActivity();
+            updateNotifications();
+            updateDetailedStats();
+        }
+
+        function updateProfileSummary() {
+            const container = document.getElementById('profileSummary');
+            if (!container) return;
+            
+            const personal = getPersonalData();
+            const professional = getProfessionalData();
+            
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Années de service</div>
+                        <div class="stat-value">${professional.yearsInRegion || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Heures/semaine</div>
+                        <div class="stat-value">${professional.weeklyHours || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Classes</div>
+                        <div class="stat-value">${professional.currentClass ? professional.currentClass.split(',').length : 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Âge actuel</div>
+                        <div class="stat-value">${calculateAge(personal.birthDate)}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function calculateAge(birthDate) {
+            if (!birthDate) return 'N/A';
+            const birth = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function updateRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            if (!container) return;
+            
+            const activities = [
+                { date: 'Aujourd\'hui', action: 'Nouvelle leçon ajoutée' },
+                { date: 'Hier', action: 'Évaluation corrigée' },
+                { date: '02/01/2024', action: 'Réunion pédagogique' }
+            ];
+            
+            let html = '';
+            activities.forEach(activity => {
+                html += `
+                    <div class="attachment-item">
+                        <div><i class="fas fa-calendar"></i> ${activity.date}</div>
+                        <div>${activity.action}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateNotifications() {
+            const container = document.getElementById('notificationsList');
+            if (!container) return;
+            
+            const notifications = [
+                { type: 'warning', message: 'Évaluation à programmer pour la semaine prochaine' },
+                { type: 'info', message: 'Réunion pédagogique le vendredi' },
+                { type: 'success', message: 'Projet terminé avec succès' }
+            ];
+            
+            let html = '';
+            notifications.forEach(notif => {
+                html += `
+                    <div class="attachment-item">
+                        <div><i class="fas fa-bell" style="color: var(--${notif.type}-color)"></i></div>
+                        <div>${notif.message}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateDetailedStats() {
+            const container = document.getElementById('detailedStats');
+            if (!container) return;
+            
+            const stats = [
+                { label: 'Leçons réalisées', value: document.querySelectorAll('.lesson-container').length, icon: 'fa-chalkboard' },
+                { label: 'TP effectués', value: document.querySelectorAll('.tp-container').length, icon: 'fa-flask' },
+                { label: 'Évaluations', value: document.querySelectorAll('.evaluation-container').length, icon: 'fa-clipboard-check' },
+                { label: 'Projets en cours', value: document.querySelectorAll('.dynamic-item').length, icon: 'fa-project-diagram' }
+            ];
+            
+            let html = '';
+            stats.forEach(stat => {
+                html += `
+                    <div class="stat-card">
+                        <i class="fas ${stat.icon} fa-2x"></i>
+                        <div class="stat-value">${stat.value}</div>
+                        <div>${stat.label}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Fonctions utilitaires
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notificationMessage');
+            const icon = document.getElementById('notificationIcon');
+            
+            if (!notification || !messageEl || !icon) return;
+            
+            // Mettre à jour le message et l'icône
+            messageEl.textContent = message;
+            
+            // Réinitialiser les classes
+            notification.className = 'notification';
+            icon.className = 'fas';
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('show');
+                    icon.classList.add('fa-check-circle');
+                    break;
+                case 'error':
+                    notification.classList.add('show', 'error');
+                    icon.classList.add('fa-exclamation-circle');
+                    break;
+                case 'warning':
+                    notification.classList.add('show', 'warning');
+                    icon.classList.add('fa-exclamation-triangle');
+                    break;
+                case 'info':
+                    notification.classList.add('show', 'info');
+                    icon.classList.add('fa-info-circle');
+                    break;
+            }
+            
+            // Masquer après 3 secondes
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+            
+            // Ajouter au journal
+            addLog(message);
+        }
+
+        function addLog(message) {
+            try {
+                const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+                logs.push({
+                    timestamp: new Date().toISOString(),
+                    message: message
+                });
+                localStorage.setItem('logs', JSON.stringify(logs.slice(-50))); // Garder les 50 derniers logs
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout du log:', error);
+            }
+        }
+
+        function loadSavedData() {
+            try {
+                const saved = localStorage.getItem('currentData');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    setAllData(data);
+                    showNotification('Données chargées depuis la sauvegarde', 'success');
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error);
+                showNotification('Erreur lors du chargement des données sauvegardées', 'error');
+            }
+        }
+
+        function openModal(title, content) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            const modal = document.getElementById('genericModal');
+            
+            if (modalTitle && modalContent && modal) {
+                modalTitle.textContent = title;
+                modalContent.innerHTML = content;
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('genericModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function printForm() {
+            window.print();
+        }
+
+        function showLoader(show) {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                if (show) {
+                    loader.classList.add('active');
+                } else {
+                    loader.classList.remove('active');
+                }
+            }
+        }
+
+        // Fonctions de génération de rapports
+        function generateTeachingReport() {
+            showLoader(true);
+            
+            // Simuler un traitement
+            setTimeout(() => {
+                const report = `
+                    <h4>Rapport d'enseignement</h4>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>Enseignant: ${document.getElementById('lastName')?.value || ''} ${document.getElementById('firstName')?.value || ''}</p>
+                    <p>Matière principale: ${document.getElementById('mainSubject')?.value || ''}</p>
+                    <p>Heures hebdomadaires: ${document.getElementById('weeklyHours')?.value || ''}</p>
+                    <p>Date de retraite: ${document.getElementById('retirementDate')?.value || 'Non calculée'}</p>
+                    <hr>
+                    <p>Ce rapport a été généré automatiquement.</p>
+                `;
+                
+                openModal('Rapport d\'enseignement', report);
+                showLoader(false);
+            }, 1000);
+        }
+
+        function generateEvaluationReport() {
+            showLoader(true);
+            
+            setTimeout(() => {
+                const report = `
+                    <h4>Rapport d'évaluation</h4>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>Nombre d'évaluations: ${document.querySelectorAll('.evaluation-container').length}</p>
+                    <p>Dernière évaluation: ${getLastEvaluationDate()}</p>
+                    <hr>
+                    <p>Ce rapport a été généré automatiquement.</p>
+                `;
+                
+                openModal('Rapport d\'évaluation', report);
+                showLoader(false);
+            }, 1000);
+        }
+
+        function getLastEvaluationDate() {
+            const dates = Array.from(document.querySelectorAll('.evaluation-container input[type="date"]'))
+                .map(input => input.value)
+                .filter(date => date)
+                .sort()
+                .reverse();
+            
+            return dates[0] || 'Aucune évaluation';
+        }
+
+        function generateActivityReport() {
+            showLoader(true);
+            
+            setTimeout(() => {
+                const report = `
+                    <h4>Rapport d'activités</h4>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>Projets: ${document.querySelectorAll('#projectsContainer .dynamic-item').length}</p>
+                    <p>Activités: ${document.querySelectorAll('#activitiesContainer .dynamic-item').length}</p>
+                    <p>Réunions: ${document.querySelectorAll('#meetingsContainer .dynamic-item').length}</p>
+                    <hr>
+                    <p>Ce rapport a été généré automatiquement.</p>
+                `;
+                
+                openModal('Rapport d\'activités', report);
+                showLoader(false);
+            }, 1000);
+        }
+
+        function generateQRCode() {
+            const data = {
+                name: `${document.getElementById('lastName')?.value || ''} ${document.getElementById('firstName')?.value || ''}`,
+                matricule: document.getElementById('matricule')?.value || '',
+                subject: document.getElementById('mainSubject')?.value || '',
+                establishment: document.getElementById('establishmentName')?.value || '',
+                retirementDate: document.getElementById('retirementDate')?.value || ''
+            };
+            
+            const qrContent = JSON.stringify(data);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrContent)}`;
+            
+            const modalContent = `
+                <div class="text-center">
+                    <h4>QR Code de l'enseignant</h4>
+                    <img src="${qrUrl}" alt="QR Code" style="max-width: 200px; margin: 20px 0;">
+                    <p>Scannez ce code pour accéder aux informations de base</p>
+                    <button class="btn btn-primary" onclick="downloadQRCode('${qrUrl}')">
+                        <i class="fas fa-download"></i> Télécharger
+                    </button>
+                </div>
+            `;
+            
+            openModal('QR Code', modalContent);
+        }
+
+        function downloadQRCode(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'qrcode-enseignant.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showNotification('QR Code téléchargé', 'success');
+        }
+
+        function generatePlanningPDF() {
+            showNotification('Génération du PDF en cours...', 'info');
+            // Note: Pour une vraie génération PDF, vous auriez besoin d'une bibliothèque comme jsPDF
+            showNotification('Fonctionnalité PDF à implémenter', 'warning');
+        }
+
+        function showStatistics() {
+            const stats = calculateStatistics();
+            const modalContent = `
+                <h4>Statistiques globales</h4>
+                <div class="stats-grid" style="margin: 20px 0;">
+                    <div class="stat-card">
+                        <div>Total leçons</div>
+                        <div class="stat-value">${stats.totalLessons}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Total TP</div>
+                        <div class="stat-value">${stats.totalTPs}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Total évaluations</div>
+                        <div class="stat-value">${stats.totalEvaluations}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Temps avant retraite</div>
+                        <div class="stat-value">${stats.yearsToRetirement} ans</div>
+                    </div>
+                </div>
+            `;
+            
+            openModal('Statistiques', modalContent);
+        }
+
+        function calculateStatistics() {
+            // Calculer les statistiques à partir des données
+            const totalLessons = document.querySelectorAll('.lesson-container').length;
+            const totalTPs = document.querySelectorAll('.tp-container').length;
+            const totalEvaluations = document.querySelectorAll('.evaluation-container').length;
+            
+            // Calculer le temps avant la retraite
+            let yearsToRetirement = 'N/A';
+            const retirementDate = document.getElementById('retirementDate')?.value;
+            if (retirementDate) {
+                const retirement = new Date(retirementDate);
+                const today = new Date();
+                const diffTime = Math.abs(retirement - today);
+                const diffYears = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 365));
+                yearsToRetirement = diffYears;
+            }
+            
+            return {
+                totalLessons,
+                totalTPs,
+                totalEvaluations,
+                yearsToRetirement
+            };
+        }
+
+        // Initialisation finale
+        window.addEventListener('beforeunload', function(e) {
+            // Sauvegarder automatiquement avant de quitter (optionnel)
+            // backupData();
+        });
+    </script>
+</body>
+</html>

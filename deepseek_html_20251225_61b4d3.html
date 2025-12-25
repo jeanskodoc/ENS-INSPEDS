@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme de Gestion Pédagogique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables CSS */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #9b59b6;
+            --dark-color: #2c3e50;
+            --light-color: #f5f5f5;
+            --gray-color: #7f8c8d;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            position: relative;
+        }
+
+        .school-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .school-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .academic-year {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        header h1 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-tab {
+            padding: 18px 30px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-color);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            font-size: 1.1rem;
+        }
+
+        .nav-tab:hover {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+        }
+
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background-color: #f8f9fa;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards Container */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            padding: 25px 25px 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+        }
+
+        .card-header i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .card-body {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-body p {
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        /* Boutons */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d68910;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        /* Section Features */
+        .features-section {
+            margin-top: 50px;
+            padding: 40px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--dark-color);
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .feature-item h4 {
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .nav-tab {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .features-section {
+                padding: 25px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .card-header i {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Animation */
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="school-info">
+            <div class="school-name">
+                <i class="fas fa-school"></i>
+                <span>Plateforme de Gestion Pédagogique</span>
+            </div>
+            <div class="academic-year">
+                <i class="fas fa-calendar-alt"></i>
+                Année scolaire: <span id="currentYear"></span>
+            </div>
+        </div>
+        <h1><i class="fas fa-chalkboard-teacher"></i> GESTION PÉDAGOGIQUE COMPLÈTE</h1>
+        <p>Système intégré de gestion administrative et pédagogique pour établissements scolaires</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <ul class="nav-tabs">
+                <li class="nav-tab active" data-tab="home">
+                    <i class="fas fa-home"></i> Accueil
+                </li>
+                <li class="nav-tab" data-tab="teachers">
+                    <i class="fas fa-user-tie"></i> Enseignants
+                </li>
+                <li class="nav-tab" data-tab="inspectors">
+                    <i class="fas fa-user-shield"></i> Inspecteurs
+                </li>
+                <li class="nav-tab" data-tab="about">
+                    <i class="fas fa-info-circle"></i> À propos
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Onglet Accueil -->
+        <div id="home" class="tab-content active">
+            <div class="welcome-section">
+                <h2>Bienvenue sur la Plateforme de Gestion Pédagogique</h2>
+                <p>
+                    Cette plateforme complète vous permet de gérer efficacement les données administratives 
+                    et pédagogiques des enseignants. Elle offre des outils modernes pour simplifier la gestion 
+                    des informations, des emplois du temps, des évaluations et bien plus encore.
+                </p>
+                <div class="features-grid" style="margin-top: 30px;">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <h4>Fiches Administratives</h4>
+                        <p>Gestion complète des informations des enseignants</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h4>Suivi Pédagogique</h4>
+                        <p>Suivi des leçons, TP et évaluations</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Statistiques</h4>
+                        <p>Tableaux de bord et analyses détaillées</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-retirement"></i>
+                        </div>
+                        <h4>Calcul de Retraite</h4>
+                        <p>Calcul automatique des dates de départ à la retraite</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <div class="section-title">
+                    <h2>Accédez aux Interfaces</h2>
+                    <p>Sélectionnez votre profil pour accéder aux fonctionnalités appropriées</p>
+                </div>
+                
+                <div class="cards-container">
+                    <div class="card animate-pulse">
+                        <div class="card-header">
+                            <i class="fas fa-user-tie"></i>
+                            <h3>Interface Enseignants</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                Accédez à la fiche administrative complète pour gérer vos informations personnelles, 
+                                vos matières enseignées, votre emploi du temps, vos leçons, évaluations et projets.
+                            </p>
+                            <p>
+                                <strong>Fonctionnalités principales :</strong>
+                            </p>
+                            <ul style="text-align: left; margin-bottom: 20px; padding-left: 20px;">
+                                <li>Fiche administrative complète</li>
+                                <li>Gestion des leçons et TP</li>
+                                <li>Suivi des évaluations</li>
+                                <li>Calcul automatique de la retraite</li>
+                                <li>Tableau de bord personnel</li>
+                            </ul>
+                            <a href="ECOLE-EDS.html" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Accéder à l'interface Enseignants
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="card animate-pulse" style="animation-delay: 0.5s;">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--warning-color), #e67e22);">
+                            <i class="fas fa-user-shield"></i>
+                            <h3>Interface Inspecteurs</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                Accédez à l'interface de supervision pour consulter et évaluer les fiches des enseignants, 
+                                suivre les activités pédagogiques et générer des rapports statistiques.
+                            </p>
+                            <p>
+                                <strong>Fonctionnalités principales :</strong>
+                            </p>
+                            <ul style="text-align: left; margin-bottom: 20px; padding-left: 20px;">
+                                <li>Consultation des fiches enseignants</li>
+                                <li>Évaluation pédagogique</li>
+                                <li>Génération de rapports</li>
+                                <li>Statistiques globales</li>
+                                <li>Supervision des activités</li>
+                            </ul>
+                            <button class="btn btn-warning" onclick="accessInspectorInterface()">
+                                <i class="fas fa-sign-in-alt"></i> Accéder à l'interface Inspecteurs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Enseignants -->
+        <div id="teachers" class="tab-content">
+            <div class="welcome-section">
+                <h2><i class="fas fa-user-tie"></i> Interface Enseignants</h2>
+                <p>
+                    L'interface Enseignants vous offre un ensemble complet d'outils pour gérer vos informations 
+                    administratives et pédagogiques. Cette interface comprend 7 onglets principaux couvrant tous 
+                    les aspects de votre activité professionnelle.
+                </p>
+                
+                <div style="margin: 40px 0;">
+                    <a href="ECOLE-EDS.html" class="btn btn-primary" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
+                        <i class="fas fa-external-link-alt"></i> Ouvrir l'interface Enseignants
+                    </a>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <div class="section-title">
+                    <h2>Fonctionnalités de l'interface Enseignants</h2>
+                    <p>Découvrez les 7 onglets principaux de l'application</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h4>Informations Générales</h4>
+                        <p>Données personnelles, professionnelles et administratives</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--info-color), #8e44ad);">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h4>Enseignement & Pédagogie</h4>
+                        <p>Gestion des leçons, TP, emplois du temps et ressources</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--success-color), #27ae60);">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4>Formation & Compétences</h4>
+                        <p>Diplômes, formations, langues et compétences informatiques</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--warning-color), #d68910);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Évaluations & Statistiques</h4>
+                        <p>Suivi des évaluations et analyses statistiques</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h4>Projets & Activités</h4>
+                        <p>Gestion des projets pédagogiques et activités extrascolaires</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h4>Données & Archives</h4>
+                        <p>Sauvegarde, restauration et gestion des données</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h4>Tableau de bord</h4>
+                        <p>Vue d'ensemble et rapports synthétiques</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <h3>Fonctionnalité spéciale : Calcul de la retraite</h3>
+                    <p>L'application calcule automatiquement la date de départ à la retraite selon les règles officielles</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Inspecteurs -->
+        <div id="inspectors" class="tab-content">
+            <div class="welcome-section">
+                <h2><i class="fas fa-user-shield"></i> Interface Inspecteurs</h2>
+                <p>
+                    L'interface Inspecteurs est conçue pour la supervision et l'évaluation des enseignants. 
+                    Elle permet d'accéder aux données consolidées, de générer des rapports et de suivre 
+                    les activités pédagogiques de l'ensemble des enseignants.
+                </p>
+                
+                <div style="margin: 40px 0;">
+                    <button class="btn btn-warning" onclick="accessInspectorInterface()" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
+                        <i class="fas fa-external-link-alt"></i> Ouvrir l'interface Inspecteurs
+                    </button>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                    <p><i class="fas fa-info-circle" style="color: var(--warning-color);"></i> 
+                    <strong>Note :</strong> L'interface Inspecteurs est en cours de développement. Certaines fonctionnalités pourraient ne pas être encore disponibles.</p>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <div class="section-title">
+                    <h2>Fonctionnalités de l'interface Inspecteurs</h2>
+                    <p>Outils de supervision et d'évaluation pédagogique</p>
+                </div>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            <i class="fas fa-search"></i>
+                            <h3>Consultation des Fiches</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Accédez aux fiches administratives complètes de tous les enseignants</p>
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Informations personnelles et professionnelles</li>
+                                <li>Matières enseignées et emplois du temps</li>
+                                <li>Formations et compétences</li>
+                                <li>Dates de retraite calculées</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3>Statistiques et Rapports</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Générez des rapports statistiques sur l'ensemble des enseignants</p>
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Répartition par matière et grade</li>
+                                <li>Analyse des années de service</li>
+                                <li>Projections des départs à la retraite</li>
+                                <li>Évaluation des besoins en formation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <i class="fas fa-clipboard-check"></i>
+                            <h3>Évaluation Pédagogique</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Évaluez les performances et activités pédagogiques des enseignants</p>
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Suivi des leçons et TP réalisés</li>
+                                <li>Analyse des résultats d'évaluation</li>
+                                <li>Évaluation des projets pédagogiques</li>
+                                <li>Recommandations et commentaires</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet À propos -->
+        <div id="about" class="tab-content">
+            <div class="welcome-section">
+                <h2><i class="fas fa-info-circle"></i> À propos du projet</h2>
+                <p>
+                    Cette plateforme de gestion pédagogique complète a été développée pour répondre aux besoins 
+                    des établissements scolaires en matière de gestion administrative et pédagogique des enseignants.
+                </p>
+            </div>
+
+            <div class="features-section">
+                <div class="section-title">
+                    <h2>Caractéristiques du projet</h2>
+                </div>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-laptop-code"></i>
+                            <h3>Technologies utilisées</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li><strong>HTML5 :</strong> Structure sémantique et accessible</li>
+                                <li><strong>CSS3 :</strong> Design responsive et moderne</li>
+                                <li><strong>JavaScript :</strong> Fonctionnalités interactives</li>
+                                <li><strong>Font Awesome :</strong> Icônes et éléments visuels</li>
+                                <li><strong>LocalStorage :</strong> Sauvegarde des données localement</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--success-color), #27ae60);">
+                            <i class="fas fa-star"></i>
+                            <h3>Fonctionnalités clés</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Fiche administrative complète en 7 onglets</li>
+                                <li>Calcul automatique de la date de retraite</li>
+                                <li>Gestion pédagogique (leçons, TP, évaluations)</li>
+                                <li>Import/Export des données au format JSON</li>
+                                <li>Tableaux de bord et statistiques</li>
+                                <li>Sauvegarde et restauration des données</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--warning-color), #d68910);">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h3>Accessibilité</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li><strong>Design responsive :</strong> Compatible avec tous les appareils</li>
+                                <li><strong>Navigation intuitive :</strong> Onglets et menus clairs</li>
+                                <li><strong>Interface utilisateur :</strong> Moderne et ergonomique</li>
+                                <li><strong>Accessibilité :</strong> Respect des standards d'accessibilité web</li>
+                                <li><strong>Performance :</strong> Chargement rapide et fonctionnement fluide</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3>À propos du calcul de la retraite</h3>
+                    <p>Le système calcule automatiquement la date de départ à la retraite selon les règles officielles :</p>
+                    <ul style="display: inline-block; text-align: left; margin: 20px auto;">
+                        <li><strong>Catégories A1 & A2 :</strong> 60 ans</li>
+                        <li><strong>Catégories B & C :</strong> 58 ans</li>
+                        <li><strong>Catégorie D :</strong> 55 ans</li>
+                    </ul>
+                    <p>Le mois de départ est déterminé selon le mois de naissance pour la catégorie 58 ans.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#home">Accueil</a>
+                <a href="#teachers">Enseignants</a>
+                <a href="#inspectors">Inspecteurs</a>
+                <a href="#about">À propos</a>
+            </div>
+            <p>Plateforme de Gestion Pédagogique Complète - Version 1.0</p>
+            <p class="copyright">
+                &copy; <span id="currentYear2"></span> - Tous droits réservés. 
+                Développé pour les établissements scolaires.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+
+        function initApp() {
+            // Initialiser l'année scolaire
+            const currentYear = new Date().getFullYear();
+            document.getElementById('currentYear').textContent = `${currentYear}-${currentYear + 1}`;
+            document.getElementById('currentYear2').textContent = currentYear;
+            
+            // Gestion des onglets de navigation
+            initNavigationTabs();
+            
+            // Initialiser les événements
+            initEvents();
+        }
+
+        function initNavigationTabs() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchNavigationTab(tabId);
+                });
+            });
+        }
+
+        function switchNavigationTab(tabId) {
+            // Désactiver tous les onglets
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activer l'onglet sélectionné
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Faire défiler vers le haut
+            window.scrollTo(0, 0);
+        }
+
+        function initEvents() {
+            // Aucun événement supplémentaire nécessaire pour l'instant
+        }
+
+        function accessInspectorInterface() {
+            // Pour l'instant, rediriger vers la même page avec un message
+            // Dans une version future, cela pourrait ouvrir une interface spécifique
+            alert("L'interface Inspecteurs est en cours de développement. Pour le moment, vous pouvez accéder à l'interface Enseignants pour voir les fonctionnalités disponibles.");
+            
+            // Optionnel : Rediriger vers l'interface enseignants avec un mode "inspecteur"
+            // window.location.href = "ECOLE-EDS.html?mode=inspector";
+        }
+
+        // Navigation par ancres
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // Si c'est un onglet, activer l'onglet correspondant
+                    if (targetId === '#home' || targetId === '#teachers' || targetId === '#inspectors' || targetId === '#about') {
+                        const tabId = targetId.substring(1); // Enlever le #
+                        switchNavigationTab(tabId);
+                    }
+                    
+                    // Faire défiler vers l'élément
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

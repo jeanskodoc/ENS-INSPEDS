@@ -1,0 +1,3869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme d'Analyse - Inspecteurs Éducation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #9b59b6;
+            --dark-color: #2c3e50;
+            --light-color: #f5f5f5;
+            --gray-color: #7f8c8d;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            padding: 20px;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .platform-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        header h1 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        /* Navigation */
+        .tabs-container {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .tabs {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            min-width: 800px;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-color);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background-color: white;
+        }
+
+        /* Contenu des onglets */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section d'importation */
+        .import-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            border: 2px dashed var(--primary-color);
+            text-align: center;
+        }
+
+        .import-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .import-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .import-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .import-card i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .import-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .import-card p {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Onglets de type de fichier */
+        .file-type-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .file-type-tab {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-type-tab:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .file-type-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Boutons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d68910;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+
+        .btn-light {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-light:hover {
+            background-color: #e9ecef;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-xs {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Sections de données */
+        .data-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .data-section h2 {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin: -25px -25px 25px -25px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        /* Tableaux */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        /* Statistiques */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        /* Filtres */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+        }
+
+        .search-box input {
+            padding-left: 40px;
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* Onglets secondaires */
+        .sub-tabs {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 25px;
+            overflow-x: auto;
+        }
+
+        .sub-tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-color);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .sub-tab:hover {
+            color: var(--dark-color);
+        }
+
+        .sub-tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .sub-tab-content {
+            display: none;
+        }
+
+        .sub-tab-content.active {
+            display: block;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-primary {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+        }
+
+        .badge-success {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background-color: #fff3e0;
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background-color: #ffebee;
+            color: var(--danger-color);
+        }
+
+        .badge-info {
+            background-color: #f3e5f5;
+            color: var(--info-color);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        .notification.info {
+            background: var(--info-color);
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 0;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .data-section {
+                padding: 20px;
+            }
+            
+            .import-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .sub-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .sub-tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .file-type-tabs {
+                flex-direction: column;
+            }
+        }
+
+        /* Utilitaires */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-30 {
+            margin-bottom: 30px;
+        }
+
+        .mt-30 {
+            margin-top: 30px;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-10 {
+            gap: 10px;
+        }
+
+        .gap-15 {
+            gap: 15px;
+        }
+
+        .gap-20 {
+            gap: 20px;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Cartes enseignants */
+        .teacher-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .teacher-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .teacher-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .teacher-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .teacher-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .teacher-matricule {
+            background: var(--primary-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .teacher-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .teacher-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-color);
+        }
+
+        .teacher-info-item i {
+            color: var(--primary-color);
+        }
+
+        /* Fichiers par type */
+        .files-by-type {
+            margin: 20px 0;
+        }
+
+        .file-type-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .file-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Visualisation données */
+        .data-preview {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle" id="notificationIcon"></i>
+        <span id="notificationMessage"></span>
+    </div>
+
+    <!-- Container principal -->
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="platform-name">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Plateforme d'Analyse - Inspecteurs Éducation</span>
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Inspecteur - <span id="currentYear"></span></span>
+                </div>
+            </div>
+            <h1><i class="fas fa-analytics"></i> ANALYSE DES FICHES ENSEIGNANTS</h1>
+            <p>Importation, visualisation et analyse des données pédagogiques complètes</p>
+        </header>
+
+        <!-- Navigation principale -->
+        <div class="tabs-container">
+            <ul class="tabs">
+                <li class="tab active" data-tab="tab-import">
+                    <i class="fas fa-upload"></i> Importation
+                </li>
+                <li class="tab" data-tab="tab-dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                </li>
+                <li class="tab" data-tab="tab-teachers">
+                    <i class="fas fa-users"></i> Enseignants
+                </li>
+                <li class="tab" data-tab="tab-pedagogy">
+                    <i class="fas fa-chalkboard-teacher"></i> Pédagogie
+                </li>
+                <li class="tab" data-tab="tab-training">
+                    <i class="fas fa-graduation-cap"></i> Formation
+                </li>
+                <li class="tab" data-tab="tab-projects">
+                    <i class="fas fa-project-diagram"></i> Projets
+                </li>
+                <li class="tab" data-tab="tab-retirement">
+                    <i class="fas fa-umbrella-beach"></i> Retraite
+                </li>
+                <li class="tab" data-tab="tab-export">
+                    <i class="fas fa-download"></i> Export Excel
+                </li>
+            </ul>
+        </div>
+
+        <!-- Onglet Importation -->
+        <div id="tab-import" class="tab-content active">
+            <div class="import-section">
+                <h2><i class="fas fa-file-import"></i> IMPORTATION DES DONNÉES</h2>
+                <p>Sélectionnez le type d'importation ou choisissez un type de fichier spécifique</p>
+                
+                <!-- Sélecteur de type de fichier -->
+                <div class="file-type-tabs" id="fileTypeTabs">
+                    <div class="file-type-tab active" data-file-type="all">
+                        <i class="fas fa-file"></i> Tous les fichiers
+                    </div>
+                    <div class="file-type-tab" data-file-type="tab1">
+                        <i class="fas fa-user-tie"></i> Informations Générales
+                    </div>
+                    <div class="file-type-tab" data-file-type="tab2">
+                        <i class="fas fa-chalkboard-teacher"></i> Enseignement
+                    </div>
+                    <div class="file-type-tab" data-file-type="tab3">
+                        <i class="fas fa-graduation-cap"></i> Formation
+                    </div>
+                    <div class="file-type-tab" data-file-type="tab4">
+                        <i class="fas fa-chart-line"></i> Évaluations
+                    </div>
+                    <div class="file-type-tab" data-file-type="tab5">
+                        <i class="fas fa-project-diagram"></i> Projets
+                    </div>
+                    <div class="file-type-tab" data-file-type="tab7">
+                        <i class="fas fa-dashboard"></i> Dashboard
+                    </div>
+                </div>
+                
+                <div class="import-grid">
+                    <!-- Import fichier unique -->
+                    <div class="import-card">
+                        <i class="fas fa-file-import"></i>
+                        <h3>Import fichier unique</h3>
+                        <p>Importez un fichier JSON spécifique (tab1, tab2, etc.)</p>
+                        <div class="file-input-wrapper">
+                            <button class="btn btn-primary" id="singleFileBtn">
+                                <i class="fas fa-upload"></i> Choisir un fichier
+                            </button>
+                            <input type="file" id="singleFileInput" accept=".json" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Import multiple -->
+                    <div class="import-card">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>Import multiple</h3>
+                        <p>Importez tous les fichiers JSON d'un enseignant</p>
+                        <div class="file-input-wrapper">
+                            <button class="btn btn-secondary" id="multiFileBtn">
+                                <i class="fas fa-folder-open"></i> Choisir des fichiers
+                            </button>
+                            <input type="file" id="multiFileInput" accept=".json" multiple style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Import dossier -->
+                    <div class="import-card">
+                        <i class="fas fa-database"></i>
+                        <h3>Import complet</h3>
+                        <p>Importez un fichier JSON complet (export total)</p>
+                        <div class="file-input-wrapper">
+                            <button class="btn btn-info" id="completeFileBtn">
+                                <i class="fas fa-database"></i> Choisir un fichier
+                            </button>
+                            <input type="file" id="completeFileInput" accept=".json" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des fichiers importés par type -->
+                <div class="data-section mt-30" id="importedFilesSection" style="display: none;">
+                    <h2><i class="fas fa-list-check"></i> FICHIERS IMPORTÉS PAR TYPE</h2>
+                    <div id="importedFilesList"></div>
+                </div>
+
+                <!-- Vue d'ensemble -->
+                <div class="data-section mt-30" id="overviewSection" style="display: none;">
+                    <h2><i class="fas fa-eye"></i> VUE D'ENSEMBLE</h2>
+                    <div class="stats-grid" id="overviewStats"></div>
+                </div>
+
+                <!-- Visualisation des données -->
+                <div class="data-section mt-30" id="dataPreviewSection" style="display: none;">
+                    <h2><i class="fas fa-eye"></i> VISUALISATION DES DONNÉES</h2>
+                    <select id="dataPreviewSelect" class="w-100 mb-20" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Sélectionner un enseignant pour prévisualiser...</option>
+                    </select>
+                    <div id="dataPreviewContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Tableau de bord -->
+        <div id="tab-dashboard" class="tab-content">
+            <div class="filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Rechercher un enseignant..." id="dashboardSearch">
+                </div>
+                <select id="dashboardFilterSubject">
+                    <option value="">Toutes les matières</option>
+                </select>
+                <select id="dashboardFilterCategory">
+                    <option value="">Toutes les catégories</option>
+                </select>
+                <select id="dashboardFilterEstablishment">
+                    <option value="">Tous les établissements</option>
+                </select>
+            </div>
+
+            <!-- Statistiques globales -->
+            <div class="data-section">
+                <h2><i class="fas fa-chart-bar"></i> STATISTIQUES GLOBALES</h2>
+                <div class="stats-grid" id="globalStats"></div>
+            </div>
+
+            <!-- Graphiques -->
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-pie"></i> Répartition par matière</h3>
+                    <div class="chart-container">
+                        <canvas id="subjectChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-line"></i> Évolution des retraites</h3>
+                    <div class="chart-container">
+                        <canvas id="retirementChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-bar"></i> Heures d'enseignement</h3>
+                    <div class="chart-container">
+                        <canvas id="hoursChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-graduation-cap"></i> Niveau de formation</h3>
+                    <div class="chart-container">
+                        <canvas id="trainingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dernières activités -->
+            <div class="data-section">
+                <h2><i class="fas fa-history"></i> DERNIÈRES ACTIVITÉS PÉDAGOGIQUES</h2>
+                <div id="recentActivities"></div>
+            </div>
+        </div>
+
+        <!-- Onglet Enseignants -->
+        <div id="tab-teachers" class="tab-content">
+            <div class="filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Rechercher par nom, matricule..." id="teacherSearch">
+                </div>
+                <button class="btn btn-light" onclick="sortTeachers('name')">
+                    <i class="fas fa-sort-alpha-down"></i> Trier par nom
+                </button>
+                <button class="btn btn-light" onclick="sortTeachers('retirement')">
+                    <i class="fas fa-calendar"></i> Trier par retraite
+                </button>
+                <button class="btn btn-light" onclick="filterCompleteOnly()">
+                    <i class="fas fa-check-circle"></i> Fiches complètes
+                </button>
+            </div>
+
+            <!-- Liste des enseignants -->
+            <div id="teachersListContainer">
+                <div class="teacher-cards" id="teachersCards"></div>
+            </div>
+
+            <!-- Détails enseignant (modal) -->
+            <div class="modal" id="teacherDetailModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="teacherModalTitle"></h3>
+                        <button class="modal-close" onclick="closeTeacherDetail()">&times;</button>
+                    </div>
+                    <div id="teacherModalContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Pédagogie -->
+        <div id="tab-pedagogy" class="tab-content">
+            <!-- Sous-onglets pédagogie -->
+            <div class="sub-tabs">
+                <div class="sub-tab active" data-subtab="pedagogy-overview">Vue d'ensemble</div>
+                <div class="sub-tab" data-subtab="pedagogy-subjects">Matières enseignées</div>
+                <div class="sub-tab" data-subtab="pedagogy-timetable">Emplois du temps</div>
+                <div class="sub-tab" data-subtab="pedagogy-lessons">Leçons</div>
+                <div class="sub-tab" data-subtab="pedagogy-tp">Travaux pratiques</div>
+                <div class="sub-tab" data-subtab="pedagogy-resources">Ressources</div>
+            </div>
+
+            <!-- Sous-contenus -->
+            <div class="sub-tab-content active" data-subtab="pedagogy-overview">
+                <div class="data-section">
+                    <h2><i class="fas fa-chart-bar"></i> STATISTIQUES PÉDAGOGIQUES</h2>
+                    <div id="pedagogyStats"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="pedagogy-subjects">
+                <div class="data-section">
+                    <h2><i class="fas fa-book"></i> MATIÈRES ENSEIGNÉES</h2>
+                    <div id="subjectsAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="pedagogy-timetable">
+                <div class="data-section">
+                    <h2><i class="fas fa-calendar-alt"></i> EMPLOIS DU TEMPS</h2>
+                    <div id="timetableAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="pedagogy-lessons">
+                <div class="data-section">
+                    <h2><i class="fas fa-chalkboard"></i> LEÇONS ENREGISTRÉES</h2>
+                    <div id="lessonsAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="pedagogy-tp">
+                <div class="data-section">
+                    <h2><i class="fas fa-flask"></i> TRAVAUX PRATIQUES</h2>
+                    <div id="tpAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="pedagogy-resources">
+                <div class="data-section">
+                    <h2><i class="fas fa-folder-open"></i> RESSOURCES PÉDAGOGIQUES</h2>
+                    <div id="resourcesAnalysis"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Formation -->
+        <div id="tab-training" class="tab-content">
+            <!-- Sous-onglets formation -->
+            <div class="sub-tabs">
+                <div class="sub-tab active" data-subtab="training-overview">Vue d'ensemble</div>
+                <div class="sub-tab" data-subtab="training-diplomas">Diplômes</div>
+                <div class="sub-tab" data-subtab="training-continuous">Formations continues</div>
+                <div class="sub-tab" data-subtab="training-languages">Compétences linguistiques</div>
+                <div class="sub-tab" data-subtab="training-it">Compétences informatiques</div>
+            </div>
+
+            <!-- Sous-contenus -->
+            <div class="sub-tab-content active" data-subtab="training-overview">
+                <div class="data-section">
+                    <h2><i class="fas fa-graduation-cap"></i> STATISTIQUES DE FORMATION</h2>
+                    <div id="trainingStats"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="training-diplomas">
+                <div class="data-section">
+                    <h2><i class="fas fa-award"></i> DIPLÔMES ACADÉMIQUES ET PROFESSIONNELS</h2>
+                    <div id="diplomasAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="training-continuous">
+                <div class="data-section">
+                    <h2><i class="fas fa-chalkboard-teacher"></i> FORMATIONS CONTINUES</h2>
+                    <div id="continuousTrainingAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="training-languages">
+                <div class="data-section">
+                    <h2><i class="fas fa-language"></i> COMPÉTENCES LINGUISTIQUES</h2>
+                    <div id="languagesAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="training-it">
+                <div class="data-section">
+                    <h2><i class="fas fa-laptop-code"></i> COMPÉTENCES INFORMATIQUES</h2>
+                    <div id="itSkillsAnalysis"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Projets -->
+        <div id="tab-projects" class="tab-content">
+            <!-- Sous-onglets projets -->
+            <div class="sub-tabs">
+                <div class="sub-tab active" data-subtab="projects-overview">Vue d'ensemble</div>
+                <div class="sub-tab" data-subtab="projects-pedagogical">Projets pédagogiques</div>
+                <div class="sub-tab" data-subtab="projects-activities">Activités extrascolaires</div>
+                <div class="sub-tab" data-subtab="projects-meetings">Réunions</div>
+            </div>
+
+            <!-- Sous-contenus -->
+            <div class="sub-tab-content active" data-subtab="projects-overview">
+                <div class="data-section">
+                    <h2><i class="fas fa-project-diagram"></i> STATISTIQUES DES PROJETS</h2>
+                    <div id="projectsStats"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="projects-pedagogical">
+                <div class="data-section">
+                    <h2><i class="fas fa-project-diagram"></i> PROJETS PÉDAGOGIQUES</h2>
+                    <div id="pedagogicalProjectsAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="projects-activities">
+                <div class="data-section">
+                    <h2><i class="fas fa-futbol"></i> ACTIVITÉS EXTRASCOLAIRES</h2>
+                    <div id="activitiesAnalysis"></div>
+                </div>
+            </div>
+
+            <div class="sub-tab-content" data-subtab="projects-meetings">
+                <div class="data-section">
+                    <h2><i class="fas fa-users"></i> RÉUNIONS ET CONSEILS</h2>
+                    <div id="meetingsAnalysis"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Retraite -->
+        <div id="tab-retirement" class="tab-content">
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-calendar-times"></i> Prochaines retraites</h3>
+                    <div id="upcomingRetirements"></div>
+                </div>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-bar"></i> Répartition par année</h3>
+                    <div class="chart-container">
+                        <canvas id="retirementYearChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h2><i class="fas fa-table"></i> TABLEAU DES RETRAITES</h2>
+                <div id="retirementTable"></div>
+            </div>
+
+            <!-- Analyse de la retraite -->
+            <div class="data-section">
+                <h2><i class="fas fa-chart-pie"></i> ANALYSE PAR CATÉGORIE</h2>
+                <div class="stats-grid" id="retirementAnalysis"></div>
+            </div>
+        </div>
+
+        <!-- Onglet Export Excel -->
+        <div id="tab-export" class="tab-content">
+            <div class="import-section">
+                <h2><i class="fas fa-file-excel"></i> EXPORT EXCEL</h2>
+                <p>Exportez toutes les données analysées au format Excel</p>
+
+                <div class="export-options">
+                    <button class="btn btn-success" onclick="exportAllToExcel()">
+                        <i class="fas fa-file-excel"></i> Export complet
+                    </button>
+                    <button class="btn btn-primary" onclick="exportTeachersToExcel()">
+                        <i class="fas fa-users"></i> Liste enseignants
+                    </button>
+                    <button class="btn btn-info" onclick="exportPedagogyToExcel()">
+                        <i class="fas fa-chalkboard-teacher"></i> Données pédagogiques
+                    </button>
+                    <button class="btn btn-warning" onclick="exportTrainingToExcel()">
+                        <i class="fas fa-graduation-cap"></i> Données formation
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportRetirementToExcel()">
+                        <i class="fas fa-umbrella-beach"></i> Planification retraite
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportProjectsToExcel()">
+                        <i class="fas fa-project-diagram"></i> Projets et activités
+                    </button>
+                </div>
+
+                <!-- Aperçu des données à exporter -->
+                <div class="data-section mt-30">
+                    <h2><i class="fas fa-eye"></i> APERÇU DES DONNÉES À EXPORTER</h2>
+                    <div id="exportPreview"></div>
+                </div>
+
+                <!-- Options d'export -->
+                <div class="data-section mt-20">
+                    <h2><i class="fas fa-cog"></i> OPTIONS D'EXPORT</h2>
+                    <div class="filter-bar">
+                        <select id="exportFilterEstablishment" class="w-100">
+                            <option value="">Tous les établissements</option>
+                        </select>
+                        <select id="exportFilterSubject" class="w-100">
+                            <option value="">Toutes les matières</option>
+                        </select>
+                        <select id="exportFilterCategory" class="w-100">
+                            <option value="">Toutes les catégories</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions globales -->
+        <div class="filter-bar" style="margin-top: 30px;">
+            <button class="btn btn-light" onclick="clearAllData()">
+                <i class="fas fa-trash"></i> Effacer toutes les données
+            </button>
+            <button class="btn btn-info" onclick="generateReport()">
+                <i class="fas fa-file-pdf"></i> Générer rapport
+            </button>
+            <button class="btn btn-primary" onclick="saveSession()">
+                <i class="fas fa-save"></i> Sauvegarder la session
+            </button>
+            <button class="btn btn-secondary" onclick="backupData()">
+                <i class="fas fa-download"></i> Exporter session
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let teachersData = [];
+        let currentTeacherIndex = -1;
+        let charts = {};
+        let filteredTeachers = [];
+        let currentFileType = 'all';
+
+        // Types de fichiers supportés
+        const FILE_TYPES = {
+            'tab1': {
+                name: 'Informations Générales',
+                icon: 'fa-user-tie',
+                description: 'Données personnelles, professionnelles et établissement'
+            },
+            'tab2': {
+                name: 'Enseignement & Pédagogie',
+                icon: 'fa-chalkboard-teacher',
+                description: 'Planning, thèmes, leçons, TP, ressources'
+            },
+            'tab3': {
+                name: 'Formation & Compétences',
+                icon: 'fa-graduation-cap',
+                description: 'Diplômes, formations, langues, compétences IT'
+            },
+            'tab4': {
+                name: 'Évaluations & Statistiques',
+                icon: 'fa-chart-line',
+                description: 'Évaluations, performances, statistiques'
+            },
+            'tab5': {
+                name: 'Projets & Activités',
+                icon: 'fa-project-diagram',
+                description: 'Projets pédagogiques, activités, réunions'
+            },
+            'tab6': {
+                name: 'Données & Archives',
+                icon: 'fa-database',
+                description: 'Sauvegardes, logs, données techniques'
+            },
+            'tab7': {
+                name: 'Tableau de bord',
+                icon: 'fa-tachometer-alt',
+                description: 'Statistiques, synthèses, rapports'
+            },
+            'complete': {
+                name: 'Fichier complet',
+                icon: 'fa-database',
+                description: 'Toutes les données en un seul fichier'
+            }
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+
+        function initApp() {
+            // Initialiser l'année
+            const currentYear = new Date().getFullYear();
+            document.getElementById('currentYear').textContent = currentYear;
+            
+            // Gestion des onglets
+            initTabs();
+            
+            // Gestion des sous-onglets
+            initSubTabs();
+            
+            // Gestion des types de fichiers
+            initFileTypeTabs();
+            
+            // Initialiser les événements des boutons
+            initButtons();
+            
+            // Charger les données de session
+            loadSessionData();
+            
+            // Initialiser les événements
+            initEvents();
+            
+            showNotification('Plateforme d\'analyse prête', 'success');
+        }
+
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        function initSubTabs() {
+            const subTabs = document.querySelectorAll('.sub-tab');
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const subtabId = this.getAttribute('data-subtab');
+                    switchSubTab(subtabId);
+                });
+            });
+        }
+
+        function initFileTypeTabs() {
+            const fileTypeTabs = document.querySelectorAll('.file-type-tab');
+            fileTypeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const fileType = this.getAttribute('data-file-type');
+                    switchFileTypeTab(fileType);
+                });
+            });
+        }
+
+        function initButtons() {
+            // Boutons d'importation
+            document.getElementById('singleFileBtn').addEventListener('click', function() {
+                document.getElementById('singleFileInput').click();
+            });
+            
+            document.getElementById('multiFileBtn').addEventListener('click', function() {
+                document.getElementById('multiFileInput').click();
+            });
+            
+            document.getElementById('completeFileBtn').addEventListener('click', function() {
+                document.getElementById('completeFileInput').click();
+            });
+            
+            // Gestion des inputs de fichiers
+            document.getElementById('singleFileInput').addEventListener('change', handleSingleFileImport);
+            document.getElementById('multiFileInput').addEventListener('change', handleMultiFileImport);
+            document.getElementById('completeFileInput').addEventListener('change', handleCompleteFileImport);
+        }
+
+        function switchTab(tabId) {
+            // Désactiver tous les onglets
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activer l'onglet sélectionné
+            const tabElement = document.querySelector(`[data-tab="${tabId}"]`);
+            const tabContent = document.getElementById(tabId);
+            
+            if (tabElement) tabElement.classList.add('active');
+            if (tabContent) tabContent.classList.add('active');
+            
+            // Mettre à jour l'interface spécifique
+            updateTabUI(tabId);
+        }
+
+        function switchSubTab(subtabId) {
+            // Désactiver tous les sous-onglets
+            document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activer le sous-onglet sélectionné
+            const subTabElement = document.querySelector(`.sub-tab[data-subtab="${subtabId}"]`);
+            const subTabContent = document.querySelector(`.sub-tab-content[data-subtab="${subtabId}"]`);
+            
+            if (subTabElement) subTabElement.classList.add('active');
+            if (subTabContent) subTabContent.classList.add('active');
+            
+            // Mettre à jour le contenu spécifique
+            updateSubTabUI(subtabId);
+        }
+
+        function switchFileTypeTab(fileType) {
+            // Désactiver tous les onglets de type de fichier
+            document.querySelectorAll('.file-type-tab').forEach(t => t.classList.remove('active'));
+            
+            // Activer l'onglet sélectionné
+            const tabElement = document.querySelector(`[data-file-type="${fileType}"]`);
+            if (tabElement) tabElement.classList.add('active');
+            
+            currentFileType = fileType;
+        }
+
+        function initEvents() {
+            // Recherche
+            const dashboardSearch = document.getElementById('dashboardSearch');
+            if (dashboardSearch) {
+                dashboardSearch.addEventListener('input', filterDashboard);
+            }
+            
+            const teacherSearch = document.getElementById('teacherSearch');
+            if (teacherSearch) {
+                teacherSearch.addEventListener('input', filterTeachers);
+            }
+            
+            // Prévisualisation des données
+            const dataPreviewSelect = document.getElementById('dataPreviewSelect');
+            if (dataPreviewSelect) {
+                dataPreviewSelect.addEventListener('change', function() {
+                    previewTeacherData(this.value);
+                });
+            }
+            
+            // Filtres dashboard
+            const subjectFilter = document.getElementById('dashboardFilterSubject');
+            const categoryFilter = document.getElementById('dashboardFilterCategory');
+            const establishmentFilter = document.getElementById('dashboardFilterEstablishment');
+            
+            if (subjectFilter) subjectFilter.addEventListener('change', filterDashboard);
+            if (categoryFilter) categoryFilter.addEventListener('change', filterDashboard);
+            if (establishmentFilter) establishmentFilter.addEventListener('change', filterDashboard);
+        }
+
+        // Gestion de l'importation
+        function handleSingleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoader(true);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const fileType = detectFileTypeFromContent(data, file.name);
+                    const teacherInfo = extractTeacherInfo(data);
+                    
+                    // Vérifier si l'enseignant existe déjà
+                    let teacherIndex = findTeacherIndex(teacherInfo);
+                    
+                    if (teacherIndex === -1) {
+                        // Créer un nouvel enseignant
+                        const newTeacher = createNewTeacher(teacherInfo, file, data, fileType);
+                        teachersData.push(newTeacher);
+                        teacherIndex = teachersData.length - 1;
+                    } else {
+                        // Ajouter le fichier à l'enseignant existant
+                        addFileToTeacher(teacherIndex, file, data, fileType);
+                    }
+                    
+                    // Mettre à jour l'interface
+                    updateUIAfterImport();
+                    showNotification(`Fichier ${file.name} importé avec succès (${FILE_TYPES[fileType]?.name || fileType})`, 'success');
+                    
+                } catch (error) {
+                    showNotification('Erreur lors de l\'importation du fichier', 'error');
+                    console.error('Erreur d\'importation:', error);
+                } finally {
+                    showLoader(false);
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleMultiFileImport(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            showLoader(true);
+            let importedCount = 0;
+            const totalFiles = files.length;
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        const fileType = detectFileTypeFromContent(data, file.name);
+                        const teacherInfo = extractTeacherInfo(data);
+                        
+                        let teacherIndex = findTeacherIndex(teacherInfo);
+                        
+                        if (teacherIndex === -1) {
+                            const newTeacher = createNewTeacher(teacherInfo, file, data, fileType);
+                            teachersData.push(newTeacher);
+                        } else {
+                            addFileToTeacher(teacherIndex, file, data, fileType);
+                        }
+                        
+                        importedCount++;
+                        
+                        if (importedCount === totalFiles) {
+                            updateUIAfterImport();
+                            showNotification(`${files.length} fichiers importés avec succès`, 'success');
+                            showLoader(false);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`Erreur avec le fichier ${file.name}:`, error);
+                        importedCount++;
+                        
+                        if (importedCount === totalFiles) {
+                            updateUIAfterImport();
+                            showNotification('Importation terminée avec quelques erreurs', 'warning');
+                            showLoader(false);
+                        }
+                    }
+                };
+                reader.readAsText(file);
+            });
+            
+            // Réinitialiser l'input
+            event.target.value = '';
+        }
+
+        function handleCompleteFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoader(true);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const teacherInfo = extractTeacherInfo(data);
+                    
+                    // Créer un enseignant avec toutes les données
+                    const newTeacher = {
+                        id: Date.now(),
+                        ...teacherInfo,
+                        files: [{
+                            name: file.name,
+                            type: 'complete',
+                            data: data,
+                            importDate: new Date().toISOString()
+                        }],
+                        complete: true,
+                        data: data
+                    };
+                    
+                    // Calculer les statistiques
+                    calculateTeacherStatistics(newTeacher);
+                    
+                    teachersData.push(newTeacher);
+                    
+                    // Mettre à jour l'interface
+                    updateUIAfterImport();
+                    showNotification(`Fichier complet importé avec succès`, 'success');
+                    
+                } catch (error) {
+                    showNotification('Erreur lors de l\'importation du fichier complet', 'error');
+                    console.error(error);
+                } finally {
+                    showLoader(false);
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function detectFileTypeFromContent(data, fileName) {
+            // Essayer de détecter le type à partir du contenu
+            if (fileName.includes('tab1') || fileName.includes('informations')) return 'tab1';
+            if (fileName.includes('tab2') || fileName.includes('enseignement') || fileName.includes('pédagogie')) return 'tab2';
+            if (fileName.includes('tab3') || fileName.includes('formation')) return 'tab3';
+            if (fileName.includes('tab4') || fileName.includes('évaluation')) return 'tab4';
+            if (fileName.includes('tab5') || fileName.includes('projet')) return 'tab5';
+            if (fileName.includes('tab6') || fileName.includes('données')) return 'tab6';
+            if (fileName.includes('tab7') || fileName.includes('dashboard')) return 'tab7';
+            if (fileName.includes('complete')) return 'complete';
+            
+            // Détection basée sur la structure des données
+            if (data.establishment && data.personal && data.professional) return 'tab1';
+            if (data.themes || data.lessons || data.tps || data.timetable) return 'tab2';
+            if (data.diplomas || data.trainings || data.languages || data.itskills) return 'tab3';
+            if (data.evaluations || data.statistics) return 'tab4';
+            if (data.projects || data.activities || data.meetings) return 'tab5';
+            if (data.backups || data.logs) return 'tab6';
+            if (data.dashboard || data.summary) return 'tab7';
+            
+            return 'unknown';
+        }
+
+        function extractTeacherInfo(data) {
+            let lastName = '';
+            let firstName = '';
+            let matricule = '';
+            let establishment = '';
+            
+            // Essayer différentes structures de données
+            if (data.personal) {
+                lastName = data.personal.lastName || '';
+                firstName = data.personal.firstName || '';
+                matricule = data.professional?.matricule || '';
+                establishment = data.establishment?.name || '';
+            } else if (data.lastName) {
+                lastName = data.lastName;
+                firstName = data.firstName || '';
+            } else if (data.teacher) {
+                lastName = data.teacher.lastName || '';
+                firstName = data.teacher.firstName || '';
+            }
+            
+            // Si pas de nom, utiliser des valeurs par défaut
+            if (!lastName) {
+                lastName = 'Enseignant';
+                firstName = 'Non spécifié';
+            }
+            
+            return {
+                lastName,
+                firstName,
+                matricule,
+                establishment,
+                fullName: `${lastName} ${firstName}`.trim()
+            };
+        }
+
+        function findTeacherIndex(teacherInfo) {
+            return teachersData.findIndex(t => 
+                t.lastName === teacherInfo.lastName && 
+                t.firstName === teacherInfo.firstName
+            );
+        }
+
+        function createNewTeacher(teacherInfo, file, data, fileType) {
+            const newTeacher = {
+                id: Date.now(),
+                ...teacherInfo,
+                files: [{
+                    name: file.name,
+                    type: fileType,
+                    data: data,
+                    importDate: new Date().toISOString()
+                }],
+                complete: false
+            };
+            
+            // Traiter les données selon le type
+            processTeacherData(newTeacher, data, fileType);
+            
+            return newTeacher;
+        }
+
+        function addFileToTeacher(teacherIndex, file, data, fileType) {
+            const teacher = teachersData[teacherIndex];
+            
+            // Vérifier si ce type de fichier existe déjà
+            const existingFileIndex = teacher.files.findIndex(f => f.type === fileType);
+            
+            if (existingFileIndex === -1) {
+                // Ajouter le nouveau fichier
+                teacher.files.push({
+                    name: file.name,
+                    type: fileType,
+                    data: data,
+                    importDate: new Date().toISOString()
+                });
+            } else {
+                // Mettre à jour le fichier existant
+                teacher.files[existingFileIndex] = {
+                    name: file.name,
+                    type: fileType,
+                    data: data,
+                    importDate: new Date().toISOString()
+                };
+            }
+            
+            // Traiter les données
+            processTeacherData(teacher, data, fileType);
+            
+            // Vérifier la complétude
+            checkTeacherCompleteness(teacherIndex);
+        }
+
+        function processTeacherData(teacher, data, fileType) {
+            // Initialiser l'objet data si nécessaire
+            if (!teacher.data) {
+                teacher.data = {};
+            }
+            
+            // Fusionner les données selon le type
+            switch(fileType) {
+                case 'tab1':
+                    teacher.data.establishment = data.establishment || {};
+                    teacher.data.personal = data.personal || {};
+                    teacher.data.professional = data.professional || {};
+                    teacher.data.subjects = data.subjects || [];
+                    break;
+                    
+                case 'tab2':
+                    // Gestion des sous-onglets de tab2
+                    if (data.timetable) teacher.data.timetable = data.timetable;
+                    if (data.themes) teacher.data.themes = data.themes;
+                    if (data.lessons) teacher.data.lessons = data.lessons;
+                    if (data.tps) teacher.data.tps = data.tps;
+                    if (data.resources) teacher.data.resources = data.resources;
+                    break;
+                    
+                case 'tab3':
+                    teacher.data.diplomas = data.diplomas || [];
+                    teacher.data.trainings = data.trainings || [];
+                    teacher.data.languages = data.languages || [];
+                    teacher.data.itskills = data.itskills || [];
+                    break;
+                    
+                case 'tab4':
+                    teacher.data.evaluations = data.evaluations || [];
+                    teacher.data.statistics = data.statistics || {};
+                    break;
+                    
+                case 'tab5':
+                    teacher.data.projects = data.projects || [];
+                    teacher.data.activities = data.activities || [];
+                    teacher.data.meetings = data.meetings || [];
+                    break;
+                    
+                case 'complete':
+                    // Fusionner toutes les données
+                    Object.assign(teacher.data, data);
+                    break;
+            }
+            
+            // Recalculer les statistiques
+            calculateTeacherStatistics(teacher);
+        }
+
+        function checkTeacherCompleteness(teacherIndex) {
+            const teacher = teachersData[teacherIndex];
+            if (!teacher) return;
+            
+            const fileTypes = teacher.files.map(f => f.type);
+            const requiredTypes = ['tab1', 'tab2', 'tab3'];
+            const hasAllRequired = requiredTypes.every(type => fileTypes.includes(type));
+            
+            teacher.complete = hasAllRequired;
+            
+            if (teacher.complete) {
+                showNotification(`${teacher.fullName} - Fiche maintenant complète`, 'success');
+            }
+        }
+
+        function calculateTeacherStatistics(teacher) {
+            if (!teacher.data) return;
+            
+            // Âge
+            if (teacher.data.personal && teacher.data.personal.birthDate) {
+                teacher.age = calculateAge(teacher.data.personal.birthDate);
+            }
+            
+            // Années de service
+            if (teacher.data.professional && teacher.data.professional.engagementDate) {
+                teacher.serviceYears = calculateServiceYears(teacher.data.professional.engagementDate);
+            }
+            
+            // Années avant retraite
+            if (teacher.data.professional && teacher.data.professional.retirementDate) {
+                teacher.yearsToRetirement = calculateYearsToDate(teacher.data.professional.retirementDate);
+            }
+            
+            // Nombre de matières
+            if (teacher.data.subjects) {
+                teacher.subjectCount = teacher.data.subjects.length;
+            }
+            
+            // Nombre de leçons
+            if (teacher.data.lessons) {
+                teacher.lessonCount = teacher.data.lessons.length;
+            }
+            
+            // Nombre de TP
+            if (teacher.data.tps) {
+                teacher.tpCount = teacher.data.tps.length;
+            }
+            
+            // Nombre d'évaluations
+            if (teacher.data.evaluations) {
+                teacher.evaluationCount = teacher.data.evaluations.length;
+            }
+            
+            // Nombre de projets
+            if (teacher.data.projects) {
+                teacher.projectCount = teacher.data.projects.length;
+            }
+            
+            // Nombre de formations
+            if (teacher.data.trainings) {
+                teacher.trainingCount = teacher.data.trainings.length;
+            }
+        }
+
+        function calculateAge(birthDate) {
+            if (!birthDate) return null;
+            const birth = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function calculateServiceYears(startDate) {
+            if (!startDate) return null;
+            const start = new Date(startDate);
+            const today = new Date();
+            let years = today.getFullYear() - start.getFullYear();
+            const monthDiff = today.getMonth() - start.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < start.getDate())) {
+                years--;
+            }
+            
+            return Math.max(years, 0);
+        }
+
+        function calculateYearsToDate(futureDate) {
+            if (!futureDate) return null;
+            const future = new Date(futureDate);
+            const today = new Date();
+            let years = future.getFullYear() - today.getFullYear();
+            const monthDiff = future.getMonth() - today.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && future.getDate() < today.getDate())) {
+                years--;
+            }
+            
+            return Math.max(years, 0);
+        }
+
+        function updateUIAfterImport() {
+            updateImportedFilesList();
+            updateOverview();
+            updateDataPreviewSelect();
+            updateDashboard();
+            updateTeachersList();
+        }
+
+        function updateImportedFilesList() {
+            const container = document.getElementById('importedFilesList');
+            const section = document.getElementById('importedFilesSection');
+            
+            if (!container || !section) return;
+            
+            if (teachersData.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            // Grouper les fichiers par type
+            const filesByType = {};
+            Object.keys(FILE_TYPES).forEach(type => {
+                filesByType[type] = [];
+            });
+            
+            teachersData.forEach(teacher => {
+                teacher.files.forEach(file => {
+                    if (filesByType[file.type]) {
+                        filesByType[file.type].push({
+                            teacher: teacher.fullName,
+                            fileName: file.name,
+                            date: file.importDate
+                        });
+                    }
+                });
+            });
+            
+            let html = '';
+            
+            Object.keys(FILE_TYPES).forEach(type => {
+                const files = filesByType[type];
+                if (files.length > 0) {
+                    html += `
+                        <div class="file-type-group">
+                            <h4><i class="fas ${FILE_TYPES[type].icon}"></i> ${FILE_TYPES[type].name} (${files.length})</h4>
+                            <div class="file-list">
+                    `;
+                    
+                    files.forEach(file => {
+                        const date = new Date(file.date).toLocaleDateString();
+                        html += `
+                            <div class="file-item">
+                                <span><strong>${file.teacher}</strong> - ${file.fileName}</span>
+                                <span class="badge badge-primary">${date}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateOverview() {
+            const container = document.getElementById('overviewStats');
+            const section = document.getElementById('overviewSection');
+            
+            if (!container || !section) return;
+            
+            if (teachersData.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            const totalFiles = teachersData.reduce((sum, t) => sum + t.files.length, 0);
+            
+            const subjectSet = new Set();
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) subjectSet.add(subject.name);
+                    });
+                }
+            });
+            
+            const uniqueSubjects = subjectSet.size;
+            
+            const html = `
+                <div class="stat-card">
+                    <div><i class="fas fa-users"></i> Enseignants</div>
+                    <div class="stat-value">${totalTeachers}</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-check-circle"></i> Fiches complètes</div>
+                    <div class="stat-value">${completeTeachers}</div>
+                    <div>${Math.round((completeTeachers / totalTeachers) * 100)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-file"></i> Fichiers</div>
+                    <div class="stat-value">${totalFiles}</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-book"></i> Matières</div>
+                    <div class="stat-value">${uniqueSubjects}</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updateDataPreviewSelect() {
+            const container = document.getElementById('dataPreviewSelect');
+            const section = document.getElementById('dataPreviewSection');
+            
+            if (!container || !section) return;
+            
+            if (teachersData.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            let html = '<option value="">Sélectionner un enseignant...</option>';
+            
+            teachersData.forEach((teacher, index) => {
+                const fileTypes = teacher.files.map(f => FILE_TYPES[f.type]?.name || f.type).join(', ');
+                html += `<option value="${index}">${teacher.fullName} - ${teacher.files.length} fichiers (${fileTypes})</option>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function previewTeacherData(teacherIndex) {
+            const container = document.getElementById('dataPreviewContent');
+            if (!container) return;
+            
+            if (!teacherIndex) {
+                container.innerHTML = '<p class="text-center">Sélectionnez un enseignant</p>';
+                return;
+            }
+            
+            const teacher = teachersData[teacherIndex];
+            if (!teacher) return;
+            
+            let html = `
+                <h4>${teacher.fullName}</h4>
+                <div class="files-by-type">
+            `;
+            
+            // Afficher les données par type de fichier
+            teacher.files.forEach(file => {
+                const fileTypeInfo = FILE_TYPES[file.type] || { name: file.type, icon: 'fa-file' };
+                
+                html += `
+                    <div class="file-type-group">
+                        <h5><i class="fas ${fileTypeInfo.icon}"></i> ${fileTypeInfo.name}</h5>
+                        <div class="data-preview">
+                `;
+                
+                // Afficher un aperçu des données
+                const previewData = getDataPreview(file.data, file.type);
+                html += JSON.stringify(previewData, null, 2);
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function getDataPreview(data, type) {
+            // Créer un aperçu limité des données
+            const preview = {};
+            
+            switch(type) {
+                case 'tab1':
+                    preview.establishment = data.establishment?.name || 'Non spécifié';
+                    preview.personal = {
+                        nom: data.personal?.lastName,
+                        prenom: data.personal?.firstName,
+                        age: calculateAge(data.personal?.birthDate)
+                    };
+                    preview.professional = {
+                        matricule: data.professional?.matricule,
+                        fonction: data.professional?.position,
+                        categorie: data.professional?.professionalCategory
+                    };
+                    preview.subjects = data.subjects?.length || 0;
+                    break;
+                    
+                case 'tab2':
+                    preview.timetable = data.timetable ? 'Disponible' : 'Non disponible';
+                    preview.themes = data.themes ? Object.keys(data.themes).length + ' thèmes' : 'Non disponible';
+                    preview.lessons = data.lessons?.length || 0;
+                    preview.tps = data.tps?.length || 0;
+                    preview.resources = data.resources?.length || 0;
+                    break;
+                    
+                case 'tab3':
+                    preview.diplomas = data.diplomas?.length || 0;
+                    preview.trainings = data.trainings?.length || 0;
+                    preview.languages = data.languages?.length || 0;
+                    preview.itskills = data.itskills?.length || 0;
+                    break;
+                    
+                case 'tab4':
+                    preview.evaluations = data.evaluations?.length || 0;
+                    preview.statistics = data.statistics || 'Non disponible';
+                    break;
+                    
+                case 'tab5':
+                    preview.projects = data.projects?.length || 0;
+                    preview.activities = data.activities?.length || 0;
+                    preview.meetings = data.meetings?.length || 0;
+                    break;
+                    
+                default:
+                    preview.type = type;
+                    preview.keys = Object.keys(data).slice(0, 5);
+            }
+            
+            return preview;
+        }
+
+        function updateTabUI(tabId) {
+            switch(tabId) {
+                case 'tab-dashboard':
+                    updateDashboard();
+                    break;
+                case 'tab-teachers':
+                    updateTeachersList();
+                    break;
+                case 'tab-pedagogy':
+                    updatePedagogyAnalysis();
+                    break;
+                case 'tab-training':
+                    updateTrainingAnalysis();
+                    break;
+                case 'tab-projects':
+                    updateProjectsAnalysis();
+                    break;
+                case 'tab-retirement':
+                    updateRetirementAnalysis();
+                    break;
+                case 'tab-export':
+                    updateExportPreview();
+                    break;
+            }
+        }
+
+        function updateSubTabUI(subtabId) {
+            // Implémenter la mise à jour pour chaque sous-onglet
+            switch(subtabId) {
+                case 'pedagogy-overview':
+                    updatePedagogyStats();
+                    break;
+                case 'pedagogy-subjects':
+                    updateSubjectsAnalysis();
+                    break;
+                case 'pedagogy-timetable':
+                    updateTimetableAnalysis();
+                    break;
+                case 'pedagogy-lessons':
+                    updateLessonsAnalysis();
+                    break;
+                case 'pedagogy-tp':
+                    updateTPAnalysis();
+                    break;
+                case 'pedagogy-resources':
+                    updateResourcesAnalysis();
+                    break;
+                case 'training-overview':
+                    updateTrainingStats();
+                    break;
+                case 'training-diplomas':
+                    updateDiplomasAnalysis();
+                    break;
+                case 'training-continuous':
+                    updateContinuousTrainingAnalysis();
+                    break;
+                case 'training-languages':
+                    updateLanguagesAnalysis();
+                    break;
+                case 'training-it':
+                    updateITSkillsAnalysis();
+                    break;
+                case 'projects-overview':
+                    updateProjectsStats();
+                    break;
+                case 'projects-pedagogical':
+                    updatePedagogicalProjectsAnalysis();
+                    break;
+                case 'projects-activities':
+                    updateActivitiesAnalysis();
+                    break;
+                case 'projects-meetings':
+                    updateMeetingsAnalysis();
+                    break;
+            }
+        }
+
+        function updateDashboard() {
+            if (teachersData.length === 0) {
+                document.getElementById('globalStats').innerHTML = '<p class="text-center">Aucune donnée importée</p>';
+                return;
+            }
+            
+            // Mettre à jour les statistiques globales
+            updateGlobalStats();
+            
+            // Mettre à jour les graphiques
+            updateCharts();
+            
+            // Mettre à jour les activités récentes
+            updateRecentActivities();
+            
+            // Mettre à jour les filtres
+            updateFilters();
+        }
+
+        function updateGlobalStats() {
+            const container = document.getElementById('globalStats');
+            if (!container) return;
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            
+            // Calculer la moyenne d'âge
+            const ages = teachersData
+                .map(t => t.age)
+                .filter(age => age !== null);
+            const avgAge = ages.length > 0 ? 
+                Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
+            
+            // Calculer la moyenne d'années de service
+            const serviceYears = teachersData
+                .map(t => t.serviceYears)
+                .filter(years => years !== null);
+            const avgServiceYears = serviceYears.length > 0 ? 
+                Math.round(serviceYears.reduce((a, b) => a + b, 0) / serviceYears.length) : 0;
+            
+            // Compter les prochaines retraites (moins de 5 ans)
+            const upcomingRetirements = teachersData
+                .map(t => t.yearsToRetirement)
+                .filter(years => years !== null && years <= 5)
+                .length;
+            
+            // Total des leçons
+            const totalLessons = teachersData.reduce((sum, t) => sum + (t.lessonCount || 0), 0);
+            
+            const html = `
+                <div class="stat-card">
+                    <div>Enseignants analysés</div>
+                    <div class="stat-value">${totalTeachers}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Âge moyen</div>
+                    <div class="stat-value">${avgAge}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Service moyen</div>
+                    <div class="stat-value">${avgServiceYears} ans</div>
+                </div>
+                <div class="stat-card">
+                    <div>Retraites ≤ 5 ans</div>
+                    <div class="stat-value">${upcomingRetirements}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Fiches complètes</div>
+                    <div class="stat-value">${completeTeachers}</div>
+                    <div>${totalTeachers > 0 ? Math.round((completeTeachers / totalTeachers) * 100) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <div>Leçons totales</div>
+                    <div class="stat-value">${totalLessons}</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updateCharts() {
+            // Détruire les anciens graphiques
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            charts = {};
+            
+            // Créer les nouveaux graphiques
+            createSubjectChart();
+            createRetirementChart();
+            createHoursChart();
+            createTrainingChart();
+        }
+
+        function createSubjectChart() {
+            const ctx = document.getElementById('subjectChart');
+            if (!ctx) return;
+            
+            // Compter les matières
+            const subjectCounts = {};
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) {
+                            subjectCounts[subject.name] = (subjectCounts[subject.name] || 0) + 1;
+                        }
+                    });
+                }
+            });
+            
+            // Trier et prendre les 10 principales
+            const sortedSubjects = Object.entries(subjectCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            const labels = sortedSubjects.map(s => s[0]);
+            const data = sortedSubjects.map(s => s[1]);
+            
+            charts.subjectChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#3498db', '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6',
+                            '#1abc9c', '#d35400', '#c0392b', '#16a085', '#8e44ad'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Matières les plus enseignées'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRetirementChart() {
+            const ctx = document.getElementById('retirementChart');
+            if (!ctx) return;
+            
+            // Grouper par année de retraite
+            const retirementYears = {};
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.professional && teacher.data.professional.retirementDate) {
+                    const year = new Date(teacher.data.professional.retirementDate).getFullYear();
+                    retirementYears[year] = (retirementYears[year] || 0) + 1;
+                }
+            });
+            
+            const sortedYears = Object.keys(retirementYears).sort();
+            const data = sortedYears.map(year => retirementYears[year]);
+            
+            charts.retirementChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedYears,
+                    datasets: [{
+                        label: 'Nombre de retraites',
+                        data: data,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Évolution des départs à la retraite'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre d\'enseignants'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Année'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createHoursChart() {
+            const ctx = document.getElementById('hoursChart');
+            if (!ctx) return;
+            
+            // Distribution des heures d'enseignement
+            const hoursDistribution = { '0-10': 0, '11-20': 0, '21-30': 0, '31+': 0 };
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.professional && teacher.data.professional.weeklyHours) {
+                    const hours = parseInt(teacher.data.professional.weeklyHours) || 0;
+                    if (hours <= 10) hoursDistribution['0-10']++;
+                    else if (hours <= 20) hoursDistribution['11-20']++;
+                    else if (hours <= 30) hoursDistribution['21-30']++;
+                    else hoursDistribution['31+']++;
+                }
+            });
+            
+            charts.hoursChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-10h', '11-20h', '21-30h', '31h+'],
+                    datasets: [{
+                        label: 'Nombre d\'enseignants',
+                        data: Object.values(hoursDistribution),
+                        backgroundColor: '#3498db'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Distribution des heures d\'enseignement'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre d\'enseignants'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Heures/semaine'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createTrainingChart() {
+            const ctx = document.getElementById('trainingChart');
+            if (!ctx) return;
+            
+            // Niveau de formation (basé sur les diplômes)
+            const trainingLevels = { 'Licence': 0, 'Master': 0, 'Doctorat': 0, 'Autre': 0 };
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.diplomas && teacher.data.diplomas.length > 0) {
+                    let hasDoctorat = false;
+                    let hasMaster = false;
+                    let hasLicence = false;
+                    
+                    teacher.data.diplomas.forEach(diploma => {
+                        const name = diploma.name || '';
+                        if (name.includes('Doctorat') || name.includes('PhD')) hasDoctorat = true;
+                        else if (name.includes('Master')) hasMaster = true;
+                        else if (name.includes('Licence') || name.includes('Bachelor')) hasLicence = true;
+                    });
+                    
+                    if (hasDoctorat) trainingLevels['Doctorat']++;
+                    else if (hasMaster) trainingLevels['Master']++;
+                    else if (hasLicence) trainingLevels['Licence']++;
+                    else trainingLevels['Autre']++;
+                } else {
+                    trainingLevels['Autre']++;
+                }
+            });
+            
+            charts.trainingChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(trainingLevels),
+                    datasets: [{
+                        data: Object.values(trainingLevels),
+                        backgroundColor: ['#2ecc71', '#3498db', '#9b59b6', '#f39c12']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Niveau de formation des enseignants'
+                        },
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRecentActivities() {
+            const container = document.getElementById('recentActivities');
+            if (!container) return;
+            
+            // Collecter les activités récentes
+            const recentActivities = [];
+            
+            teachersData.forEach(teacher => {
+                // Dernières leçons
+                if (teacher.data && teacher.data.lessons) {
+                    teacher.data.lessons.slice(-3).forEach(lesson => {
+                        if (lesson.date) {
+                            recentActivities.push({
+                                type: 'lesson',
+                                date: lesson.date,
+                                teacher: teacher.fullName,
+                                title: lesson.title || 'Leçon'
+                            });
+                        }
+                    });
+                }
+                
+                // Derniers TP
+                if (teacher.data && teacher.data.tps) {
+                    teacher.data.tps.slice(-2).forEach(tp => {
+                        if (tp.date) {
+                            recentActivities.push({
+                                type: 'tp',
+                                date: tp.date,
+                                teacher: teacher.fullName,
+                                title: tp.title || 'TP'
+                            });
+                        }
+                    });
+                }
+                
+                // Dernières évaluations
+                if (teacher.data && teacher.data.evaluations) {
+                    teacher.data.evaluations.slice(-2).forEach(eval => {
+                        if (eval.date) {
+                            recentActivities.push({
+                                type: 'evaluation',
+                                date: eval.date,
+                                teacher: teacher.fullName,
+                                title: eval.type || 'Évaluation'
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Trier par date
+            recentActivities.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (recentActivities.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune activité récente</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Enseignant</th><th>Description</th></tr></thead><tbody>';
+            
+            recentActivities.slice(0, 10).forEach(activity => {
+                const typeIcon = activity.type === 'lesson' ? 'fa-chalkboard' : 
+                                activity.type === 'tp' ? 'fa-flask' : 'fa-clipboard-check';
+                const typeLabel = activity.type === 'lesson' ? 'Leçon' : 
+                                 activity.type === 'tp' ? 'TP' : 'Évaluation';
+                
+                html += `
+                    <tr>
+                        <td>${new Date(activity.date).toLocaleDateString()}</td>
+                        <td><i class="fas ${typeIcon}"></i> ${typeLabel}</td>
+                        <td>${activity.teacher}</td>
+                        <td>${activity.title}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function updateFilters() {
+            // Mettre à jour les filtres de matière
+            const subjectFilter = document.getElementById('dashboardFilterSubject');
+            const subjectSet = new Set();
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) subjectSet.add(subject.name);
+                    });
+                }
+            });
+            
+            let subjectOptions = '<option value="">Toutes les matières</option>';
+            Array.from(subjectSet).sort().forEach(subject => {
+                subjectOptions += `<option value="${subject}">${subject}</option>`;
+            });
+            
+            if (subjectFilter) subjectFilter.innerHTML = subjectOptions;
+            
+            // Mettre à jour les filtres de catégorie
+            const categoryFilter = document.getElementById('dashboardFilterCategory');
+            const categorySet = new Set();
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.professional && teacher.data.professional.professionalCategory) {
+                    categorySet.add(teacher.data.professional.professionalCategory);
+                }
+            });
+            
+            let categoryOptions = '<option value="">Toutes les catégories</option>';
+            Array.from(categorySet).sort().forEach(category => {
+                categoryOptions += `<option value="${category}">${category}</option>`;
+            });
+            
+            if (categoryFilter) categoryFilter.innerHTML = categoryOptions;
+            
+            // Mettre à jour les filtres d'établissement
+            const establishmentFilter = document.getElementById('dashboardFilterEstablishment');
+            const establishmentSet = new Set();
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.establishment && teacher.data.establishment.name) {
+                    establishmentSet.add(teacher.data.establishment.name);
+                }
+            });
+            
+            let establishmentOptions = '<option value="">Tous les établissements</option>';
+            Array.from(establishmentSet).sort().forEach(establishment => {
+                establishmentOptions += `<option value="${establishment}">${establishment}</option>`;
+            });
+            
+            if (establishmentFilter) establishmentFilter.innerHTML = establishmentOptions;
+        }
+
+        function filterDashboard() {
+            const searchTerm = document.getElementById('dashboardSearch')?.value.toLowerCase() || '';
+            const subject = document.getElementById('dashboardFilterSubject')?.value || '';
+            const category = document.getElementById('dashboardFilterCategory')?.value || '';
+            const establishment = document.getElementById('dashboardFilterEstablishment')?.value || '';
+            
+            // Filtrer les enseignants pour les statistiques
+            const filtered = teachersData.filter(teacher => {
+                // Recherche par nom
+                if (searchTerm && !teacher.fullName.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                
+                // Filtre par matière
+                if (subject && (!teacher.data || !teacher.data.subjects || 
+                    !teacher.data.subjects.some(s => s && s.name === subject))) {
+                    return false;
+                }
+                
+                // Filtre par catégorie
+                if (category && (!teacher.data || !teacher.data.professional || 
+                    teacher.data.professional.professionalCategory !== category)) {
+                    return false;
+                }
+                
+                // Filtre par établissement
+                if (establishment && (!teacher.data || !teacher.data.establishment || 
+                    teacher.data.establishment.name !== establishment)) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Mettre à jour les statistiques avec les données filtrées
+            updateFilteredStats(filtered);
+        }
+
+        function updateFilteredStats(filteredTeachers) {
+            const container = document.getElementById('globalStats');
+            if (!container) return;
+            
+            const totalTeachers = filteredTeachers.length;
+            
+            if (totalTeachers === 0) {
+                container.innerHTML = '<p class="text-center">Aucun enseignant ne correspond aux critères</p>';
+                return;
+            }
+            
+            const completeTeachers = filteredTeachers.filter(t => t.complete).length;
+            
+            // Calculer la moyenne d'âge
+            const ages = filteredTeachers
+                .map(t => t.age)
+                .filter(age => age !== null);
+            const avgAge = ages.length > 0 ? 
+                Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
+            
+            const html = `
+                <div class="stat-card">
+                    <div>Enseignants filtrés</div>
+                    <div class="stat-value">${totalTeachers}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Âge moyen</div>
+                    <div class="stat-value">${avgAge}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Fiches complètes</div>
+                    <div class="stat-value">${completeTeachers}</div>
+                    <div>${Math.round((completeTeachers / totalTeachers) * 100)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div>Leçons totales</div>
+                    <div class="stat-value">${filteredTeachers.reduce((sum, t) => sum + (t.lessonCount || 0), 0)}</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updateTeachersList() {
+            const container = document.getElementById('teachersCards');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucun enseignant importé</p>';
+                return;
+            }
+            
+            // Appliquer le filtre si nécessaire
+            filteredTeachers = [...teachersData];
+            applyTeacherFilters();
+            
+            let html = '';
+            filteredTeachers.forEach((teacher, index) => {
+                const mainSubject = teacher.data && teacher.data.subjects && teacher.data.subjects.length > 0 ? 
+                    teacher.data.subjects[0].name : 'Non spécifié';
+                
+                const establishment = teacher.data && teacher.data.establishment ? 
+                    teacher.data.establishment.name : 'Non spécifié';
+                
+                const serviceYears = teacher.serviceYears || '?';
+                const age = teacher.age || '?';
+                const yearsToRetirement = teacher.yearsToRetirement !== null ? teacher.yearsToRetirement + ' ans' : 'N/A';
+                
+                const fileCount = teacher.files.length;
+                const fileTypes = teacher.files.map(f => FILE_TYPES[f.type]?.name?.substring(0, 3) || f.type.substring(0, 3)).join(', ');
+                
+                html += `
+                    <div class="teacher-card" onclick="showTeacherDetail(${index})">
+                        <div class="teacher-header">
+                            <div class="teacher-name">${teacher.fullName}</div>
+                            <div>
+                                ${teacher.complete ? 
+                                    '<span class="badge badge-success">Complet</span>' : 
+                                    `<span class="badge badge-warning">${fileCount} fichiers</span>`}
+                            </div>
+                        </div>
+                        <div class="teacher-info">
+                            <div class="teacher-info-item">
+                                <i class="fas fa-id-badge"></i>
+                                <span>${teacher.data && teacher.data.professional ? teacher.data.professional.matricule : 'N/A'}</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-book"></i>
+                                <span>${mainSubject}</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-school"></i>
+                                <span>${establishment}</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${serviceYears} ans</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-user"></i>
+                                <span>${age} ans</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-umbrella-beach"></i>
+                                <span>${yearsToRetirement}</span>
+                            </div>
+                        </div>
+                        <div class="teacher-info-item mt-10">
+                            <i class="fas fa-file"></i>
+                            <small>Types: ${fileTypes}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function applyTeacherFilters() {
+            const searchTerm = document.getElementById('teacherSearch')?.value.toLowerCase() || '';
+            
+            if (searchTerm) {
+                filteredTeachers = filteredTeachers.filter(teacher => {
+                    const fullName = teacher.fullName.toLowerCase();
+                    const matricule = teacher.data && teacher.data.professional ? 
+                        (teacher.data.professional.matricule || '').toLowerCase() : '';
+                    const establishment = teacher.data && teacher.data.establishment ? 
+                        (teacher.data.establishment.name || '').toLowerCase() : '';
+                    
+                    return fullName.includes(searchTerm) || 
+                           matricule.includes(searchTerm) || 
+                           establishment.includes(searchTerm);
+                });
+            }
+        }
+
+        function filterCompleteOnly() {
+            filteredTeachers = teachersData.filter(teacher => teacher.complete);
+            updateTeachersList();
+            showNotification(`${filteredTeachers.length} fiches complètes affichées`, 'info');
+        }
+
+        function sortTeachers(criteria) {
+            filteredTeachers.sort((a, b) => {
+                switch(criteria) {
+                    case 'name':
+                        return a.fullName.localeCompare(b.fullName);
+                    case 'retirement':
+                        const aYears = a.yearsToRetirement !== null ? a.yearsToRetirement : 99;
+                        const bYears = b.yearsToRetirement !== null ? b.yearsToRetirement : 99;
+                        return aYears - bYears;
+                    default:
+                        return 0;
+                }
+            });
+            
+            updateTeachersList();
+            showNotification(`Trié par ${criteria === 'name' ? 'nom' : 'retraite'}`, 'info');
+        }
+
+        function showTeacherDetail(index) {
+            const teacher = teachersData[index];
+            if (!teacher) return;
+            
+            currentTeacherIndex = index;
+            
+            const modalTitle = document.getElementById('teacherModalTitle');
+            const modalContent = document.getElementById('teacherModalContent');
+            const modal = document.getElementById('teacherDetailModal');
+            
+            if (!modalTitle || !modalContent || !modal) return;
+            
+            modalTitle.textContent = `${teacher.fullName} - Détails`;
+            
+            // Générer le contenu détaillé
+            let content = `
+                <div class="teacher-detail">
+                    <div class="filter-bar">
+                        <button class="btn btn-primary" onclick="exportTeacherToExcel(${index})">
+                            <i class="fas fa-file-excel"></i> Exporter cet enseignant
+                        </button>
+                        <button class="btn btn-info" onclick="showTeacherFiles(${index})">
+                            <i class="fas fa-folder-open"></i> Voir les fichiers
+                        </button>
+                    </div>
+                    
+                    <div class="data-section">
+                        <h3><i class="fas fa-info-circle"></i> Informations générales</h3>
+                        ${generateTeacherGeneralInfo(teacher)}
+                    </div>
+                    
+                    <div class="data-section">
+                        <h3><i class="fas fa-chart-bar"></i> Statistiques</h3>
+                        ${generateTeacherStatistics(teacher)}
+                    </div>
+                    
+                    <div class="data-section">
+                        <h3><i class="fas fa-book"></i> Matières enseignées</h3>
+                        ${generateTeacherSubjects(teacher)}
+                    </div>
+                    
+                    ${teacher.data && teacher.data.lessons && teacher.data.lessons.length > 0 ? `
+                        <div class="data-section">
+                            <h3><i class="fas fa-chalkboard"></i> Dernières leçons</h3>
+                            ${generateTeacherRecentLessons(teacher)}
+                        </div>
+                    ` : ''}
+                    
+                    ${teacher.data && teacher.data.evaluations && teacher.data.evaluations.length > 0 ? `
+                        <div class="data-section">
+                            <h3><i class="fas fa-clipboard-check"></i> Évaluations récentes</h3>
+                            ${generateTeacherRecentEvaluations(teacher)}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modalContent.innerHTML = content;
+            modal.classList.add('active');
+        }
+
+        function generateTeacherGeneralInfo(teacher) {
+            if (!teacher.data) return '<p>Aucune donnée disponible</p>';
+            
+            const personal = teacher.data.personal || {};
+            const professional = teacher.data.professional || {};
+            const establishment = teacher.data.establishment || {};
+            
+            return `
+                <table class="data-table">
+                    <tr>
+                        <td><strong>Matricule:</strong></td>
+                        <td>${professional.matricule || 'N/A'}</td>
+                        <td><strong>Fonction:</strong></td>
+                        <td>${professional.position || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Date de naissance:</strong></td>
+                        <td>${personal.birthDate ? new Date(personal.birthDate).toLocaleDateString() : 'N/A'}</td>
+                        <td><strong>Lieu de naissance:</strong></td>
+                        <td>${personal.birthPlace || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Date d'engagement:</strong></td>
+                        <td>${professional.engagementDate ? new Date(professional.engagementDate).toLocaleDateString() : 'N/A'}</td>
+                        <td><strong>Catégorie:</strong></td>
+                        <td>${professional.professionalCategory || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Établissement:</strong></td>
+                        <td colspan="3">${establishment.name || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Type d'établissement:</strong></td>
+                        <td>${establishment.type || 'N/A'}</td>
+                        <td><strong>Téléphone:</strong></td>
+                        <td>${establishment.phone || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>${personal.personalEmail || 'N/A'}</td>
+                        <td><strong>Téléphone personnel:</strong></td>
+                        <td>${personal.personalPhone || 'N/A'}</td>
+                    </tr>
+                </table>
+            `;
+        }
+
+        function generateTeacherStatistics(teacher) {
+            const stats = [];
+            
+            if (teacher.age !== null) stats.push(['Âge', teacher.age + ' ans']);
+            if (teacher.serviceYears !== null) stats.push(['Service', teacher.serviceYears + ' ans']);
+            if (teacher.yearsToRetirement !== null) stats.push(['Retraite dans', teacher.yearsToRetirement + ' ans']);
+            if (teacher.lessonCount) stats.push(['Leçons', teacher.lessonCount]);
+            if (teacher.tpCount) stats.push(['TP', teacher.tpCount]);
+            if (teacher.evaluationCount) stats.push(['Évaluations', teacher.evaluationCount]);
+            if (teacher.projectCount) stats.push(['Projets', teacher.projectCount]);
+            if (teacher.trainingCount) stats.push(['Formations', teacher.trainingCount]);
+            
+            if (stats.length === 0) return '<p>Aucune statistique disponible</p>';
+            
+            let html = '<div class="stats-grid">';
+            stats.forEach(([label, value]) => {
+                html += `
+                    <div class="stat-card">
+                        <div>${label}</div>
+                        <div class="stat-value">${value}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateTeacherSubjects(teacher) {
+            if (!teacher.data || !teacher.data.subjects || teacher.data.subjects.length === 0) {
+                return '<p>Aucune matière renseignée</p>';
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>Matière</th><th>Type</th><th>Heures/semaine</th></tr></thead><tbody>';
+            
+            teacher.data.subjects.forEach(subject => {
+                html += `
+                    <tr>
+                        <td>${subject.name || 'N/A'}</td>
+                        <td>${subject.type === 'main' ? 'Principale' : 
+                              subject.type === 'secondary' ? 'Secondaire' : 
+                              'Supplémentaire'}</td>
+                        <td>${subject.hours || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function generateTeacherRecentLessons(teacher) {
+            const lessons = teacher.data.lessons.slice(-5).reverse();
+            
+            let html = '<table class="data-table"><thead><tr><th>Date</th><th>Titre</th><th>Durée</th><th>Classe</th></tr></thead><tbody>';
+            
+            lessons.forEach(lesson => {
+                html += `
+                    <tr>
+                        <td>${lesson.date ? new Date(lesson.date).toLocaleDateString() : 'N/A'}</td>
+                        <td>${lesson.title || 'Sans titre'}</td>
+                        <td>${lesson.duration || 'N/A'}</td>
+                        <td>${lesson.class || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function generateTeacherRecentEvaluations(teacher) {
+            const evaluations = teacher.data.evaluations.slice(-5).reverse();
+            
+            let html = '<table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Matière</th><th>Classe</th><th>Moyenne</th></tr></thead><tbody>';
+            
+            evaluations.forEach(eval => {
+                html += `
+                    <tr>
+                        <td>${eval.date ? new Date(eval.date).toLocaleDateString() : 'N/A'}</td>
+                        <td>${eval.type || 'N/A'}</td>
+                        <td>${eval.subject || 'N/A'}</td>
+                        <td>${eval.class || 'N/A'}</td>
+                        <td>${eval.average || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function showTeacherFiles(index) {
+            const teacher = teachersData[index];
+            if (!teacher) return;
+            
+            let content = `
+                <div class="data-section">
+                    <h3><i class="fas fa-folder-open"></i> Fichiers de ${teacher.fullName}</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Nom du fichier</th>
+                                <th>Date d'import</th>
+                                <th>Taille (approx)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            teacher.files.forEach(file => {
+                const fileType = FILE_TYPES[file.type] || { name: file.type, icon: 'fa-file' };
+                const size = JSON.stringify(file.data).length;
+                const sizeFormatted = formatFileSize(size);
+                const date = new Date(file.importDate).toLocaleString();
+                
+                content += `
+                    <tr>
+                        <td><i class="fas ${fileType.icon}"></i> ${fileType.name}</td>
+                        <td>${file.name}</td>
+                        <td>${date}</td>
+                        <td>${sizeFormatted}</td>
+                    </tr>
+                `;
+            });
+            
+            content += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            const modalTitle = document.getElementById('teacherModalTitle');
+            const modalContent = document.getElementById('teacherModalContent');
+            
+            if (modalTitle && modalContent) {
+                modalTitle.textContent = `Fichiers - ${teacher.fullName}`;
+                modalContent.innerHTML = content;
+            }
+        }
+
+        function closeTeacherDetail() {
+            const modal = document.getElementById('teacherDetailModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function viewTeacherDetails(index) {
+            currentTeacherIndex = index;
+            switchTab('tab-teachers');
+            setTimeout(() => {
+                showTeacherDetail(index);
+            }, 100);
+        }
+
+        function removeTeacher(index) {
+            if (confirm('Voulez-vous vraiment supprimer cet enseignant et toutes ses données ?')) {
+                teachersData.splice(index, 1);
+                updateUIAfterImport();
+                showNotification('Enseignant supprimé', 'success');
+            }
+        }
+
+        // Analyse pédagogique
+        function updatePedagogyAnalysis() {
+            updatePedagogyStats();
+        }
+
+        function updatePedagogyStats() {
+            const container = document.getElementById('pedagogyStats');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Calculer les statistiques pédagogiques
+            const totalLessons = teachersData.reduce((sum, t) => sum + (t.lessonCount || 0), 0);
+            const totalTPs = teachersData.reduce((sum, t) => sum + (t.tpCount || 0), 0);
+            
+            // Compter les enseignants avec emploi du temps
+            const teachersWithTimetable = teachersData.filter(t => 
+                t.data && t.data.timetable && Object.keys(t.data.timetable).length > 0
+            ).length;
+            
+            // Compter les ressources pédagogiques
+            const totalResources = teachersData.reduce((sum, t) => 
+                sum + (t.data && t.data.resources ? t.data.resources.length : 0), 0
+            );
+            
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Leçons totales</div>
+                        <div class="stat-value">${totalLessons}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Travaux pratiques</div>
+                        <div class="stat-value">${totalTPs}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Emplois du temps</div>
+                        <div class="stat-value">${teachersWithTimetable}</div>
+                        <div>${teachersData.length > 0 ? Math.round((teachersWithTimetable / teachersData.length) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Ressources</div>
+                        <div class="stat-value">${totalResources}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updateSubjectsAnalysis() {
+            const container = document.getElementById('subjectsAnalysis');
+            if (!container) return;
+            
+            // Implémenter l'analyse des matières
+            container.innerHTML = '<p class="text-center">Analyse des matières en cours de développement...</p>';
+        }
+
+        function updateTimetableAnalysis() {
+            const container = document.getElementById('timetableAnalysis');
+            if (!container) return;
+            
+            // Implémenter l'analyse des emplois du temps
+            container.innerHTML = '<p class="text-center">Analyse des emplois du temps en cours de développement...</p>';
+        }
+
+        function updateLessonsAnalysis() {
+            const container = document.getElementById('lessonsAnalysis');
+            if (!container) return;
+            
+            // Implémenter l'analyse des leçons
+            container.innerHTML = '<p class="text-center">Analyse des leçons en cours de développement...</p>';
+        }
+
+        function updateTPAnalysis() {
+            const container = document.getElementById('tpAnalysis');
+            if (!container) return;
+            
+            // Implémenter l'analyse des TP
+            container.innerHTML = '<p class="text-center">Analyse des travaux pratiques en cours de développement...</p>';
+        }
+
+        function updateResourcesAnalysis() {
+            const container = document.getElementById('resourcesAnalysis');
+            if (!container) return;
+            
+            // Implémenter l'analyse des ressources
+            container.innerHTML = '<p class="text-center">Analyse des ressources pédagogiques en cours de développement...</p>';
+        }
+
+        // Analyse formation
+        function updateTrainingAnalysis() {
+            updateTrainingStats();
+        }
+
+        function updateTrainingStats() {
+            const container = document.getElementById('trainingStats');
+            if (!container) return;
+            
+            // Implémenter les statistiques de formation
+            container.innerHTML = '<p class="text-center">Statistiques de formation en cours de développement...</p>';
+        }
+
+        // Analyse projets
+        function updateProjectsAnalysis() {
+            updateProjectsStats();
+        }
+
+        function updateProjectsStats() {
+            const container = document.getElementById('projectsStats');
+            if (!container) return;
+            
+            // Implémenter les statistiques des projets
+            container.innerHTML = '<p class="text-center">Statistiques des projets en cours de développement...</p>';
+        }
+
+        // Analyse retraite
+        function updateRetirementAnalysis() {
+            const container = document.getElementById('retirementAnalysis');
+            const tableContainer = document.getElementById('retirementTable');
+            const upcomingContainer = document.getElementById('upcomingRetirements');
+            
+            if (!container || !tableContainer || !upcomingContainer) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                tableContainer.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                upcomingContainer.innerHTML = '<p class="text-center">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Compter par catégorie
+            const categoryStats = {};
+            const retirementByYear = {};
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.professional) {
+                    const category = teacher.data.professional.professionalCategory || 'Non spécifiée';
+                    categoryStats[category] = (categoryStats[category] || 0) + 1;
+                    
+                    if (teacher.data.professional.retirementDate) {
+                        const year = new Date(teacher.data.professional.retirementDate).getFullYear();
+                        retirementByYear[year] = (retirementByYear[year] || 0) + 1;
+                    }
+                }
+            });
+            
+            // Statistiques par catégorie
+            let statsHtml = '';
+            Object.entries(categoryStats).forEach(([category, count]) => {
+                statsHtml += `
+                    <div class="stat-card">
+                        <div>Catégorie ${category}</div>
+                        <div class="stat-value">${count}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = statsHtml;
+            
+            // Tableau des retraites
+            const teachersWithRetirement = teachersData
+                .filter(t => t.data && t.data.professional && t.data.professional.retirementDate)
+                .sort((a, b) => new Date(a.data.professional.retirementDate) - new Date(b.data.professional.retirementDate));
+            
+            let tableHtml = '<table class="data-table"><thead><tr><th>Enseignant</th><th>Date de retraite</th><th>Années restantes</th><th>Catégorie</th><th>Établissement</th></tr></thead><tbody>';
+            
+            teachersWithRetirement.forEach(teacher => {
+                const retirementDate = new Date(teacher.data.professional.retirementDate);
+                const today = new Date();
+                const yearsLeft = Math.max(0, retirementDate.getFullYear() - today.getFullYear());
+                
+                tableHtml += `
+                    <tr>
+                        <td>${teacher.fullName}</td>
+                        <td>${retirementDate.toLocaleDateString()}</td>
+                        <td><span class="badge ${yearsLeft <= 2 ? 'badge-danger' : yearsLeft <= 5 ? 'badge-warning' : 'badge-success'}">${yearsLeft} ans</span></td>
+                        <td>${teacher.data.professional.professionalCategory || 'N/A'}</td>
+                        <td>${teacher.data.establishment ? teacher.data.establishment.name : 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHtml += '</tbody></table>';
+            tableContainer.innerHTML = tableHtml;
+            
+            // Prochaines retraites (moins de 3 ans)
+            const upcoming = teachersWithRetirement
+                .filter(teacher => {
+                    const retirementDate = new Date(teacher.data.professional.retirementDate);
+                    const today = new Date();
+                    const yearsLeft = retirementDate.getFullYear() - today.getFullYear();
+                    return yearsLeft <= 3;
+                })
+                .slice(0, 10);
+            
+            let upcomingHtml = '<table class="data-table"><thead><tr><th>Enseignant</th><th>Date</th><th>Jours restants</th></tr></thead><tbody>';
+            
+            upcoming.forEach(teacher => {
+                const retirementDate = new Date(teacher.data.professional.retirementDate);
+                const today = new Date();
+                const timeDiff = retirementDate.getTime() - today.getTime();
+                const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                upcomingHtml += `
+                    <tr>
+                        <td>${teacher.fullName}</td>
+                        <td>${retirementDate.toLocaleDateString()}</td>
+                        <td><span class="badge badge-danger">${daysLeft} jours</span></td>
+                    </tr>
+                `;
+            });
+            
+            upcomingHtml += '</tbody></table>';
+            upcomingContainer.innerHTML = upcomingHtml;
+        }
+
+        // Export Excel
+        function exportAllToExcel() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            // Créer un workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille 1: Liste des enseignants
+            const teachersSheetData = [
+                ['Nom', 'Prénom', 'Matricule', 'Date de naissance', 'Âge', 'Date d\'engagement', 'Années de service', 
+                 'Date de retraite', 'Années restantes', 'Catégorie', 'Établissement', 'Matière principale', 'Heures/semaine',
+                 'Fiche complète', 'Nombre de fichiers']
+            ];
+            
+            teachersData.forEach(teacher => {
+                const personal = teacher.data ? teacher.data.personal : {};
+                const professional = teacher.data ? teacher.data.professional : {};
+                const establishment = teacher.data ? teacher.data.establishment : {};
+                const mainSubject = teacher.data && teacher.data.subjects && teacher.data.subjects.length > 0 ? 
+                    teacher.data.subjects[0].name : '';
+                
+                teachersSheetData.push([
+                    teacher.lastName,
+                    teacher.firstName,
+                    professional.matricule || '',
+                    personal.birthDate || '',
+                    teacher.age || '',
+                    professional.engagementDate || '',
+                    teacher.serviceYears || '',
+                    professional.retirementDate || '',
+                    teacher.yearsToRetirement || '',
+                    professional.professionalCategory || '',
+                    establishment.name || '',
+                    mainSubject,
+                    professional.weeklyHours || '',
+                    teacher.complete ? 'Oui' : 'Non',
+                    teacher.files.length
+                ]);
+            });
+            
+            const teachersSheet = XLSX.utils.aoa_to_sheet(teachersSheetData);
+            XLSX.utils.book_append_sheet(wb, teachersSheet, 'Enseignants');
+            
+            // Feuille 2: Matières enseignées
+            const subjectsMap = new Map();
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        const key = subject.name;
+                        if (key) {
+                            if (!subjectsMap.has(key)) {
+                                subjectsMap.set(key, { count: 0, teachers: [] });
+                            }
+                            const data = subjectsMap.get(key);
+                            data.count++;
+                            data.teachers.push(teacher.fullName);
+                        }
+                    });
+                }
+            });
+            
+            const subjectsSheetData = [['Matière', 'Nombre d\'enseignants', 'Enseignants']];
+            subjectsMap.forEach((data, subject) => {
+                subjectsSheetData.push([subject, data.count, data.teachers.join(', ')]);
+            });
+            
+            const subjectsSheet = XLSX.utils.aoa_to_sheet(subjectsSheetData);
+            XLSX.utils.book_append_sheet(wb, subjectsSheet, 'Matières');
+            
+            // Feuille 3: Planification retraite
+            const retirementSheetData = [['Enseignant', 'Date de retraite', 'Années restantes', 'Catégorie', 'Âge actuel', 'Établissement']];
+            
+            teachersData
+                .filter(t => t.data && t.data.professional && t.data.professional.retirementDate)
+                .sort((a, b) => new Date(a.data.professional.retirementDate) - new Date(b.data.professional.retirementDate))
+                .forEach(teacher => {
+                    const retirementDate = new Date(teacher.data.professional.retirementDate);
+                    const today = new Date();
+                    const yearsLeft = Math.max(0, retirementDate.getFullYear() - today.getFullYear());
+                    
+                    retirementSheetData.push([
+                        teacher.fullName,
+                        retirementDate.toISOString().split('T')[0],
+                        yearsLeft,
+                        teacher.data.professional.professionalCategory || '',
+                        teacher.age || '',
+                        teacher.data.establishment?.name || ''
+                    ]);
+                });
+            
+            const retirementSheet = XLSX.utils.aoa_to_sheet(retirementSheetData);
+            XLSX.utils.book_append_sheet(wb, retirementSheet, 'Retraites');
+            
+            // Générer le fichier Excel
+            const fileName = `analyse-enseignants-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showLoader(false);
+            showNotification('Export Excel complet terminé avec succès', 'success');
+        }
+
+        function exportTeachersToExcel() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            const wb = XLSX.utils.book_new();
+            const sheetData = [
+                ['Nom', 'Prénom', 'Matricule', 'Date de naissance', 'Âge', 'Établissement', 'Fonction', 
+                 'Catégorie', 'Date d\'engagement', 'Années de service', 'Date de retraite', 'Années restantes',
+                 'Matière principale', 'Heures/semaine', 'Email', 'Téléphone', 'Fiche complète']
+            ];
+            
+            teachersData.forEach(teacher => {
+                const personal = teacher.data ? teacher.data.personal : {};
+                const professional = teacher.data ? teacher.data.professional : {};
+                const establishment = teacher.data ? teacher.data.establishment : {};
+                const mainSubject = teacher.data && teacher.data.subjects && teacher.data.subjects.length > 0 ? 
+                    teacher.data.subjects[0].name : '';
+                
+                sheetData.push([
+                    teacher.lastName,
+                    teacher.firstName,
+                    professional.matricule || '',
+                    personal.birthDate || '',
+                    teacher.age || '',
+                    establishment.name || '',
+                    professional.position || '',
+                    professional.professionalCategory || '',
+                    professional.engagementDate || '',
+                    teacher.serviceYears || '',
+                    professional.retirementDate || '',
+                    teacher.yearsToRetirement || '',
+                    mainSubject,
+                    professional.weeklyHours || '',
+                    personal.personalEmail || '',
+                    personal.personalPhone || '',
+                    teacher.complete ? 'Oui' : 'Non'
+                ]);
+            });
+            
+            const sheet = XLSX.utils.aoa_to_sheet(sheetData);
+            XLSX.utils.book_append_sheet(wb, sheet, 'Liste Enseignants');
+            
+            const fileName = `liste-enseignants-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Liste des enseignants exportée avec succès', 'success');
+        }
+
+        function exportPedagogyToExcel() {
+            showNotification('Export pédagogique à implémenter', 'info');
+        }
+
+        function exportTrainingToExcel() {
+            showNotification('Export des formations à implémenter', 'info');
+        }
+
+        function exportRetirementToExcel() {
+            showNotification('Export des retraites à implémenter', 'info');
+        }
+
+        function exportProjectsToExcel() {
+            showNotification('Export des projets à implémenter', 'info');
+        }
+
+        function exportTeacherToExcel(index) {
+            const teacher = teachersData[index];
+            if (!teacher) return;
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille 1: Informations générales
+            const generalData = [
+                ['FICHE SYNTHÉTIQUE DE L\'ENSEIGNANT'],
+                [''],
+                ['Nom:', teacher.lastName],
+                ['Prénom:', teacher.firstName],
+                ['Matricule:', teacher.data && teacher.data.professional ? teacher.data.professional.matricule : ''],
+                [''],
+                ['INFORMATIONS PERSONNELLES'],
+                ['Date de naissance:', teacher.data && teacher.data.personal ? teacher.data.personal.birthDate : ''],
+                ['Lieu de naissance:', teacher.data && teacher.data.personal ? teacher.data.personal.birthPlace : ''],
+                ['Nationalité:', teacher.data && teacher.data.personal ? teacher.data.personal.nationality : ''],
+                [''],
+                ['INFORMATIONS PROFESSIONNELLES'],
+                ['Établissement:', teacher.data && teacher.data.establishment ? teacher.data.establishment.name : ''],
+                ['Fonction:', teacher.data && teacher.data.professional ? teacher.data.professional.position : ''],
+                ['Catégorie:', teacher.data && teacher.data.professional ? teacher.data.professional.professionalCategory : ''],
+                ['Date d\'engagement:', teacher.data && teacher.data.professional ? teacher.data.professional.engagementDate : ''],
+                ['Date de retraite:', teacher.data && teacher.data.professional ? teacher.data.professional.retirementDate : ''],
+                [''],
+                ['STATISTIQUES'],
+                ['Âge:', teacher.age || ''],
+                ['Années de service:', teacher.serviceYears || ''],
+                ['Années avant retraite:', teacher.yearsToRetirement || '']
+            ];
+            
+            const generalSheet = XLSX.utils.aoa_to_sheet(generalData);
+            XLSX.utils.book_append_sheet(wb, generalSheet, 'Synthèse');
+            
+            // Feuille 2: Matières enseignées
+            if (teacher.data && teacher.data.subjects) {
+                const subjectsData = [['Matière', 'Type', 'Heures/semaine']];
+                teacher.data.subjects.forEach(subject => {
+                    subjectsData.push([subject.name || '', subject.type || '', subject.hours || '']);
+                });
+                
+                const subjectsSheet = XLSX.utils.aoa_to_sheet(subjectsData);
+                XLSX.utils.book_append_sheet(wb, subjectsSheet, 'Matières');
+            }
+            
+            const fileName = `enseignant-${teacher.lastName}-${teacher.firstName}-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Fiche enseignant exportée avec succès', 'success');
+        }
+
+        function updateExportPreview() {
+            const container = document.getElementById('exportPreview');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée à exporter</p>';
+                return;
+            }
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            const subjectsCount = new Set();
+            const establishmentsCount = new Set();
+            
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject.name) subjectsCount.add(subject.name);
+                    });
+                }
+                if (teacher.data && teacher.data.establishment && teacher.data.establishment.name) {
+                    establishmentsCount.add(teacher.data.establishment.name);
+                }
+            });
+            
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Enseignants à exporter</div>
+                        <div class="stat-value">${totalTeachers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Fiches complètes</div>
+                        <div class="stat-value">${completeTeachers}</div>
+                        <div>${totalTeachers > 0 ? Math.round((completeTeachers / totalTeachers) * 100) : 0}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Matières uniques</div>
+                        <div class="stat-value">${subjectsCount.size}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Établissements</div>
+                        <div class="stat-value">${establishmentsCount.size}</div>
+                    </div>
+                </div>
+                
+                <p class="mt-20"><i class="fas fa-info-circle"></i> L'export Excel contiendra ${totalTeachers} enseignants répartis en plusieurs feuilles.</p>
+                <p><i class="fas fa-lightbulb"></i> Astuce: Utilisez les filtres pour affiner votre export.</p>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // Fonctions utilitaires
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notificationMessage');
+            const icon = document.getElementById('notificationIcon');
+            
+            if (!notification || !messageEl || !icon) return;
+            
+            messageEl.textContent = message;
+            notification.className = 'notification';
+            icon.className = 'fas';
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('show');
+                    icon.classList.add('fa-check-circle');
+                    break;
+                case 'error':
+                    notification.classList.add('show', 'error');
+                    icon.classList.add('fa-exclamation-circle');
+                    break;
+                case 'warning':
+                    notification.classList.add('show', 'warning');
+                    icon.classList.add('fa-exclamation-triangle');
+                    break;
+                case 'info':
+                    notification.classList.add('show', 'info');
+                    icon.classList.add('fa-info-circle');
+                    break;
+            }
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showLoader(show) {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                if (show) {
+                    loader.classList.add('active');
+                } else {
+                    loader.classList.remove('active');
+                }
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Voulez-vous vraiment effacer toutes les données importées ? Cette action est irréversible.')) {
+                teachersData = [];
+                filteredTeachers = [];
+                updateUIAfterImport();
+                showNotification('Toutes les données ont été effacées', 'success');
+            }
+        }
+
+        function saveSession() {
+            try {
+                const sessionData = {
+                    teachers: teachersData,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('inspecteurSession', JSON.stringify(sessionData));
+                showNotification('Session sauvegardée avec succès', 'success');
+            } catch (error) {
+                showNotification('Erreur lors de la sauvegarde', 'error');
+                console.error(error);
+            }
+        }
+
+        function backupData() {
+            try {
+                const sessionData = {
+                    teachers: teachersData,
+                    timestamp: new Date().toISOString(),
+                    version: '1.0'
+                };
+                
+                const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `session-inspecteur-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Session exportée avec succès', 'success');
+            } catch (error) {
+                showNotification('Erreur lors de l\'export', 'error');
+                console.error(error);
+            }
+        }
+
+        function loadSessionData() {
+            try {
+                const saved = localStorage.getItem('inspecteurSession');
+                if (saved) {
+                    const sessionData = JSON.parse(saved);
+                    teachersData = sessionData.teachers || [];
+                    
+                    // Recalculer les statistiques
+                    teachersData.forEach(teacher => {
+                        calculateTeacherStatistics(teacher);
+                    });
+                    
+                    updateUIAfterImport();
+                    showNotification('Session restaurée avec succès', 'success');
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de la session:', error);
+            }
+        }
+
+        function generateReport() {
+            showNotification('Génération de rapport PDF à implémenter', 'info');
+        }
+
+        // Fonctions pour les autres analyses
+        function updateDiplomasAnalysis() {
+            // À implémenter
+        }
+
+        function updateContinuousTrainingAnalysis() {
+            // À implémenter
+        }
+
+        function updateLanguagesAnalysis() {
+            // À implémenter
+        }
+
+        function updateITSkillsAnalysis() {
+            // À implémenter
+        }
+
+        function updatePedagogicalProjectsAnalysis() {
+            // À implémenter
+        }
+
+        function updateActivitiesAnalysis() {
+            // À implémenter
+        }
+
+        function updateMeetingsAnalysis() {
+            // À implémenter
+        }
+
+        // Initialisation finale
+        window.addEventListener('beforeunload', function() {
+            // Sauvegarder automatiquement avant de quitter
+            saveSession();
+        });
+    </script>
+</body>
+</html>
