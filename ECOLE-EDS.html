@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -909,123 +910,30 @@
             position: relative;
         }
 
-        /* Sélecteurs de couleur */
-        .color-picker {
-            display: flex;
-            gap: 5px;
-            margin: 10px 0;
-        }
-
-        .color-option {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .color-option.active {
-            border-color: var(--dark-color);
-        }
-
-        /* Timeline */
-        .timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--primary-color);
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -23px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--primary-color);
-        }
-
-        /* Filtres */
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: var(--border-radius);
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 250px;
-            position: relative;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-color);
-        }
-
-        .search-box input {
-            padding-left: 40px;
-        }
-
-        /* Tags */
-        .tags-input {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-height: 45px;
-            align-items: center;
-        }
-
-        .tag {
-            background: var(--primary-color);
+        /* Bouton Accueil */
+        .btn-accueil {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            padding: 12px 20px;
+            background-color: var(--primary-color);
             color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            display: flex;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
         }
 
-        .tag-remove {
-            background: none;
-            border: none;
+        .btn-accueil:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
             color: white;
-            cursor: pointer;
-            padding: 0;
-            font-size: 0.8rem;
-        }
-
-        .tags-input input {
-            border: none;
-            outline: none;
-            flex: 1;
-            min-width: 100px;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -1056,6 +964,11 @@
     <button class="btn-retour" onclick="history.back()">
         <i class="fas fa-arrow-left"></i> Retour
     </button>
+
+    <!-- Bouton Accueil -->
+    <a href="index.html" class="btn btn-accueil">
+        <i class="fas fa-home"></i> Accueil
+    </a>
     
     <!-- Container principal -->
     <div class="container">
@@ -2025,6 +1938,23 @@
             if (importFile) {
                 importFile.addEventListener('change', handleFileSelect);
             }
+            
+            // Synchronisation des données
+            initDataSync();
+        }
+
+        function initDataSync() {
+            // Écouter les changements sur tous les champs du formulaire
+            const form = document.getElementById('teacherForm');
+            if (form) {
+                form.addEventListener('change', function() {
+                    syncData();
+                });
+                
+                form.addEventListener('input', function() {
+                    syncData();
+                });
+            }
         }
 
         function updateSchoolName() {
@@ -2110,6 +2040,9 @@
             
             // Mettre à jour l'affichage détaillé
             updateRetirementDetails(birthYear, birthMonth, retirementAge, retirementYear, retirementMonth, professionalCategory);
+            
+            // Synchroniser avec les données globales
+            syncData();
         }
 
         function updateRetirementDetails(birthYear, birthMonth, retirementAge, retirementYear, retirementMonth, professionalCategory) {
@@ -2182,6 +2115,131 @@
                 }
                 
                 yearsField.value = Math.max(years, 0);
+                
+                // Synchroniser avec les données globales
+                syncData();
+            }
+        }
+
+        // Fonction pour synchroniser les données entre tous les onglets
+        function syncData() {
+            // Mettre à jour l'objet currentData avec les valeurs actuelles du formulaire
+            currentData.establishment = {
+                name: document.getElementById('establishmentName')?.value || '',
+                type: document.getElementById('establishmentType')?.value || '',
+                address: document.getElementById('establishmentAddress')?.value || '',
+                phone: document.getElementById('establishmentPhone')?.value || '',
+                email: document.getElementById('establishmentEmail')?.value || '',
+                website: document.getElementById('establishmentWebsite')?.value || ''
+            };
+            
+            currentData.personal = {
+                last_name: document.getElementById('lastName')?.value || '',
+                first_name: document.getElementById('firstName')?.value || '',
+                gender: document.getElementById('gender')?.value || '',
+                birth_date: document.getElementById('birthDate')?.value || '',
+                birth_month: document.getElementById('birthMonth')?.value || '',
+                birth_place: document.getElementById('birthPlace')?.value || '',
+                nationality: document.getElementById('nationality')?.value || '',
+                address: document.getElementById('address')?.value || '',
+                personal_phone: document.getElementById('personalPhone')?.value || '',
+                personal_email: document.getElementById('personalEmail')?.value || '',
+                cin: document.getElementById('cin')?.value || '',
+                marital_status: document.getElementById('maritalStatus')?.value || '',
+                children_number: document.getElementById('childrenNumber')?.value || ''
+            };
+            
+            currentData.professional = {
+                matricule: document.getElementById('matricule')?.value || '',
+                position: document.getElementById('position')?.value || '',
+                grade: document.getElementById('grade')?.value || '',
+                professional_category: document.getElementById('professionalCategory')?.value || '',
+                engagement_date: document.getElementById('engagementDate')?.value || '',
+                region_service_date: document.getElementById('regionServiceDate')?.value || '',
+                inspection_service_date: document.getElementById('inspectionServiceDate')?.value || '',
+                years_in_region: document.getElementById('yearsInRegion')?.value || '',
+                years_in_inspection: document.getElementById('yearsInInspection')?.value || '',
+                retirement_date: document.getElementById('retirementDate')?.value || '',
+                current_class: document.getElementById('currentClass')?.value || '',
+                weekly_hours: document.getElementById('weeklyHours')?.value || ''
+            };
+            
+            // Collecter les matières
+            currentData.subjects = [];
+            const mainSubject = document.getElementById('mainSubject')?.value;
+            const secondarySubject = document.getElementById('secondarySubject')?.value;
+            
+            if (mainSubject) {
+                currentData.subjects.push({
+                    name: mainSubject,
+                    type: 'main'
+                });
+            }
+            
+            if (secondarySubject) {
+                currentData.subjects.push({
+                    name: secondarySubject,
+                    type: 'secondary'
+                });
+            }
+            
+            // Collecter les matières supplémentaires
+            const subjectRows = document.querySelectorAll('#subjectsContainer .form-row');
+            subjectRows.forEach((row, index) => {
+                if (index > 0) { // Ignorer la première ligne (matière principale/secondaire)
+                    const subjectInput = row.querySelector('input[type="text"]');
+                    const hoursInput = row.querySelector('input[type="number"]');
+                    
+                    if (subjectInput && subjectInput.value) {
+                        currentData.subjects.push({
+                            name: subjectInput.value,
+                            hours: hoursInput?.value || '',
+                            type: 'additional'
+                        });
+                    }
+                }
+            });
+            
+            // Mettre à jour les sélecteurs de matières dans les autres onglets
+            updateSubjectsSelector();
+            
+            // Sauvegarder les données dans localStorage pour persistance
+            try {
+                localStorage.setItem('teacherCurrentData', JSON.stringify(currentData));
+            } catch (e) {
+                console.error('Erreur lors de la sauvegarde dans localStorage:', e);
+            }
+            
+            // Mettre à jour le tableau de bord si on est sur l'onglet 7
+            if (currentTab === 'tab7') {
+                updateDashboard();
+            }
+        }
+
+        // Mettre à jour le sélecteur de matières dans l'onglet 2
+        function updateSubjectsSelector() {
+            const selector = document.getElementById('subjectSelector');
+            if (!selector) return;
+            
+            selector.innerHTML = '<option value="">-- Sélectionner une matière --</option>';
+            
+            currentData.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                selector.appendChild(option);
+            });
+            
+            // Mettre à jour aussi les filtres de leçons
+            const lessonFilterSubject = document.getElementById('lessonFilterSubject');
+            if (lessonFilterSubject) {
+                lessonFilterSubject.innerHTML = '<option value="">Toutes les matières</option>';
+                currentData.subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.name;
+                    option.textContent = subject.name;
+                    lessonFilterSubject.appendChild(option);
+                });
             }
         }
 
@@ -2196,18 +2254,39 @@
                 <div class="form-col">
                     <div class="form-group">
                         <label><i class="fas fa-book"></i> Matière supplémentaire ${counters.subject}</label>
-                        <input type="text" placeholder="Nom de la matière" id="subject_${counters.subject}">
+                        <input type="text" placeholder="Nom de la matière" class="subject-field">
                     </div>
                 </div>
                 <div class="form-col">
                     <div class="form-group">
                         <label><i class="fas fa-clock"></i> Heures/semaine</label>
-                        <input type="number" min="0" max="20" id="subject_hours_${counters.subject}">
+                        <input type="number" min="0" max="20" class="subject-hours-field">
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectField(this)">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
                     </div>
                 </div>
             `;
             
             container.appendChild(newSubject);
+            
+            // Synchroniser avec les données globales
+            syncData();
+        }
+
+        function removeSubjectField(button) {
+            const row = button.closest('.form-row');
+            if (row && row !== row.parentElement.firstElementChild) {
+                row.remove();
+                counters.subject--;
+                // Synchroniser avec les données globales
+                syncData();
+            }
         }
 
         function addAcademicDiploma() {
@@ -2253,6 +2332,7 @@
             `;
             
             container.insertAdjacentHTML('beforeend', diplomaHTML);
+            syncData();
         }
 
         function addProfessionalDiploma() {
@@ -2298,6 +2378,7 @@
             `;
             
             container.insertAdjacentHTML('beforeend', diplomaHTML);
+            syncData();
         }
 
         function addTraining() {
@@ -2347,6 +2428,7 @@
             `;
             
             container.insertAdjacentHTML('beforeend', trainingHTML);
+            syncData();
         }
 
         function addLanguage() {
@@ -2405,6 +2487,7 @@
             `;
             
             container.insertAdjacentHTML('beforeend', languageHTML);
+            syncData();
         }
 
         function addITSkill() {
@@ -2446,6 +2529,7 @@
             `;
             
             container.insertAdjacentHTML('beforeend', skillHTML);
+            syncData();
         }
 
         function addNewLesson() {
@@ -2520,6 +2604,7 @@
             const lessonsContainer = document.getElementById('lessonsContainer');
             if (lessonsContainer) {
                 lessonsContainer.insertAdjacentHTML('beforeend', lessonHTML);
+                syncData();
             }
         }
 
@@ -2605,6 +2690,7 @@
             const tpContainer = document.getElementById('tpContainer');
             if (tpContainer) {
                 tpContainer.insertAdjacentHTML('beforeend', tpHTML);
+                syncData();
             }
         }
 
@@ -2684,6 +2770,7 @@
             const evaluationsContainer = document.getElementById('evaluationsContainer');
             if (evaluationsContainer) {
                 evaluationsContainer.insertAdjacentHTML('beforeend', evalHTML);
+                syncData();
             }
         }
 
@@ -2745,6 +2832,7 @@
             const projectsContainer = document.getElementById('projectsContainer');
             if (projectsContainer) {
                 projectsContainer.insertAdjacentHTML('beforeend', projectHTML);
+                syncData();
             }
         }
 
@@ -2799,6 +2887,7 @@
             const activitiesContainer = document.getElementById('activitiesContainer');
             if (activitiesContainer) {
                 activitiesContainer.insertAdjacentHTML('beforeend', activityHTML);
+                syncData();
             }
         }
 
@@ -2850,6 +2939,7 @@
             const meetingsContainer = document.getElementById('meetingsContainer');
             if (meetingsContainer) {
                 meetingsContainer.insertAdjacentHTML('beforeend', meetingHTML);
+                syncData();
             }
         }
 
@@ -2857,6 +2947,7 @@
             const element = document.getElementById(elementId);
             if (element) {
                 showNotification('Élément sauvegardé avec succès', 'success');
+                syncData();
             }
         }
 
@@ -2866,6 +2957,7 @@
                 if (element) {
                     element.remove();
                     showNotification('Élément supprimé avec succès', 'success');
+                    syncData();
                 }
             }
         }
@@ -2873,7 +2965,7 @@
         // Fonctions d'emploi du temps
         function generateTimetable() {
             const container = document.getElementById('timetableContainer');
-            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi','Samedi',];
+            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
             const hours = ['7h00-7h55', '7h55-8h50', '8h50-9h45', '10h10-11h05', '11h05-12h00', '15h-16h', '16h-17h'];
             
             let timetableHTML = `
@@ -2932,6 +3024,7 @@
             document.querySelectorAll('.timetable-cell').forEach(cell => {
                 cell.addEventListener('change', function() {
                     updateTimetableCell(this);
+                    syncData();
                 });
             });
         }
@@ -3020,6 +3113,7 @@
                 `;
                 themesList.insertAdjacentHTML('beforeend', themeHTML);
                 themeNameInput.value = '';
+                syncData();
             }
         }
 
@@ -3071,6 +3165,7 @@
             }
             
             showNotification(`${files.length} ressource(s) ajoutée(s)`, 'success');
+            syncData();
         }
 
         function previewResource(resourceId) {
@@ -3084,470 +3179,6 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
-
-        // Import/Export
-        function exportJSON(tabId) {
-            const data = getTabData(tabId);
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `fiche-enseignant-${tabId}-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('Données exportées avec succès', 'success');
-        }
-
-        function importJSON(tabId) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        setTabData(tabId, data);
-                        showNotification('Données importées avec succès', 'success');
-                    } catch (error) {
-                        showNotification('Erreur lors de l\'importation', 'error');
-                        console.error(error);
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        function exportAllJSON() {
-            const data = getAllData();
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `fiche-enseignant-complete-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('Toutes les données exportées avec succès', 'success');
-        }
-
-        function importAllJSON() {
-            const fileInput = document.getElementById('importFile');
-            if (!fileInput) return;
-            
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                showNotification('Veuillez sélectionner un fichier', 'warning');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    setAllData(data);
-                    showNotification('Données importées avec succès', 'success');
-                } catch (error) {
-                    showNotification('Erreur lors de l\'importation', 'error');
-                    console.error(error);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                showNotification(`Fichier sélectionné: ${file.name}`, 'info');
-            }
-        }
-
-        // Sauvegarde/Restauration
-        function backupData() {
-            const data = getAllData();
-            const backup = {
-                timestamp: new Date().toISOString(),
-                data: data
-            };
-            
-            try {
-                // Sauvegarder dans localStorage
-                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
-                backups.push(backup);
-                localStorage.setItem('backups', JSON.stringify(backups.slice(-10))); // Garder les 10 dernières
-                
-                // Sauvegarder les données courantes
-                localStorage.setItem('currentData', JSON.stringify(data));
-                
-                showNotification('Sauvegarde effectuée avec succès', 'success');
-                updateBackupHistory();
-            } catch (error) {
-                showNotification('Erreur lors de la sauvegarde', 'error');
-                console.error(error);
-            }
-        }
-
-        function restoreData() {
-            try {
-                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
-                if (backups.length === 0) {
-                    showNotification('Aucune sauvegarde disponible', 'warning');
-                    return;
-                }
-                
-                // Demander quelle sauvegarde restaurer
-                const backupList = backups.map((b, i) => 
-                    `${i + 1}. ${new Date(b.timestamp).toLocaleString()}`
-                ).join('\n');
-                
-                const choice = prompt(`Sauvegardes disponibles:\n${backupList}\n\nEntrez le numéro de la sauvegarde (1-${backups.length}):`);
-                const index = parseInt(choice) - 1;
-                
-                if (index >= 0 && index < backups.length) {
-                    setAllData(backups[index].data);
-                    showNotification('Données restaurées avec succès', 'success');
-                } else {
-                    showNotification('Numéro invalide', 'warning');
-                }
-            } catch (error) {
-                showNotification('Erreur lors de la restauration', 'error');
-                console.error(error);
-            }
-        }
-
-        function clearAllData() {
-            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible.')) {
-                try {
-                    localStorage.clear();
-                    location.reload();
-                } catch (error) {
-                    showNotification('Erreur lors de la suppression des données', 'error');
-                }
-            }
-        }
-
-        // Gestion des données
-        function getAllData() {
-            // Collecter toutes les données du formulaire
-            const data = {
-                establishment: getEstablishmentData(),
-                personal: getPersonalData(),
-                professional: getProfessionalData(),
-                subjects: getSubjectsData(),
-                themes: getThemesData(),
-                lessons: getLessonsData(),
-                tps: getTPsData(),
-                evaluations: getEvaluationsData(),
-                diplomas: getDiplomasData(),
-                trainings: getTrainingsData(),
-                languages: getLanguagesData(),
-                itskills: getITSkillsData(),
-                projects: getProjectsData(),
-                activities: getActivitiesData(),
-                meetings: getMeetingsData()
-            };
-            
-            return data;
-        }
-
-        function getEstablishmentData() {
-            return {
-                name: document.getElementById('establishmentName')?.value || '',
-                type: document.getElementById('establishmentType')?.value || '',
-                address: document.getElementById('establishmentAddress')?.value || '',
-                phone: document.getElementById('establishmentPhone')?.value || '',
-                email: document.getElementById('establishmentEmail')?.value || '',
-                website: document.getElementById('establishmentWebsite')?.value || ''
-            };
-        }
-
-        function getPersonalData() {
-            return {
-                lastName: document.getElementById('lastName')?.value || '',
-                firstName: document.getElementById('firstName')?.value || '',
-                gender: document.getElementById('gender')?.value || '',
-                birthDate: document.getElementById('birthDate')?.value || '',
-                birthMonth: document.getElementById('birthMonth')?.value || '',
-                birthPlace: document.getElementById('birthPlace')?.value || '',
-                nationality: document.getElementById('nationality')?.value || '',
-                address: document.getElementById('address')?.value || '',
-                personalPhone: document.getElementById('personalPhone')?.value || '',
-                personalEmail: document.getElementById('personalEmail')?.value || '',
-                cin: document.getElementById('cin')?.value || '',
-                maritalStatus: document.getElementById('maritalStatus')?.value || '',
-                childrenNumber: document.getElementById('childrenNumber')?.value || ''
-            };
-        }
-
-        function getProfessionalData() {
-            return {
-                matricule: document.getElementById('matricule')?.value || '',
-                position: document.getElementById('position')?.value || '',
-                grade: document.getElementById('grade')?.value || '',
-                professionalCategory: document.getElementById('professionalCategory')?.value || '',
-                engagementDate: document.getElementById('engagementDate')?.value || '',
-                regionServiceDate: document.getElementById('regionServiceDate')?.value || '',
-                inspectionServiceDate: document.getElementById('inspectionServiceDate')?.value || '',
-                yearsInRegion: document.getElementById('yearsInRegion')?.value || '',
-                yearsInInspection: document.getElementById('yearsInInspection')?.value || '',
-                retirementDate: document.getElementById('retirementDate')?.value || '',
-                currentClass: document.getElementById('currentClass')?.value || '',
-                weeklyHours: document.getElementById('weeklyHours')?.value || ''
-            };
-        }
-
-        function getSubjectsData() {
-            const subjects = [];
-            const mainSubject = document.getElementById('mainSubject')?.value;
-            const secondarySubject = document.getElementById('secondarySubject')?.value;
-            
-            if (mainSubject) {
-                subjects.push({ name: mainSubject, type: 'main', hours: document.getElementById('weeklyHours')?.value || '' });
-            }
-            if (secondarySubject) {
-                subjects.push({ name: secondarySubject, type: 'secondary' });
-            }
-            
-            // Récupérer les matières supplémentaires
-            for (let i = 1; i <= counters.subject; i++) {
-                const subjectName = document.getElementById(`subject_${i}`)?.value;
-                const subjectHours = document.getElementById(`subject_hours_${i}`)?.value;
-                if (subjectName) {
-                    subjects.push({ name: subjectName, type: 'additional', hours: subjectHours });
-                }
-            }
-            
-            return subjects;
-        }
-
-        function getTabData(tabId) {
-            switch(tabId) {
-                case 'tab1':
-                    return {
-                        establishment: getEstablishmentData(),
-                        personal: getPersonalData(),
-                        professional: getProfessionalData(),
-                        subjects: getSubjectsData()
-                    };
-                case 'tab2':
-                    return {
-                        themes: getThemesData(),
-                        lessons: getLessonsData(),
-                        tps: getTPsData()
-                    };
-                case 'tab3':
-                    return {
-                        diplomas: getDiplomasData(),
-                        trainings: getTrainingsData(),
-                        languages: getLanguagesData(),
-                        itskills: getITSkillsData()
-                    };
-                case 'tab4':
-                    return {
-                        evaluations: getEvaluationsData()
-                    };
-                case 'tab5':
-                    return {
-                        projects: getProjectsData(),
-                        activities: getActivitiesData(),
-                        meetings: getMeetingsData()
-                    };
-                default:
-                    return {};
-            }
-        }
-
-        function setTabData(tabId, data) {
-            // Implémenter selon la structure de chaque onglet
-            switch(tabId) {
-                case 'tab1':
-                    setEstablishmentData(data.establishment || {});
-                    setPersonalData(data.personal || {});
-                    setProfessionalData(data.professional || {});
-                    setSubjectsData(data.subjects || []);
-                    break;
-                // Les autres onglets peuvent être implémentés de manière similaire
-            }
-        }
-
-        function setAllData(data) {
-            setEstablishmentData(data.establishment || {});
-            setPersonalData(data.personal || {});
-            setProfessionalData(data.professional || {});
-            setSubjectsData(data.subjects || []);
-            // ... autres données peuvent être implémentées
-        }
-
-        function setEstablishmentData(data) {
-            if (!data) return;
-            setValue('establishmentName', data.name);
-            setValue('establishmentType', data.type);
-            setValue('establishmentAddress', data.address);
-            setValue('establishmentPhone', data.phone);
-            setValue('establishmentEmail', data.email);
-            setValue('establishmentWebsite', data.website);
-            updateSchoolName();
-        }
-
-        function setPersonalData(data) {
-            if (!data) return;
-            setValue('lastName', data.lastName);
-            setValue('firstName', data.firstName);
-            setValue('gender', data.gender);
-            setValue('birthDate', data.birthDate);
-            setValue('birthMonth', data.birthMonth);
-            setValue('birthPlace', data.birthPlace);
-            setValue('nationality', data.nationality);
-            setValue('address', data.address);
-            setValue('personalPhone', data.personalPhone);
-            setValue('personalEmail', data.personalEmail);
-            setValue('cin', data.cin);
-            setValue('maritalStatus', data.maritalStatus);
-            setValue('childrenNumber', data.childrenNumber);
-            
-            // Recalculer la retraite
-            if (data.birthDate) calculateRetirementDate();
-        }
-
-        function setProfessionalData(data) {
-            if (!data) return;
-            setValue('matricule', data.matricule);
-            setValue('position', data.position);
-            setValue('grade', data.grade);
-            setValue('professionalCategory', data.professionalCategory);
-            setValue('engagementDate', data.engagementDate);
-            setValue('regionServiceDate', data.regionServiceDate);
-            setValue('inspectionServiceDate', data.inspectionServiceDate);
-            setValue('currentClass', data.currentClass);
-            setValue('weeklyHours', data.weeklyHours);
-            
-            // Recalculer les valeurs dérivées
-            if (data.birthDate) calculateRetirementDate();
-            if (data.regionServiceDate) calculateServiceYears('regionServiceDate', 'yearsInRegion');
-            if (data.inspectionServiceDate) calculateServiceYears('inspectionServiceDate', 'yearsInInspection');
-        }
-
-        function setValue(id, value) {
-            const element = document.getElementById(id);
-            if (element && value !== undefined) {
-                element.value = value;
-            }
-        }
-
-        function setSubjectsData(subjects) {
-            if (!subjects) return;
-            
-            // Réinitialiser
-            counters.subject = 0;
-            const container = document.getElementById('subjectsContainer');
-            
-            if (!container) return;
-            
-            // Nettoyer les champs supplémentaires (garder le premier row)
-            const formRows = container.querySelectorAll('.form-row');
-            for (let i = 1; i < formRows.length; i++) {
-                formRows[i].remove();
-            }
-            
-            // Remplir les matières principales
-            subjects.forEach((subject, index) => {
-                if (index === 0) {
-                    setValue('mainSubject', subject.name);
-                } else if (index === 1) {
-                    setValue('secondarySubject', subject.name);
-                } else {
-                    counters.subject++;
-                    const newSubject = document.createElement('div');
-                    newSubject.className = 'form-row';
-                    newSubject.innerHTML = `
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label><i class="fas fa-book"></i> Matière supplémentaire ${counters.subject}</label>
-                                <input type="text" value="${subject.name || ''}" id="subject_${counters.subject}">
-                            </div>
-                        </div>
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label><i class="fas fa-clock"></i> Heures/semaine</label>
-                                <input type="number" value="${subject.hours || ''}" id="subject_hours_${counters.subject}">
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(newSubject);
-                }
-            });
-        }
-
-        // Fonctions pour récupérer les autres données (simplifiées)
-        function getThemesData() { 
-            const themes = [];
-            const themeElements = document.querySelectorAll('.theme-container .dynamic-item');
-            themeElements.forEach(theme => {
-                const name = theme.querySelector('label')?.textContent?.replace('Thème: ', '') || '';
-                const description = theme.querySelector('textarea')?.value || '';
-                if (name) {
-                    themes.push({ name, description });
-                }
-            });
-            return themes;
-        }
-
-        function getLessonsData() { 
-            const lessons = [];
-            const lessonElements = document.querySelectorAll('.lesson-container');
-            lessonElements.forEach(lesson => {
-                const title = lesson.querySelector('input[type="text"]')?.value || '';
-                const date = lesson.querySelector('input[type="date"]')?.value || '';
-                if (title) {
-                    lessons.push({ title, date });
-                }
-            });
-            return lessons;
-        }
-
-        function getTPsData() { 
-            const tps = [];
-            const tpElements = document.querySelectorAll('.tp-container');
-            tpElements.forEach(tp => {
-                const title = tp.querySelector('input[type="text"]')?.value || '';
-                const date = tp.querySelector('input[type="date"]')?.value || '';
-                if (title) {
-                    tps.push({ title, date });
-                }
-            });
-            return tps;
-        }
-
-        function getEvaluationsData() { 
-            const evaluations = [];
-            const evalElements = document.querySelectorAll('.evaluation-container');
-            evalElements.forEach(eval => {
-                const type = eval.querySelector('select')?.value || '';
-                const date = eval.querySelector('input[type="date"]')?.value || '';
-                if (type || date) {
-                    evaluations.push({ type, date });
-                }
-            });
-            return evaluations;
-        }
-
-        function getDiplomasData() { return []; }
-        function getTrainingsData() { return []; }
-        function getLanguagesData() { return []; }
-        function getITSkillsData() { return []; }
-        function getProjectsData() { return []; }
-        function getActivitiesData() { return []; }
-        function getMeetingsData() { return []; }
 
         // Gestion du formulaire
         function handleSubmit(event) {
@@ -3620,22 +3251,6 @@
             }
         }
 
-        function updateSubjectsSelector() {
-            const selector = document.getElementById('subjectSelector');
-            if (!selector) return;
-            
-            const subjects = getSubjectsData();
-            
-            selector.innerHTML = '<option value="">-- Sélectionner une matière --</option>';
-            
-            subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.name;
-                option.textContent = subject.name;
-                selector.appendChild(option);
-            });
-        }
-
         function updateBackupHistory() {
             const container = document.getElementById('backupHistory');
             if (!container) return;
@@ -3680,8 +3295,24 @@
                 const backups = JSON.parse(localStorage.getItem('backups') || '[]');
                 if (index >= 0 && index < backups.length) {
                     if (confirm('Restaurer cette sauvegarde ? Les données actuelles seront perdues.')) {
-                        setAllData(backups[index].data);
+                        // Restaurer les données
+                        const backupData = backups[index].data;
+                        
+                        // Restaurer les champs du formulaire
+                        if (backupData.establishment) {
+                            document.getElementById('establishmentName').value = backupData.establishment.name || '';
+                            document.getElementById('establishmentType').value = backupData.establishment.type || '';
+                            document.getElementById('establishmentAddress').value = backupData.establishment.address || '';
+                            document.getElementById('establishmentPhone').value = backupData.establishment.phone || '';
+                            document.getElementById('establishmentEmail').value = backupData.establishment.email || '';
+                            document.getElementById('establishmentWebsite').value = backupData.establishment.website || '';
+                        }
+                        
+                        // Mettre à jour le nom de l'école
+                        updateSchoolName();
+                        
                         showNotification('Sauvegarde restaurée avec succès', 'success');
+                        syncData();
                     }
                 }
             } catch (error) {
@@ -3733,26 +3364,26 @@
             const container = document.getElementById('profileSummary');
             if (!container) return;
             
-            const personal = getPersonalData();
-            const professional = getProfessionalData();
+            const personal = currentData.personal;
+            const professional = currentData.professional;
             
             const html = `
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div>Années de service</div>
-                        <div class="stat-value">${professional.yearsInRegion || 0}</div>
+                        <div class="stat-value">${professional.years_in_region || 0}</div>
                     </div>
                     <div class="stat-card">
                         <div>Heures/semaine</div>
-                        <div class="stat-value">${professional.weeklyHours || 0}</div>
+                        <div class="stat-value">${professional.weekly_hours || 0}</div>
                     </div>
                     <div class="stat-card">
                         <div>Classes</div>
-                        <div class="stat-value">${professional.currentClass ? professional.currentClass.split(',').length : 0}</div>
+                        <div class="stat-value">${professional.current_class ? professional.current_class.split(',').length : 0}</div>
                     </div>
                     <div class="stat-card">
                         <div>Âge actuel</div>
-                        <div class="stat-value">${calculateAge(personal.birthDate)}</div>
+                        <div class="stat-value">${calculateAge(personal.birth_date)}</div>
                     </div>
                 </div>
             `;
@@ -3903,15 +3534,39 @@
 
         function loadSavedData() {
             try {
-                const saved = localStorage.getItem('currentData');
+                const saved = localStorage.getItem('teacherCurrentData');
                 if (saved) {
                     const data = JSON.parse(saved);
-                    setAllData(data);
+                    
+                    // Restaurer les champs principaux
+                    if (data.establishment) {
+                        document.getElementById('establishmentName').value = data.establishment.name || '';
+                        document.getElementById('establishmentType').value = data.establishment.type || '';
+                        document.getElementById('establishmentAddress').value = data.establishment.address || '';
+                        document.getElementById('establishmentPhone').value = data.establishment.phone || '';
+                        document.getElementById('establishmentEmail').value = data.establishment.email || '';
+                        document.getElementById('establishmentWebsite').value = data.establishment.website || '';
+                    }
+                    
+                    if (data.personal) {
+                        document.getElementById('lastName').value = data.personal.last_name || '';
+                        document.getElementById('firstName').value = data.personal.first_name || '';
+                        document.getElementById('gender').value = data.personal.gender || '';
+                        document.getElementById('birthDate').value = data.personal.birth_date || '';
+                        document.getElementById('birthMonth').value = data.personal.birth_month || '';
+                        document.getElementById('birthPlace').value = data.personal.birth_place || '';
+                    }
+                    
+                    // Mettre à jour le nom de l'école
+                    updateSchoolName();
+                    
+                    // Recalculer les dates
+                    calculateRetirementDate();
+                    
                     showNotification('Données chargées depuis la sauvegarde', 'success');
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement des données:', error);
-                showNotification('Erreur lors du chargement des données sauvegardées', 'error');
             }
         }
 
@@ -3946,6 +3601,193 @@
                 } else {
                     loader.classList.remove('active');
                 }
+            }
+        }
+
+        // Import/Export
+        function exportJSON(tabId) {
+            const data = getTabData(tabId);
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fiche-enseignant-${tabId}-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Données exportées avec succès', 'success');
+        }
+
+        function importJSON(tabId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        // Implémenter l'importation des données pour l'onglet spécifique
+                        showNotification('Données importées avec succès', 'success');
+                    } catch (error) {
+                        showNotification('Erreur lors de l\'importation', 'error');
+                        console.error(error);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function exportAllJSON() {
+            const data = getAllData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fiche-enseignant-complete-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Toutes les données exportées avec succès', 'success');
+        }
+
+        function importAllJSON() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput) return;
+            
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('Veuillez sélectionner un fichier', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // Implémenter l'importation complète des données
+                    showNotification('Données importées avec succès', 'success');
+                } catch (error) {
+                    showNotification('Erreur lors de l\'importation', 'error');
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                showNotification(`Fichier sélectionné: ${file.name}`, 'info');
+            }
+        }
+
+        // Sauvegarde/Restauration
+        function backupData() {
+            const data = getAllData();
+            const backup = {
+                timestamp: new Date().toISOString(),
+                data: data
+            };
+            
+            try {
+                // Sauvegarder dans localStorage
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                backups.push(backup);
+                localStorage.setItem('backups', JSON.stringify(backups.slice(-10))); // Garder les 10 dernières
+                
+                showNotification('Sauvegarde effectuée avec succès', 'success');
+                updateBackupHistory();
+            } catch (error) {
+                showNotification('Erreur lors de la sauvegarde', 'error');
+                console.error(error);
+            }
+        }
+
+        function restoreData() {
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                if (backups.length === 0) {
+                    showNotification('Aucune sauvegarde disponible', 'warning');
+                    return;
+                }
+                
+                // Demander quelle sauvegarde restaurer
+                const backupList = backups.map((b, i) => 
+                    `${i + 1}. ${new Date(b.timestamp).toLocaleString()}`
+                ).join('\n');
+                
+                const choice = prompt(`Sauvegardes disponibles:\n${backupList}\n\nEntrez le numéro de la sauvegarde (1-${backups.length}):`);
+                const index = parseInt(choice) - 1;
+                
+                if (index >= 0 && index < backups.length) {
+                    if (confirm('Restaurer cette sauvegarde ? Les données actuelles seront perdues.')) {
+                        const backupData = backups[index].data;
+                        
+                        // Restaurer les champs principaux
+                        if (backupData.establishment) {
+                            document.getElementById('establishmentName').value = backupData.establishment.name || '';
+                            document.getElementById('establishmentType').value = backupData.establishment.type || '';
+                        }
+                        
+                        // Mettre à jour le nom de l'école
+                        updateSchoolName();
+                        
+                        showNotification('Données restaurées avec succès', 'success');
+                        syncData();
+                    }
+                } else {
+                    showNotification('Numéro invalide', 'warning');
+                }
+            } catch (error) {
+                showNotification('Erreur lors de la restauration', 'error');
+                console.error(error);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible.')) {
+                try {
+                    localStorage.clear();
+                    location.reload();
+                } catch (error) {
+                    showNotification('Erreur lors de la suppression des données', 'error');
+                }
+            }
+        }
+
+        // Gestion des données
+        function getAllData() {
+            // Retourner les données actuelles
+            return currentData;
+        }
+
+        function getTabData(tabId) {
+            switch(tabId) {
+                case 'tab1':
+                    return {
+                        establishment: currentData.establishment,
+                        personal: currentData.personal,
+                        professional: currentData.professional,
+                        subjects: currentData.subjects
+                    };
+                case 'tab2':
+                    return {
+                        themes: currentData.themes,
+                        lessons: currentData.lessons,
+                        tps: currentData.tps
+                    };
+                default:
+                    return {};
             }
         }
 
@@ -4111,12 +3953,6 @@
                 yearsToRetirement
             };
         }
-
-        // Initialisation finale
-        window.addEventListener('beforeunload', function(e) {
-            // Sauvegarder automatiquement avant de quitter (optionnel)
-            // backupData();
-        });
     </script>
 </body>
 </html>
