@@ -1,0 +1,4028 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESODI - Système de Saisie des Résultats Scolaires - Direction Régionale de l'éducation de la Région KARA</title>
+    <!-- Inclusion de Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Inclusion de jsPDF pour la génération de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #0066cc;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 5px solid #ffcc00;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .header h2 {
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card h3 {
+            color: #0066cc;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0, 102, 204, 0.3);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #0066cc;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .btn {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background-color: #0052a3;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .result-display {
+            background-color: #e9f7fe;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .result-display h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .result-item {
+            margin-bottom: 8px;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-color: #ddd #ddd white;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            margin-top: 40px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .instructions {
+            background-color: #fffde7;
+            padding: 15px;
+            border-left: 4px solid #ffcc00;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .class-level {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .class-level h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .danger-zone {
+            background-color: #f8d7da;
+            padding: 20px;
+            border-radius: 5px;
+            border: 2px solid #dc3545;
+            margin-top: 30px;
+        }
+        
+        .danger-zone h4 {
+            color: #721c24;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #0066cc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-area:hover {
+            background-color: #e9f7fe;
+            border-color: #0052a3;
+        }
+        
+        .file-upload-area.dragover {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            transform: scale(1.02);
+        }
+        
+        .file-upload-icon {
+            font-size: 48px;
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-hint {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .import-preview {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .import-preview h4 {
+            margin-bottom: 10px;
+            color: #0066cc;
+        }
+        
+        .comparaison-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+        }
+        
+        .comparaison-etablissement {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .comparaison-etablissement h5 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .comparaison-graphique-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .comparaison-graphique {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                margin-right: 0;
+                margin-bottom: 5px;
+                border-radius: 5px;
+            }
+            
+            .comparaison-graphique-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ESODI - SYSTÈME DE SAISIE ET D'ANALYSE DES RÉSULTATS SCOLAIRES</h1>
+        <h2>Direction Régionale de l'éducation de la Région KARA - République Togolaise</h2>
+        <h2>Ministère des Enseignements Primaire, Secondaire et de la Formation Professionnelle</h2>
+    </div>
+    
+    <div class="container">
+        <div class="logo">
+            <div class="logo-text">Plateforme de Gestion des Résultats Scolaires - Région de la Kara</div>
+        </div>
+        
+        <div id="alert-message" class="alert" style="display: none;"></div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('saisie')">Saisie des données</div>
+            <div class="tab" onclick="switchTab('resultats')">Résultats et analyses</div>
+            <div class="tab" onclick="switchTab('comparaison')">Comparaison</div>
+            <div class="tab" onclick="switchTab('personnel')">Personnel enseignant</div>
+            <div class="tab" onclick="switchTab('export')">Exportation des données</div>
+            <div class="tab" onclick="switchTab('import')">Importation des données</div>
+            <div class="tab" onclick="switchTab('administration')">Administration</div>
+        </div>
+        
+        <!-- Tab 1: Saisie des données -->
+        <div id="saisie" class="tab-content active">
+            <div class="card">
+                <h3>Informations générales de l'établissement</h3>
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="nom_etablissement">Nom de l'établissement :</label>
+                        <input type="text" id="nom_etablissement" placeholder="Saisir le nom de l'établissement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="annee_scolaire">Année scolaire :</label>
+                        <input type="text" id="annee_scolaire" placeholder="Ex: 2025-2026">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trimestre">Trimestre :</label>
+                        <select id="trimestre">
+                            <option value="">Sélectionner un trimestre</option>
+                            <option value="1">1er trimestre</option>
+                            <option value="2">2ème trimestre</option>
+                            <option value="3">3ème trimestre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="directeur">Nom et contact du directeur :</label>
+                        <input type="text" id="directeur" placeholder="Saisir le nom et contact du directeur">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Résultats de la composition</h3>
+                <div class="instructions">
+                    <strong>Instructions :</strong> Remplissez les effectifs pour chaque classe. Les pourcentages seront calculés automatiquement.
+                </div>
+                
+                <h4>Effectifs</h4>
+                <div class="table-container">
+                    <table id="table-effectifs">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Classes</th>
+                                <th rowspan="2">Sect.</th>
+                                <th colspan="3">INSCRITS</th>
+                                <th colspan="3">COMPOSANTS</th>
+                                <th colspan="3">ONT LA MOYENNE</th>
+                                <th rowspan="2">POURC. TOTAL</th>
+                                <th rowspan="2">PLUS FORTE MOYENNE</th>
+                                <th rowspan="2">PLUS FAIBLE MOYENNE</th>
+                                <th colspan="7">ONT LA MOYENNE PAR DISCIPLINE</th>
+                            </tr>
+                            <tr>
+                                <th>G</th><th>F</th><th>T</th>
+                                <th>G</th><th>F</th><th>T</th>
+                                <th>G</th><th>F</th><th>T</th>
+                                <th>FR</th><th>ANG</th><th>HG</th><th>ECM</th><th>MATHS</th><th>SP</th><th>SVT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les lignes seront générées par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="calculerPourcentages()">Calculer les pourcentages</button>
+                    <button class="btn btn-secondary" onclick="remplirExemple()">Remplir avec des exemples</button>
+                    <button class="btn btn-warning" onclick="viderTableaux()">Vider tous les tableaux</button>
+                </div>
+                
+                <div id="pourcentages-result" style="display: none;">
+                    <h4>Pourcentages calculés</h4>
+                    <div class="table-container">
+                        <table id="table-pourcentages">
+                            <!-- Les pourcentages seront calculés automatiquement -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Résultats du trimestre</h3>
+                <div class="instructions">
+                    <strong>Instructions :</strong> Remplissez les données pour le trimestre en cours.
+                </div>
+                
+                <div class="table-container">
+                    <table id="table-trimestre">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Classes</th>
+                                <th rowspan="2">Sect.</th>
+                                <th colspan="3">INSCRITS</th>
+                                <th colspan="3">COMPOSANTS</th>
+                                <th colspan="3">ONT LA MOYENNE</th>
+                                <th rowspan="2">POURC. TOTAL</th>
+                                <th rowspan="2">PLUS FORTE MOYENNE</th>
+                                <th rowspan="2">PLUS FAIBLE MOYENNE</th>
+                                <th colspan="7">ONT LA MOYENNE PAR DISCIPLINE</th>
+                            </tr>
+                            <tr>
+                                <th>G</th><th>F</th><th>T</th>
+                                <th>G</th><th>F</th><th>T</th>
+                                <th>G</th><th>F</th><th>T</th>
+                                <th>FR</th><th>ANG</th><th>HG</th><th>ECM</th><th>MATHS</th><th>SP</th><th>SVT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les lignes seront générées par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-success" onclick="enregistrerDonnees()">Enregistrer toutes les données</button>
+                <button class="btn" onclick="genererAnalyse()">Générer l'analyse des données</button>
+                <button class="btn" onclick="genererPDF()">Générer PDF des données</button>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Résultats et analyses -->
+        <div id="resultats" class="tab-content">
+            <div class="card">
+                <h3>Analyse des résultats</h3>
+                <div id="analyse-resultats">
+                    <p>Sélectionnez une action pour afficher les analyses.</p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="analyserReussite()">Analyser les taux de réussite</button>
+                    <button class="btn" onclick="comparerClasses()">Comparer les classes</button>
+                    <button class="btn" onclick="analyserDisciplines()">Analyser les performances par discipline</button>
+                    <button class="btn" onclick="analyserParGenre()">Analyser par genre</button>
+                    <button class="btn btn-warning" onclick="viderAnalyses()">Effacer les analyses</button>
+                </div>
+                
+                <div id="resultat-analyse" class="result-display">
+                    <!-- Les résultats d'analyse s'afficheront ici -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Graphiques de visualisation</h3>
+                <div id="graphiques">
+                    <p>Les graphiques s'afficheront ici après analyse.</p>
+                </div>
+                <canvas id="chart-performance" width="400" height="200" style="max-width: 100%;"></canvas>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Comparaison -->
+        <div id="comparaison" class="tab-content">
+            <div class="card">
+                <h3>Comparaison des établissements</h3>
+                <div class="instructions">
+                    <strong>Instructions :</strong> Cette section permet de comparer les résultats de différents établissements enregistrés dans le système.
+                </div>
+                
+                <div class="comparaison-section">
+                    <h4>Sélection des établissements à comparer</h4>
+                    <div id="liste-etablissements-comparaison">
+                        <p>Chargement des établissements enregistrés...</p>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="chargerEtablissementsComparaison()">Actualiser la liste</button>
+                        <button class="btn" onclick="comparerEtablissementsSelectionnes()">Comparer les établissements sélectionnés</button>
+                        <button class="btn btn-warning" onclick="viderComparaison()">Effacer la comparaison</button>
+                    </div>
+                </div>
+                
+                <div id="resultats-comparaison" style="display: none;">
+                    <h4>Résultats de la comparaison</h4>
+                    <div id="tableau-comparaison">
+                        <!-- Les résultats de comparaison s'afficheront ici -->
+                    </div>
+                    
+                    <div class="comparaison-graphique-container">
+                        <div class="comparaison-graphique">
+                            <canvas id="chart-comparaison-reussite" width="400" height="300"></canvas>
+                        </div>
+                        <div class="comparaison-graphique">
+                            <canvas id="chart-comparaison-effectifs" width="400" height="300"></canvas>
+                        </div>
+                        <div class="comparaison-graphique">
+                            <canvas id="chart-comparaison-disciplines" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="details-comparaison" class="result-display" style="display: none; margin-top: 20px;">
+                    <!-- Détails détaillés de la comparaison -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 4: Personnel enseignant -->
+        <div id="personnel" class="tab-content">
+            <div class="card">
+                <h3>Personnel enseignant - Premier cycle</h3>
+                <div class="table-container">
+                    <table id="table-personnel">
+                        <thead>
+                            <tr>
+                                <th>N° mle</th>
+                                <th>NOM ET PRENOMS</th>
+                                <th>Sexe</th>
+                                <th>Date de Naissance</th>
+                                <th>Diplôme académique/Année</th>
+                                <th>Diplôme professionnel/Année</th>
+                                <th>Discipline (dom/s. dom)</th>
+                                <th>Statut</th>
+                                <th>Grade</th>
+                                <th>Catégorie</th>
+                                <th>Classe et échelon</th>
+                                <th>Date de prise de service</th>
+                                <th>Date engagement</th>
+                                <th>Date présumée retraite</th>
+                                <th>Fonction occupée</th>
+                                <th>Classes tenues + Volume-horaire</th>
+                                <th>Ancienneté dans la région</th>
+                                <th>Ancienneté dans la préfecture</th>
+                                <th>Ancienneté dans le poste</th>
+                                <th>Banque</th>
+                                <th>Régions de service</th>
+                                <th>CONTACT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Données du personnel seront ajoutées ici -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="ajouterEnseignant()">Ajouter un enseignant</button>
+                    <button class="btn btn-secondary" onclick="exporterPersonnel()">Exporter la liste du personnel</button>
+                    <button class="btn btn-warning" onclick="viderPersonnel()">Vider la liste du personnel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 5: Exportation des données -->
+        <div id="export" class="tab-content">
+            <div class="card">
+                <h3>Exportation des données</h3>
+                <p>Exportez les données saisies dans différents formats.</p>
+                
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="format-export">Format d'exportation :</label>
+                        <select id="format-export">
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="pdf">PDF (.pdf)</option>
+                            <option value="json">JSON (.json)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donnees-export">Données à exporter :</label>
+                        <select id="donnees-export" multiple>
+                            <option value="resultats" selected>Résultats de la composition</option>
+                            <option value="trimestre" selected>Résultats du trimestre</option>
+                            <option value="personnel" selected>Personnel enseignant</option>
+                            <option value="analyses">Analyses statistiques</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="exporterDonnees()">Exporter les données</button>
+                    <button class="btn" onclick="genererRapport()">Générer un rapport complet</button>
+                    <button class="btn" onclick="genererPDFComplet()">Générer PDF complet</button>
+                </div>
+                
+                <div id="export-result" class="result-display">
+                    <!-- Les résultats d'exportation s'afficheront ici -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Historique des enregistrements</h3>
+                <div id="historique">
+                    <p>Aucun enregistrement trouvé.</p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="chargerHistorique()">Actualiser l'historique</button>
+                    <button class="btn btn-warning" onclick="exporterHistoriquePDF()">Exporter historique en PDF</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 6: Importation des données -->
+        <div id="import" class="tab-content">
+            <div class="card">
+                <h3>Importation des données depuis un fichier JSON</h3>
+                <p>Importez des données précédemment exportées depuis un fichier JSON.</p>
+                
+                <div class="instructions">
+                    <strong>Instructions :</strong> Sélectionnez ou glissez-déposez un fichier JSON exporté depuis ce système. Les données seront chargées dans les tableaux correspondants.
+                </div>
+                
+                <div class="file-upload-area" id="file-upload-area">
+                    <div class="file-upload-icon">📁</div>
+                    <div class="file-upload-text">Cliquez pour sélectionner un fichier ou glissez-déposez ici</div>
+                    <div class="file-upload-hint">Format accepté : .json (fichiers exportés depuis ce système)</div>
+                    <input type="file" id="file-input" accept=".json" style="display: none;">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="document.getElementById('file-input').click()">Sélectionner un fichier</button>
+                    <button class="btn btn-info" onclick="importerExempleJSON()">Importer un exemple JSON</button>
+                    <button class="btn btn-warning" onclick="reinitialiserImport()">Réinitialiser l'importation</button>
+                </div>
+                
+                <div id="import-preview" class="import-preview" style="display: none;">
+                    <h4>Aperçu des données à importer</h4>
+                    <div id="import-preview-content">
+                        <!-- Aperçu des données JSON -->
+                    </div>
+                </div>
+                
+                <div id="import-options" style="display: none; margin-top: 20px;">
+                    <h4>Options d'importation</h4>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="import-etablissement" checked>
+                                Importer les informations de l'établissement
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="import-resultats" checked>
+                                Importer les résultats de la composition
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="import-trimestre" checked>
+                                Importer les résultats du trimestre
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="import-personnel" checked>
+                                Importer le personnel enseignant
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="import-historique">
+                                Ajouter à l'historique des enregistrements
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="import-mode">Mode d'importation :</label>
+                            <select id="import-mode">
+                                <option value="fusionner">Fusionner avec les données existantes</option>
+                                <option value="remplacer">Remplacer les données existantes</option>
+                                <option value="ajouter">Ajouter comme nouvel enregistrement</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="confirmerImport()">Confirmer l'importation</button>
+                        <button class="btn btn-secondary" onclick="annulerImport()">Annuler</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Historique des importations</h3>
+                <div id="historique-import">
+                    <p>Aucune importation effectuée.</p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="actualiserHistoriqueImport()">Actualiser l'historique</button>
+                    <button class="btn btn-warning" onclick="viderHistoriqueImport()">Vider l'historique des importations</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 7: Administration -->
+        <div id="administration" class="tab-content">
+            <div class="card">
+                <h3>Gestion des données</h3>
+                <p>Cette section permet de gérer toutes les données du système.</p>
+                
+                <div class="danger-zone">
+                    <h4>⚠️ Zone de danger - Actions irréversibles</h4>
+                    <p>Les actions suivantes supprimeront définitivement des données. Cette opération est irréversible.</p>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-danger" onclick="supprimerToutesDonnees()">Supprimer TOUTES les données</button>
+                        <button class="btn btn-danger" onclick="supprimerHistorique()">Supprimer l'historique</button>
+                        <button class="btn btn-danger" onclick="supprimerDonneesActuelles()">Supprimer les données actuelles</button>
+                    </div>
+                </div>
+                
+                <div class="instructions" style="margin-top: 30px;">
+                    <h4>Statistiques du système</h4>
+                    <div id="statistiques-systeme">
+                        <p>Chargement des statistiques...</p>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="actualiserStatistiques()">Actualiser les statistiques</button>
+                    <button class="btn btn-secondary" onclick="sauvegarderConfiguration()">Sauvegarder la configuration</button>
+                    <button class="btn" onclick="restaurerConfiguration()">Restaurer la configuration</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Sauvegarde et restauration</h3>
+                <p>Créez une sauvegarde complète de toutes les données ou restaurez à partir d'une sauvegarde précédente.</p>
+                
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="nom-sauvegarde">Nom de la sauvegarde :</label>
+                        <input type="text" id="nom-sauvegarde" placeholder="Sauvegarde du [date]">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="creerSauvegarde()">Créer une sauvegarde</button>
+                    <button class="btn" onclick="restaurerSauvegarde()">Restaurer une sauvegarde</button>
+                    <button class="btn" onclick="exporterSauvegarde()">Exporter la sauvegarde</button>
+                </div>
+                
+                <div id="liste-sauvegardes" style="margin-top: 20px;">
+                    <h4>Sauvegardes disponibles</h4>
+                    <div id="contenu-sauvegardes">
+                        <p>Aucune sauvegarde disponible.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>ESODI - Direction Régionale de l'éducation de la Région KARA - République Togolaise</p>
+        <p>Ministère des Enseignements Primaire, Secondaire et de la Formation Professionnelle</p>
+        <p>&copy; 2025 - Système de Saisie des Résultats Scolaires | Version 2.0</p>
+    </footer>
+
+    <script>
+        // Initialiser jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Données d'exemple pour le CEG MASSÉDÉNA
+        const classes = ['6ième', '5ième', '4ième', '3ième'];
+        const disciplines = ['FR', 'ANG', 'HG', 'ECM', 'MATHS', 'SP', 'SVT'];
+        
+        // Données d'exemple pour les résultats de composition
+        const donneesExemple = {
+            '6ième': { 
+                inscrits: { G: 33, F: 15, T: 48 },
+                composants: { G: 33, F: 14, T: 47 },
+                moyenne: { G: 13, F: 6, T: 19 },
+                pourcTotal: 40.43,
+                plusForteMoyenne: 17.11,
+                plusFaibleMoyenne: 4.67,
+                disciplines: { FR: 7, ANG: 21, HG: 31, ECM: 28, MATHS: 3, SP: 9, SVT: 38 }
+            },
+            '5ième': { 
+                inscrits: { G: 20, F: 18, T: 38 },
+                composants: { G: 20, F: 18, T: 38 },
+                moyenne: { G: 16, F: 13, T: 29 },
+                pourcTotal: 76.32,
+                plusForteMoyenne: 14.78,
+                plusFaibleMoyenne: 7.78,
+                disciplines: { FR: 12, ANG: 25, HG: 34, ECM: 37, MATHS: 10, SP: 11, SVT: 33 }
+            },
+            '4ième': { 
+                inscrits: { G: 22, F: 16, T: 38 },
+                composants: { G: 22, F: 16, T: 38 },
+                moyenne: { G: 12, F: 4, T: 16 },
+                pourcTotal: 42.11,
+                plusForteMoyenne: 15.56,
+                plusFaibleMoyenne: 4.78,
+                disciplines: { FR: 28, ANG: 27, HG: 27, ECM: 26, MATHS: 4, SP: 4, SVT: 35 }
+            },
+            '3ième': { 
+                inscrits: { G: 11, F: 11, T: 22 },
+                composants: { G: 11, F: 10, T: 21 },
+                moyenne: { G: 5, F: 2, T: 7 },
+                pourcTotal: 33.33,
+                plusForteMoyenne: 12.11,
+                plusFaibleMoyenne: 7.89,
+                disciplines: { FR: 2, ANG: 8, HG: 21, ECM: 20, MATHS: 0, SP: 0, SVT: 20 }
+            }
+        };
+        
+        // Données du personnel enseignant
+        const personnelExemple = [
+            {
+                matricule: '103821F',
+                nom: 'YAO Kpatcha',
+                sexe: 'M',
+                naissance: '14/10/1990',
+                diplomeAcademique: 'Licence 2015',
+                diplomeProfessionnel: 'CAPCEG 2022',
+                discipline: 'HG/FR',
+                statut: 'Fonctionnaire',
+                grade: 'PCEG',
+                categorie: 'A2',
+                classeEchelon: '3cl 4éch',
+                dateService: '14/12/2020',
+                dateEngagement: '22/10/2019',
+                dateRetraite: '1/1/2050',
+                fonction: 'CC',
+                classesTenues: '6,5,4,3 19H',
+                ancienneteRegion: 6,
+                anciennetePrefecture: 3,
+                anciennetePoste: 3,
+                banque: 'SUNU',
+                regionsService: 'KA',
+                contact: '90958162'
+            },
+            {
+                matricule: '116091D',
+                nom: 'KPENOU Kossigan Florant',
+                sexe: 'M',
+                naissance: '05/12/1999',
+                diplomeAcademique: 'BAC2 2017',
+                diplomeProfessionnel: 'CAPCEG 2024',
+                discipline: 'PCT/MATHS',
+                statut: 'Fonctionnaire',
+                grade: 'PCEG',
+                categorie: 'A2',
+                classeEchelon: '3cl 1éch',
+                dateService: '03/10/2022',
+                dateEngagement: '22/10/2019',
+                dateRetraite: '1/1/2059',
+                fonction: 'CC',
+                classesTenues: '6,5,4,3 17H',
+                ancienneteRegion: 4,
+                anciennetePrefecture: 3,
+                anciennetePoste: 3,
+                banque: 'SUNU',
+                regionsService: 'KA',
+                contact: '93742570'
+            },
+            {
+                matricule: '111884W',
+                nom: 'TEKPASSA Banaka',
+                sexe: 'F',
+                naissance: '21/11/1991',
+                diplomeAcademique: 'Licence 2018',
+                diplomeProfessionnel: 'CAPCEG 2024',
+                discipline: 'FR/HG',
+                statut: 'Fonctionnaire',
+                grade: 'PECEG',
+                categorie: 'A2',
+                classeEchelon: '3cl 1éch',
+                dateService: '3/10/2022',
+                dateEngagement: '19/09/2022',
+                dateRetraite: '1/1/2052',
+                fonction: 'CC',
+                classesTenues: '6,5,4,3 16H',
+                ancienneteRegion: 4,
+                anciennetePrefecture: 4,
+                anciennetePoste: 4,
+                banque: 'IB',
+                regionsService: 'KA',
+                contact: '93298320'
+            }
+        ];
+        
+        // Variables globales
+        let chart = null;
+        let chartComparaisonReussite = null;
+        let chartComparaisonEffectifs = null;
+        let chartComparaisonDisciplines = null;
+        let donneesImportees = null;
+        let etablissementsSelectionnes = [];
+        
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            initialiserTableaux();
+            initialiserPersonnel();
+            initialiserImportation();
+            chargerDonnees();
+            chargerHistorique();
+            chargerSauvegardes();
+            actualiserStatistiques();
+            actualiserHistoriqueImport();
+            chargerEtablissementsComparaison();
+        });
+        
+        // Fonction pour initialiser les tableaux de saisie
+        function initialiserTableaux() {
+            const tbodyEffectifs = document.querySelector('#table-effectifs tbody');
+            const tbodyTrimestre = document.querySelector('#table-trimestre tbody');
+            
+            // Vider les tableaux
+            tbodyEffectifs.innerHTML = '';
+            tbodyTrimestre.innerHTML = '';
+            
+            // Créer les lignes pour chaque classe
+            classes.forEach(classe => {
+                // Ligne pour les effectifs
+                const trEffectifs = document.createElement('tr');
+                trEffectifs.innerHTML = `
+                    <td>${classe}</td>
+                    <td><input type="number" class="sect" value="1" min="1" max="10" style="width: 60px;"></td>
+                    <td><input type="number" class="inscrits-g" value="0" min="0" style="width: 60px;"></td>
+                    <td><input type="number" class="inscrits-f" value="0" min="0" style="width: 60px;"></td>
+                    <td><input type="number" class="inscrits-t" value="0" min="0" style="width: 60px;" readonly></td>
+                    <td><input type="number" class="composants-g" value="0" min="0" style="width: 60px;"></td>
+                    <td><input type="number" class="composants-f" value="0" min="0" style="width: 60px;"></td>
+                    <td><input type="number" class="composants-t" value="0" min="0" style="width: 60px;" readonly></td>
+                    <td><input type="number" class="moyenne-g" value="0" min="0" style="width: 60px;"></td>
+                    <td><input type="number" class="moyenne-f" value="0" min="0" style="width: 60px;"></td>
+                    <td><input type="number" class="moyenne-t" value="0" min="0" style="width: 60px;" readonly></td>
+                    <td><input type="number" class="pourc-total" value="0" min="0" max="100" step="0.01" style="width: 80px;" readonly></td>
+                    <td><input type="number" class="plus-forte" value="0" min="0" max="20" step="0.01" style="width: 80px;"></td>
+                    <td><input type="number" class="plus-faible" value="0" min="0" max="20" step="0.01" style="width: 80px;"></td>
+                    ${disciplines.map(d => `<td><input type="number" class="disc-${d.toLowerCase()}" value="0" min="0" style="width: 60px;"></td>`).join('')}
+                `;
+                tbodyEffectifs.appendChild(trEffectifs);
+                
+                // Ligne pour le trimestre (identique pour l'instant)
+                const trTrimestre = trEffectifs.cloneNode(true);
+                tbodyTrimestre.appendChild(trTrimestre);
+                
+                // Ajouter des événements pour calcul automatique
+                ajouterEvenementsCalcul(trEffectifs);
+                ajouterEvenementsCalcul(trTrimestre);
+            });
+            
+            // Ajouter la ligne TOTAL
+            const trTotalEffectifs = document.createElement('tr');
+            trTotalEffectifs.innerHTML = `
+                <td>TOTAL</td>
+                <td><input type="number" id="total-sect" value="4" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-inscrits-g" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-inscrits-f" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-inscrits-t" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-composants-g" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-composants-f" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-composants-t" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-moyenne-g" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-moyenne-f" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-moyenne-t" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-pourc-total" value="0" readonly style="width: 80px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-plus-forte" value="0" readonly style="width: 80px; background-color: #f0f0f0;"></td>
+                <td><input type="number" id="total-plus-faible" value="0" readonly style="width: 80px; background-color: #f0f0f0;"></td>
+                ${disciplines.map(d => `<td><input type="number" id="total-disc-${d.toLowerCase()}" value="0" readonly style="width: 60px; background-color: #f0f0f0;"></td>`).join('')}
+            `;
+            tbodyEffectifs.appendChild(trTotalEffectifs);
+            
+            const trTotalTrimestre = trTotalEffectifs.cloneNode(true);
+            tbodyTrimestre.appendChild(trTotalTrimestre);
+        }
+        
+        // Initialiser les fonctionnalités d'importation
+        function initialiserImportation() {
+            const fileInput = document.getElementById('file-input');
+            const fileUploadArea = document.getElementById('file-upload-area');
+            
+            // Gestion du clic sur la zone de dépôt
+            fileUploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Gestion du changement de fichier
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    lireFichierJSON(file);
+                }
+            });
+            
+            // Gestion du glisser-déposer
+            fileUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fileUploadArea.classList.add('dragover');
+            });
+            
+            fileUploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fileUploadArea.classList.remove('dragover');
+            });
+            
+            fileUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fileUploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    
+                    // Vérifier que c'est un fichier JSON
+                    if (file.type === 'application/json' || file.name.endsWith('.json')) {
+                        lireFichierJSON(file);
+                    } else {
+                        showAlert('Veuillez sélectionner un fichier JSON (.json)', 'error');
+                    }
+                }
+            });
+        }
+        
+        // Lire un fichier JSON
+        function lireFichierJSON(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const contenu = e.target.result;
+                    donneesImportees = JSON.parse(contenu);
+                    
+                    // Vérifier si le fichier a le format attendu
+                    if (!donneesImportees.etablissement && !donneesImportees.resultats && !donneesImportees.personnel) {
+                        throw new Error('Format de fichier JSON invalide. Le fichier doit contenir des données d\'établissement, de résultats ou de personnel.');
+                    }
+                    
+                    // Afficher l'aperçu
+                    afficherApercuImport(donneesImportees);
+                    
+                    // Afficher les options d'importation
+                    document.getElementById('import-options').style.display = 'block';
+                    
+                    showAlert(`Fichier "${file.name}" chargé avec succès!`, 'success');
+                } catch (error) {
+                    showAlert(`Erreur lors de la lecture du fichier: ${error.message}`, 'error');
+                    console.error('Erreur de parsing JSON:', error);
+                }
+            };
+            
+            reader.onerror = function() {
+                showAlert('Erreur lors de la lecture du fichier', 'error');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Afficher l'aperçu des données importées
+        function afficherApercuImport(donnees) {
+            const previewContent = document.getElementById('import-preview-content');
+            let html = '<div style="font-family: monospace; font-size: 12px;">';
+            
+            // Informations générales
+            if (donnees.etablissement) {
+                html += `<div><strong>Établissement:</strong> ${donnees.etablissement}</div>`;
+            }
+            
+            if (donnees.anneeScolaire) {
+                html += `<div><strong>Année scolaire:</strong> ${donnees.anneeScolaire}</div>`;
+            }
+            
+            if (donnees.trimestre) {
+                html += `<div><strong>Trimestre:</strong> ${donnees.trimestre}</div>`;
+            }
+            
+            // Résultats
+            if (donnees.resultats && donnees.resultats.length > 0) {
+                html += `<div><strong>Résultats:</strong> ${donnees.resultats.length} classe(s)</div>`;
+            }
+            
+            if (donnees.trimestre && donnees.trimestre.length > 0) {
+                html += `<div><strong>Trimestre:</strong> ${donnees.trimestre.length} classe(s)</div>`;
+            }
+            
+            // Personnel
+            if (donnees.personnel && donnees.personnel.length > 0) {
+                html += `<div><strong>Personnel:</strong> ${donnees.personnel.length} enseignant(s)</div>`;
+            }
+            
+            // Date
+            if (donnees.dateExport || donnees.dateEnregistrement) {
+                html += `<div><strong>Date:</strong> ${donnees.dateExport || donnees.dateEnregistrement}</div>`;
+            }
+            
+            html += '</div>';
+            
+            previewContent.innerHTML = html;
+            document.getElementById('import-preview').style.display = 'block';
+        }
+        
+        // Importer un exemple JSON
+        function importerExempleJSON() {
+            // Créer un exemple de données JSON
+            const exempleJSON = {
+                etablissement: "CEG MASSÉDÉNA",
+                anneeScolaire: "2025-2026",
+                trimestre: "1",
+                directeur: "TOMSIWA Katanama",
+                dateExport: new Date().toLocaleString(),
+                resultats: [
+                    {
+                        classe: "6ième",
+                        secteur: 1,
+                        inscrits: { G: 33, F: 15, T: 48 },
+                        composants: { G: 33, F: 14, T: 47 },
+                        moyenne: { G: 13, F: 6, T: 19 },
+                        pourcTotal: 40.43,
+                        plusForteMoyenne: 17.11,
+                        plusFaibleMoyenne: 4.67,
+                        disciplines: { FR: 7, ANG: 21, HG: 31, ECM: 28, MATHS: 3, SP: 9, SVT: 38 }
+                    },
+                    {
+                        classe: "5ième",
+                        secteur: 1,
+                        inscrits: { G: 20, F: 18, T: 38 },
+                        composants: { G: 20, F: 18, T: 38 },
+                        moyenne: { G: 16, F: 13, T: 29 },
+                        pourcTotal: 76.32,
+                        plusForteMoyenne: 14.78,
+                        plusFaibleMoyenne: 7.78,
+                        disciplines: { FR: 12, ANG: 25, HG: 34, ECM: 37, MATHS: 10, SP: 11, SVT: 33 }
+                    }
+                ],
+                personnel: [
+                    {
+                        matricule: "EXEMPLE001",
+                        nom: "ENSEIGNANT Exemple",
+                        sexe: "M",
+                        naissance: "01/01/1980",
+                        diplomeAcademique: "Licence 2005",
+                        diplomeProfessionnel: "CAPCEG 2010",
+                        discipline: "MATHS/PC",
+                        statut: "Fonctionnaire",
+                        grade: "PCEG",
+                        categorie: "A2",
+                        classeEchelon: "3cl 4éch",
+                        dateService: "01/09/2010",
+                        dateEngagement: "01/09/2010",
+                        dateRetraite: "01/01/2040",
+                        fonction: "CC",
+                        classesTenues: "6,5,4,3 18H",
+                        ancienneteRegion: 10,
+                        anciennetePrefecture: 8,
+                        anciennetePoste: 5,
+                        banque: "SUNU",
+                        regionsService: "KA",
+                        contact: "90000000"
+                    }
+                ]
+            };
+            
+            donneesImportees = exempleJSON;
+            afficherApercuImport(donneesImportees);
+            document.getElementById('import-options').style.display = 'block';
+            
+            showAlert('Exemple JSON chargé avec succès!', 'success');
+        }
+        
+        // Réinitialiser l'importation
+        function reinitialiserImport() {
+            donneesImportees = null;
+            document.getElementById('import-preview').style.display = 'none';
+            document.getElementById('import-options').style.display = 'none';
+            document.getElementById('file-input').value = '';
+            
+            showAlert('Importation réinitialisée', 'info');
+        }
+        
+        // Annuler l'importation
+        function annulerImport() {
+            reinitialiserImport();
+        }
+        
+        // Confirmer l'importation
+        function confirmerImport() {
+            if (!donneesImportees) {
+                showAlert('Aucune donnée à importer', 'error');
+                return;
+            }
+            
+            const importEtablissement = document.getElementById('import-etablissement').checked;
+            const importResultats = document.getElementById('import-resultats').checked;
+            const importTrimestre = document.getElementById('import-trimestre').checked;
+            const importPersonnel = document.getElementById('import-personnel').checked;
+            const importHistorique = document.getElementById('import-historique').checked;
+            const importMode = document.getElementById('import-mode').value;
+            
+            try {
+                // Importer les informations de l'établissement
+                if (importEtablissement) {
+                    if (donneesImportees.etablissement) {
+                        document.getElementById('nom_etablissement').value = donneesImportees.etablissement;
+                    }
+                    
+                    if (donneesImportees.anneeScolaire) {
+                        document.getElementById('annee_scolaire').value = donneesImportees.anneeScolaire;
+                    }
+                    
+                    if (donneesImportees.trimestre) {
+                        document.getElementById('trimestre').value = donneesImportees.trimestre;
+                    }
+                    
+                    if (donneesImportees.directeur) {
+                        document.getElementById('directeur').value = donneesImportees.directeur;
+                    }
+                }
+                
+                // Importer les résultats
+                if (importResultats && donneesImportees.resultats) {
+                    if (importMode === 'remplacer') {
+                        viderTableaux();
+                    }
+                    chargerDonneesTableau('table-effectifs', donneesImportees.resultats);
+                }
+                
+                // Importer les résultats du trimestre
+                if (importTrimestre && donneesImportees.trimestre) {
+                    if (importMode === 'remplacer') {
+                        // Vider le tableau du trimestre
+                        const rows = document.querySelectorAll('#table-trimestre tbody tr');
+                        rows.forEach((row, index) => {
+                            if (index < classes.length) {
+                                const inputs = row.querySelectorAll('input');
+                                inputs.forEach(input => {
+                                    if (!input.readOnly) {
+                                        input.value = '0';
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    chargerDonneesTableau('table-trimestre', donneesImportees.trimestre);
+                }
+                
+                // Importer le personnel
+                if (importPersonnel && donneesImportees.personnel) {
+                    if (importMode === 'remplacer') {
+                        viderPersonnel();
+                    }
+                    
+                    // Ajouter le personnel importé
+                    const tbody = document.querySelector('#table-personnel tbody');
+                    donneesImportees.personnel.forEach(personne => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${personne.matricule || ''}</td>
+                            <td>${personne.nom || ''}</td>
+                            <td>${personne.sexe || ''}</td>
+                            <td>${personne.naissance || ''}</td>
+                            <td>${personne.diplomeAcademique || ''}</td>
+                            <td>${personne.diplomeProfessionnel || ''}</td>
+                            <td>${personne.discipline || ''}</td>
+                            <td>${personne.statut || ''}</td>
+                            <td>${personne.grade || ''}</td>
+                            <td>${personne.categorie || ''}</td>
+                            <td>${personne.classeEchelon || ''}</td>
+                            <td>${personne.dateService || ''}</td>
+                            <td>${personne.dateEngagement || ''}</td>
+                            <td>${personne.dateRetraite || ''}</td>
+                            <td>${personne.fonction || ''}</td>
+                            <td>${personne.classesTenues || ''}</td>
+                            <td>${personne.ancienneteRegion || ''}</td>
+                            <td>${personne.anciennetePrefecture || ''}</td>
+                            <td>${personne.anciennetePoste || ''}</td>
+                            <td>${personne.banque || ''}</td>
+                            <td>${personne.regionsService || ''}</td>
+                            <td>${personne.contact || ''}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+                
+                // Ajouter à l'historique
+                if (importHistorique && importMode === 'ajouter') {
+                    const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+                    
+                    // Créer un nouvel enregistrement à partir des données importées
+                    const nouvelEnregistrement = {
+                        etablissement: donneesImportees.etablissement || 'Importé',
+                        anneeScolaire: donneesImportees.anneeScolaire || '',
+                        trimestre: donneesImportees.trimestre || '',
+                        directeur: donneesImportees.directeur || '',
+                        dateEnregistrement: new Date().toLocaleString(),
+                        effectifs: donneesImportees.resultats || [],
+                        trimestre: donneesImportees.trimestre || [],
+                        personnel: donneesImportees.personnel || []
+                    };
+                    
+                    historique.push(nouvelEnregistrement);
+                    localStorage.setItem('historiqueResultats', JSON.stringify(historique));
+                    
+                    // Mettre à jour l'historique
+                    mettreAJourHistorique();
+                }
+                
+                // Enregistrer dans l'historique des importations
+                enregistrerHistoriqueImport(donneesImportees);
+                
+                // Calculer les totaux
+                calculerTotaux();
+                
+                // Réinitialiser l'importation
+                reinitialiserImport();
+                
+                // Basculer vers l'onglet de saisie
+                switchTab('saisie');
+                
+                showAlert('Données importées avec succès!', 'success');
+                
+            } catch (error) {
+                showAlert(`Erreur lors de l'importation: ${error.message}`, 'error');
+                console.error('Erreur d\'importation:', error);
+            }
+        }
+        
+        // Enregistrer dans l'historique des importations
+        function enregistrerHistoriqueImport(donnees) {
+            const historiqueImport = JSON.parse(localStorage.getItem('historiqueImport') || '[]');
+            
+            const importation = {
+                date: new Date().toLocaleString(),
+                etablissement: donnees.etablissement || 'Importé',
+                anneeScolaire: donnees.anneeScolaire || '',
+                trimestre: donnees.trimestre || '',
+                nbResultats: donnees.resultats ? donnees.resultats.length : 0,
+                nbPersonnel: donnees.personnel ? donnees.personnel.length : 0
+            };
+            
+            historiqueImport.push(importation);
+            localStorage.setItem('historiqueImport', JSON.stringify(historiqueImport));
+            
+            // Mettre à jour l'affichage
+            actualiserHistoriqueImport();
+        }
+        
+        // Actualiser l'historique des importations
+        function actualiserHistoriqueImport() {
+            const historiqueImport = JSON.parse(localStorage.getItem('historiqueImport') || '[]');
+            const historiqueDiv = document.getElementById('historique-import');
+            
+            if (historiqueImport.length === 0) {
+                historiqueDiv.innerHTML = '<p>Aucune importation effectuée.</p>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%;"><thead><tr><th>Date</th><th>Établissement</th><th>Année scolaire</th><th>Trimestre</th><th>Résultats</th><th>Personnel</th></tr></thead><tbody>';
+            
+            historiqueImport.slice().reverse().forEach((importation, index) => {
+                html += `
+                    <tr>
+                        <td>${importation.date}</td>
+                        <td>${importation.etablissement}</td>
+                        <td>${importation.anneeScolaire}</td>
+                        <td>${importation.trimestre}</td>
+                        <td>${importation.nbResultats}</td>
+                        <td>${importation.nbPersonnel}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            historiqueDiv.innerHTML = html;
+        }
+        
+        // Vider l'historique des importations
+        function viderHistoriqueImport() {
+            if (confirm('Voulez-vous vraiment vider l\'historique des importations ?')) {
+                localStorage.removeItem('historiqueImport');
+                actualiserHistoriqueImport();
+                showAlert('Historique des importations vidé avec succès!', 'success');
+            }
+        }
+        
+        // Ajouter des événements pour le calcul automatique
+        function ajouterEvenementsCalcul(row) {
+            // Calcul automatique des totaux inscrits
+            const inputsInscritsG = row.querySelector('.inscrits-g');
+            const inputsInscritsF = row.querySelector('.inscrits-f');
+            const inputsInscritsT = row.querySelector('.inscrits-t');
+            
+            if (inputsInscritsG && inputsInscritsF && inputsInscritsT) {
+                inputsInscritsG.addEventListener('input', function() {
+                    const g = parseFloat(this.value) || 0;
+                    const f = parseFloat(inputsInscritsF.value) || 0;
+                    inputsInscritsT.value = g + f;
+                    calculerTotaux();
+                });
+                
+                inputsInscritsF.addEventListener('input', function() {
+                    const g = parseFloat(inputsInscritsG.value) || 0;
+                    const f = parseFloat(this.value) || 0;
+                    inputsInscritsT.value = g + f;
+                    calculerTotaux();
+                });
+            }
+            
+            // Calcul automatique des totaux composants
+            const inputsComposantsG = row.querySelector('.composants-g');
+            const inputsComposantsF = row.querySelector('.composants-f');
+            const inputsComposantsT = row.querySelector('.composants-t');
+            
+            if (inputsComposantsG && inputsComposantsF && inputsComposantsT) {
+                inputsComposantsG.addEventListener('input', function() {
+                    const g = parseFloat(this.value) || 0;
+                    const f = parseFloat(inputsComposantsF.value) || 0;
+                    inputsComposantsT.value = g + f;
+                    calculerTotaux();
+                });
+                
+                inputsComposantsF.addEventListener('input', function() {
+                    const g = parseFloat(inputsComposantsG.value) || 0;
+                    const f = parseFloat(this.value) || 0;
+                    inputsComposantsT.value = g + f;
+                    calculerTotaux();
+                });
+            }
+            
+            // Calcul automatique des totaux moyenne
+            const inputsMoyenneG = row.querySelector('.moyenne-g');
+            const inputsMoyenneF = row.querySelector('.moyenne-f');
+            const inputsMoyenneT = row.querySelector('.moyenne-t');
+            
+            if (inputsMoyenneG && inputsMoyenneF && inputsMoyenneT) {
+                inputsMoyenneG.addEventListener('input', function() {
+                    const g = parseFloat(this.value) || 0;
+                    const f = parseFloat(inputsMoyenneF.value) || 0;
+                    inputsMoyenneT.value = g + f;
+                    calculerTotaux();
+                });
+                
+                inputsMoyenneF.addEventListener('input', function() {
+                    const g = parseFloat(inputsMoyenneG.value) || 0;
+                    const f = parseFloat(this.value) || 0;
+                    inputsMoyenneT.value = g + f;
+                    calculerTotaux();
+                });
+            }
+        }
+        
+        // Calculer les totaux pour toutes les classes
+        function calculerTotaux() {
+            const tables = ['table-effectifs', 'table-trimestre'];
+            
+            tables.forEach(tableId => {
+                const table = document.getElementById(tableId);
+                const rows = table.querySelectorAll('tbody tr');
+                
+                let totalSect = 0;
+                let totalInscritsG = 0, totalInscritsF = 0, totalInscritsT = 0;
+                let totalComposantsG = 0, totalComposantsF = 0, totalComposantsT = 0;
+                let totalMoyenneG = 0, totalMoyenneF = 0, totalMoyenneT = 0;
+                let totalPourcTotal = 0;
+                let totalPlusForte = 0, totalPlusFaible = 0;
+                const totalDisciplines = {};
+                disciplines.forEach(d => totalDisciplines[d] = 0);
+                
+                rows.forEach((row, index) => {
+                    if (index < classes.length) { // Ignorer la ligne TOTAL
+                        // Secteur
+                        const sect = parseFloat(row.querySelector('.sect').value) || 0;
+                        totalSect += sect;
+                        
+                        // Inscrits
+                        const inscritsG = parseFloat(row.querySelector('.inscrits-g').value) || 0;
+                        const inscritsF = parseFloat(row.querySelector('.inscrits-f').value) || 0;
+                        const inscritsT = parseFloat(row.querySelector('.inscrits-t').value) || 0;
+                        
+                        totalInscritsG += inscritsG;
+                        totalInscritsF += inscritsF;
+                        totalInscritsT += inscritsT;
+                        
+                        // Composants
+                        const composantsG = parseFloat(row.querySelector('.composants-g').value) || 0;
+                        const composantsF = parseFloat(row.querySelector('.composants-f').value) || 0;
+                        const composantsT = parseFloat(row.querySelector('.composants-t').value) || 0;
+                        
+                        totalComposantsG += composantsG;
+                        totalComposantsF += composantsF;
+                        totalComposantsT += composantsT;
+                        
+                        // Moyenne
+                        const moyenneG = parseFloat(row.querySelector('.moyenne-g').value) || 0;
+                        const moyenneF = parseFloat(row.querySelector('.moyenne-f').value) || 0;
+                        const moyenneT = parseFloat(row.querySelector('.moyenne-t').value) || 0;
+                        
+                        totalMoyenneG += moyenneG;
+                        totalMoyenneF += moyenneF;
+                        totalMoyenneT += moyenneT;
+                        
+                        // Pourcentage total
+                        const pourcTotal = parseFloat(row.querySelector('.pourc-total').value) || 0;
+                        totalPourcTotal += pourcTotal;
+                        
+                        // Plus forte et plus faible moyenne
+                        const plusForte = parseFloat(row.querySelector('.plus-forte').value) || 0;
+                        const plusFaible = parseFloat(row.querySelector('.plus-faible').value) || 0;
+                        
+                        totalPlusForte += plusForte;
+                        totalPlusFaible += plusFaible;
+                        
+                        // Disciplines
+                        disciplines.forEach(d => {
+                            const discValue = parseFloat(row.querySelector(`.disc-${d.toLowerCase()}`).value) || 0;
+                            totalDisciplines[d] += discValue;
+                        });
+                    }
+                });
+                
+                // Mettre à jour la ligne TOTAL
+                const totalRow = rows[rows.length - 1];
+                
+                totalRow.querySelector('#total-sect').value = totalSect;
+                totalRow.querySelector('#total-inscrits-g').value = totalInscritsG;
+                totalRow.querySelector('#total-inscrits-f').value = totalInscritsF;
+                totalRow.querySelector('#total-inscrits-t').value = totalInscritsT;
+                totalRow.querySelector('#total-composants-g').value = totalComposantsG;
+                totalRow.querySelector('#total-composants-f').value = totalComposantsF;
+                totalRow.querySelector('#total-composants-t').value = totalComposantsT;
+                totalRow.querySelector('#total-moyenne-g').value = totalMoyenneG;
+                totalRow.querySelector('#total-moyenne-f').value = totalMoyenneF;
+                totalRow.querySelector('#total-moyenne-t').value = totalMoyenneT;
+                totalRow.querySelector('#total-pourc-total').value = (totalMoyenneT / totalComposantsT * 100 || 0).toFixed(2);
+                totalRow.querySelector('#total-plus-forte').value = (totalPlusForte / classes.length || 0).toFixed(2);
+                totalRow.querySelector('#total-plus-faible').value = (totalPlusFaible / classes.length || 0).toFixed(2);
+                
+                disciplines.forEach(d => {
+                    totalRow.querySelector(`#total-disc-${d.toLowerCase()}`).value = totalDisciplines[d];
+                });
+            });
+        }
+        
+        // Remplir avec des exemples
+        function remplirExemple() {
+            const rows = document.querySelectorAll('#table-effectifs tbody tr');
+            
+            rows.forEach((row, index) => {
+                if (index < classes.length) {
+                    const classe = classes[index];
+                    const donnees = donneesExemple[classe];
+                    
+                    if (donnees) {
+                        row.querySelector('.sect').value = 1;
+                        row.querySelector('.inscrits-g').value = donnees.inscrits.G;
+                        row.querySelector('.inscrits-f').value = donnees.inscrits.F;
+                        row.querySelector('.inscrits-t').value = donnees.inscrits.T;
+                        row.querySelector('.composants-g').value = donnees.composants.G;
+                        row.querySelector('.composants-f').value = donnees.composants.F;
+                        row.querySelector('.composants-t').value = donnees.composants.T;
+                        row.querySelector('.moyenne-g').value = donnees.moyenne.G;
+                        row.querySelector('.moyenne-f').value = donnees.moyenne.F;
+                        row.querySelector('.moyenne-t').value = donnees.moyenne.T;
+                        row.querySelector('.pourc-total').value = donnees.pourcTotal;
+                        row.querySelector('.plus-forte').value = donnees.plusForteMoyenne;
+                        row.querySelector('.plus-faible').value = donnees.plusFaibleMoyenne;
+                        
+                        disciplines.forEach(d => {
+                            row.querySelector(`.disc-${d.toLowerCase()}`).value = donnees.disciplines[d];
+                        });
+                    }
+                }
+            });
+            
+            // Copier les mêmes données dans le tableau du trimestre
+            const rowsTrimestre = document.querySelectorAll('#table-trimestre tbody tr');
+            rowsTrimestre.forEach((row, index) => {
+                if (index < classes.length) {
+                    const rowEffectifs = rows[index];
+                    
+                    // Copier toutes les valeurs
+                    const inputsEffectifs = rowEffectifs.querySelectorAll('input');
+                    const inputsTrimestre = row.querySelectorAll('input');
+                    
+                    inputsEffectifs.forEach((input, i) => {
+                        if (inputsTrimestre[i] && !inputsTrimestre[i].id.includes('total')) {
+                            inputsTrimestre[i].value = input.value;
+                        }
+                    });
+                }
+            });
+            
+            calculerTotaux();
+            calculerPourcentages();
+            
+            showAlert('Données d\'exemple chargées avec succès!', 'success');
+        }
+        
+        // Vider tous les tableaux
+        function viderTableaux() {
+            if (confirm('Êtes-vous sûr de vouloir vider tous les tableaux ? Cette action ne supprime pas les données enregistrées.')) {
+                const tables = ['table-effectifs', 'table-trimestre'];
+                
+                tables.forEach(tableId => {
+                    const table = document.getElementById(tableId);
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    rows.forEach((row, index) => {
+                        if (index < classes.length) { // Ignorer la ligne TOTAL
+                            const inputs = row.querySelectorAll('input');
+                            inputs.forEach(input => {
+                                if (!input.readOnly) {
+                                    input.value = '0';
+                                }
+                            });
+                        }
+                    });
+                });
+                
+                calculerTotaux();
+                document.getElementById('pourcentages-result').style.display = 'none';
+                
+                showAlert('Tous les tableaux ont été vidés avec succès!', 'success');
+            }
+        }
+        
+        // Calculer les pourcentages
+        function calculerPourcentages() {
+            const tablePourcentages = document.getElementById('table-pourcentages');
+            const tbodyEffectifs = document.querySelector('#table-effectifs tbody');
+            const rows = tbodyEffectifs.querySelectorAll('tr');
+            
+            // Vider le tableau des pourcentages
+            tablePourcentages.innerHTML = '';
+            
+            // En-tête du tableau
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th rowspan="2">Classes</th>
+                    <th rowspan="2">Sect.</th>
+                    <th colspan="3">INSCRITS</th>
+                    <th colspan="3">COMPOSANTS</th>
+                    <th colspan="3">ONT LA MOYENNE</th>
+                    <th rowspan="2">POURC. TOTAL</th>
+                    <th rowspan="2">PLUS FORTE MOYENNE</th>
+                    <th rowspan="2">PLUS FAIBLE MOYENNE</th>
+                    <th colspan="7">POURCENTAGE D'ELEVES AYANT LA MOYENNE PAR DISCIPLINE</th>
+                </tr>
+                <tr>
+                    <th>G</th><th>F</th><th>T</th>
+                    <th>G</th><th>F</th><th>T</th>
+                    <th>G</th><th>F</th><th>T</th>
+                    <th>FR</th><th>ANG</th><th>HG</th><th>ECM</th><th>MATHS</th><th>SP</th><th>SVT</th>
+                </tr>
+            `;
+            tablePourcentages.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            
+            rows.forEach((row, index) => {
+                if (index < classes.length) {
+                    const tr = document.createElement('tr');
+                    
+                    // Classe
+                    const classeCell = document.createElement('td');
+                    classeCell.textContent = classes[index];
+                    tr.appendChild(classeCell);
+                    
+                    // Secteur
+                    const sectCell = document.createElement('td');
+                    sectCell.textContent = row.querySelector('.sect').value;
+                    tr.appendChild(sectCell);
+                    
+                    // Pour les inscrits, composants et moyenne - laisser vides selon l'exemple
+                    for (let i = 0; i < 9; i++) {
+                        const td = document.createElement('td');
+                        td.textContent = '';
+                        tr.appendChild(td);
+                    }
+                    
+                    // Pourcentage total
+                    const pourcTotal = parseFloat(row.querySelector('.pourc-total').value) || 0;
+                    const pourcTotalCell = document.createElement('td');
+                    pourcTotalCell.textContent = pourcTotal.toFixed(2);
+                    tr.appendChild(pourcTotalCell);
+                    
+                    // Plus forte et plus faible moyenne
+                    const plusForte = parseFloat(row.querySelector('.plus-forte').value) || 0;
+                    const plusFaible = parseFloat(row.querySelector('.plus-faible').value) || 0;
+                    
+                    const plusForteCell = document.createElement('td');
+                    plusForteCell.textContent = plusForte.toFixed(2);
+                    tr.appendChild(plusForteCell);
+                    
+                    const plusFaibleCell = document.createElement('td');
+                    plusFaibleCell.textContent = plusFaible.toFixed(2);
+                    tr.appendChild(plusFaibleCell);
+                    
+                    // Pourcentages par discipline
+                    const composantsT = parseFloat(row.querySelector('.composants-t').value) || 1; // Éviter la division par zéro
+                    
+                    disciplines.forEach(d => {
+                        const discValue = parseFloat(row.querySelector(`.disc-${d.toLowerCase()}`).value) || 0;
+                        const pourcentage = (discValue / composantsT * 100).toFixed(2);
+                        
+                        const discCell = document.createElement('td');
+                        discCell.textContent = pourcentage;
+                        tr.appendChild(discCell);
+                    });
+                    
+                    tbody.appendChild(tr);
+                }
+            });
+            
+            tablePourcentages.appendChild(tbody);
+            document.getElementById('pourcentages-result').style.display = 'block';
+            
+            showAlert('Pourcentages calculés avec succès!', 'success');
+        }
+        
+        // Initialiser le tableau du personnel
+        function initialiserPersonnel() {
+            const tbody = document.querySelector('#table-personnel tbody');
+            tbody.innerHTML = '';
+            
+            personnelExemple.forEach(personne => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${personne.matricule}</td>
+                    <td>${personne.nom}</td>
+                    <td>${personne.sexe}</td>
+                    <td>${personne.naissance}</td>
+                    <td>${personne.diplomeAcademique}</td>
+                    <td>${personne.diplomeProfessionnel}</td>
+                    <td>${personne.discipline}</td>
+                    <td>${personne.statut}</td>
+                    <td>${personne.grade}</td>
+                    <td>${personne.categorie}</td>
+                    <td>${personne.classeEchelon}</td>
+                    <td>${personne.dateService}</td>
+                    <td>${personne.dateEngagement}</td>
+                    <td>${personne.dateRetraite}</td>
+                    <td>${personne.fonction}</td>
+                    <td>${personne.classesTenues}</td>
+                    <td>${personne.ancienneteRegion}</td>
+                    <td>${personne.anciennetePrefecture}</td>
+                    <td>${personne.anciennetePoste}</td>
+                    <td>${personne.banque}</td>
+                    <td>${personne.regionsService}</td>
+                    <td>${personne.contact}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Vider la liste du personnel
+        function viderPersonnel() {
+            if (confirm('Êtes-vous sûr de vouloir vider la liste du personnel ?')) {
+                const tbody = document.querySelector('#table-personnel tbody');
+                tbody.innerHTML = '';
+                
+                showAlert('Liste du personnel vidée avec succès!', 'success');
+            }
+        }
+        
+        // Ajouter un nouvel enseignant
+        function ajouterEnseignant() {
+            const tbody = document.querySelector('#table-personnel tbody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" placeholder="Matricule" style="width: 100px;"></td>
+                <td><input type="text" placeholder="Nom et prénoms" style="width: 150px;"></td>
+                <td><select style="width: 70px;"><option value="M">M</option><option value="F">F</option></select></td>
+                <td><input type="text" placeholder="JJ/MM/AAAA" style="width: 100px;"></td>
+                <td><input type="text" placeholder="Diplôme/Année" style="width: 120px;"></td>
+                <td><input type="text" placeholder="Diplôme/Année" style="width: 120px;"></td>
+                <td><input type="text" placeholder="Discipline" style="width: 100px;"></td>
+                <td><select style="width: 120px;"><option value="Fonctionnaire">Fonctionnaire</option><option value="Auxiliaire">Auxiliaire</option><option value="VNE">VNE</option><option value="Volontaire APE">Volontaire APE</option><option value="Privé">Privé</option></select></td>
+                <td><input type="text" placeholder="Grade" style="width: 80px;"></td>
+                <td><input type="text" placeholder="Catégorie" style="width: 80px;"></td>
+                <td><input type="text" placeholder="Classe/échelon" style="width: 100px;"></td>
+                <td><input type="text" placeholder="JJ/MM/AAAA" style="width: 100px;"></td>
+                <td><input type="text" placeholder="JJ/MM/AAAA" style="width: 100px;"></td>
+                <td><input type="text" placeholder="JJ/MM/AAAA" style="width: 100px;"></td>
+                <td><input type="text" placeholder="Fonction" style="width: 80px;"></td>
+                <td><input type="text" placeholder="Classes/Volume" style="width: 120px;"></td>
+                <td><input type="number" placeholder="Années" style="width: 60px;"></td>
+                <td><input type="number" placeholder="Années" style="width: 60px;"></td>
+                <td><input type="number" placeholder="Années" style="width: 60px;"></td>
+                <td><input type="text" placeholder="Banque" style="width: 80px;"></td>
+                <td><input type="text" placeholder="Régions" style="width: 80px;"></td>
+                <td><input type="text" placeholder="Contact" style="width: 100px;"></td>
+            `;
+            tbody.appendChild(tr);
+            
+            showAlert('Nouvelle ligne ajoutée pour un enseignant. Remplissez les informations.', 'success');
+        }
+        
+        // Enregistrer les données
+        function enregistrerDonnees() {
+            const nomEtablissement = document.getElementById('nom_etablissement').value;
+            const anneeScolaire = document.getElementById('annee_scolaire').value;
+            const trimestre = document.getElementById('trimestre').value;
+            const directeur = document.getElementById('directeur').value;
+            
+            // Vérifier que les champs obligatoires sont remplis
+            if (!nomEtablissement || !anneeScolaire || !trimestre) {
+                showAlert('Veuillez remplir tous les champs obligatoires (Nom de l\'établissement, Année scolaire, Trimestre)', 'error');
+                return;
+            }
+            
+            // Collecter les données des tableaux
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            const donneesTrimestre = collecterDonneesTableau('table-trimestre');
+            const donneesPersonnel = collecterDonneesPersonnel();
+            
+            // Préparer l'objet de données
+            const donnees = {
+                etablissement: nomEtablissement,
+                anneeScolaire: anneeScolaire,
+                trimestre: trimestre,
+                directeur: directeur,
+                dateEnregistrement: new Date().toLocaleString(),
+                effectifs: donneesEffectifs,
+                trimestre: donneesTrimestre,
+                personnel: donneesPersonnel
+            };
+            
+            // Sauvegarder dans le localStorage
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            historique.push(donnees);
+            localStorage.setItem('historiqueResultats', JSON.stringify(historique));
+            
+            // Sauvegarder les données actuelles
+            localStorage.setItem('donneesActuelles', JSON.stringify(donnees));
+            
+            showAlert(`Données enregistrées avec succès pour ${nomEtablissement} (${anneeScolaire}, trimestre ${trimestre})`, 'success');
+            
+            // Mettre à jour l'historique
+            mettreAJourHistorique();
+            
+            // Mettre à jour les statistiques
+            actualiserStatistiques();
+            
+            // Mettre à jour la liste des établissements pour la comparaison
+            chargerEtablissementsComparaison();
+        }
+        
+        // Collecter les données d'un tableau
+        function collecterDonneesTableau(tableId) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            const donnees = [];
+            
+            rows.forEach((row, index) => {
+                if (index < classes.length) {
+                    const donneeClasse = {
+                        classe: classes[index],
+                        secteur: parseFloat(row.querySelector('.sect').value) || 0,
+                        inscrits: {
+                            G: parseFloat(row.querySelector('.inscrits-g').value) || 0,
+                            F: parseFloat(row.querySelector('.inscrits-f').value) || 0,
+                            T: parseFloat(row.querySelector('.inscrits-t').value) || 0
+                        },
+                        composants: {
+                            G: parseFloat(row.querySelector('.composants-g').value) || 0,
+                            F: parseFloat(row.querySelector('.composants-f').value) || 0,
+                            T: parseFloat(row.querySelector('.composants-t').value) || 0
+                        },
+                        moyenne: {
+                            G: parseFloat(row.querySelector('.moyenne-g').value) || 0,
+                            F: parseFloat(row.querySelector('.moyenne-f').value) || 0,
+                            T: parseFloat(row.querySelector('.moyenne-t').value) || 0
+                        },
+                        pourcTotal: parseFloat(row.querySelector('.pourc-total').value) || 0,
+                        plusForteMoyenne: parseFloat(row.querySelector('.plus-forte').value) || 0,
+                        plusFaibleMoyenne: parseFloat(row.querySelector('.plus-faible').value) || 0,
+                        disciplines: {}
+                    };
+                    
+                    disciplines.forEach(d => {
+                        donneeClasse.disciplines[d] = parseFloat(row.querySelector(`.disc-${d.toLowerCase()}`).value) || 0;
+                    });
+                    
+                    donnees.push(donneeClasse);
+                }
+            });
+            
+            return donnees;
+        }
+        
+        // Collecter les données du personnel
+        function collecterDonneesPersonnel() {
+            const tbody = document.querySelector('#table-personnel tbody');
+            const rows = tbody.querySelectorAll('tr');
+            const donnees = [];
+            
+            rows.forEach(row => {
+                // Vérifier si c'est une ligne d'édition (avec des inputs) ou une ligne affichée
+                const inputs = row.querySelectorAll('input, select');
+                
+                if (inputs.length > 0) {
+                    // Ligne d'édition
+                    const personne = {
+                        matricule: inputs[0].value,
+                        nom: inputs[1].value,
+                        sexe: inputs[2].value,
+                        naissance: inputs[3].value,
+                        diplomeAcademique: inputs[4].value,
+                        diplomeProfessionnel: inputs[5].value,
+                        discipline: inputs[6].value,
+                        statut: inputs[7].value,
+                        grade: inputs[8].value,
+                        categorie: inputs[9].value,
+                        classeEchelon: inputs[10].value,
+                        dateService: inputs[11].value,
+                        dateEngagement: inputs[12].value,
+                        dateRetraite: inputs[13].value,
+                        fonction: inputs[14].value,
+                        classesTenues: inputs[15].value,
+                        ancienneteRegion: parseFloat(inputs[16].value) || 0,
+                        anciennetePrefecture: parseFloat(inputs[17].value) || 0,
+                        anciennetePoste: parseFloat(inputs[18].value) || 0,
+                        banque: inputs[19].value,
+                        regionsService: inputs[20].value,
+                        contact: inputs[21].value
+                    };
+                    donnees.push(personne);
+                } else {
+                    // Ligne affichée (données statiques)
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 22) {
+                        const personne = {
+                            matricule: cells[0].textContent,
+                            nom: cells[1].textContent,
+                            sexe: cells[2].textContent,
+                            naissance: cells[3].textContent,
+                            diplomeAcademique: cells[4].textContent,
+                            diplomeProfessionnel: cells[5].textContent,
+                            discipline: cells[6].textContent,
+                            statut: cells[7].textContent,
+                            grade: cells[8].textContent,
+                            categorie: cells[9].textContent,
+                            classeEchelon: cells[10].textContent,
+                            dateService: cells[11].textContent,
+                            dateEngagement: cells[12].textContent,
+                            dateRetraite: cells[13].textContent,
+                            fonction: cells[14].textContent,
+                            classesTenues: cells[15].textContent,
+                            ancienneteRegion: parseFloat(cells[16].textContent) || 0,
+                            anciennetePrefecture: parseFloat(cells[17].textContent) || 0,
+                            anciennetePoste: parseFloat(cells[18].textContent) || 0,
+                            banque: cells[19].textContent,
+                            regionsService: cells[20].textContent,
+                            contact: cells[21].textContent
+                        };
+                        donnees.push(personne);
+                    }
+                }
+            });
+            
+            return donnees;
+        }
+        
+        // Charger les données sauvegardées
+        function chargerDonnees() {
+            const donnees = JSON.parse(localStorage.getItem('donneesActuelles'));
+            
+            if (donnees) {
+                document.getElementById('nom_etablissement').value = donnees.etablissement || '';
+                document.getElementById('annee_scolaire').value = donnees.anneeScolaire || '';
+                document.getElementById('trimestre').value = donnees.trimestre || '';
+                document.getElementById('directeur').value = donnees.directeur || '';
+                
+                // Charger les données des tableaux si disponibles
+                if (donnees.effectifs) {
+                    chargerDonneesTableau('table-effectifs', donnees.effectifs);
+                }
+                
+                if (donnees.trimestre) {
+                    chargerDonneesTableau('table-trimestre', donnees.trimestre);
+                }
+                
+                showAlert('Données précédentes chargées avec succès!', 'success');
+            }
+            
+            // Mettre à jour l'historique
+            mettreAJourHistorique();
+        }
+        
+        // Charger les données dans un tableau
+        function chargerDonneesTableau(tableId, donnees) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            
+            donnees.forEach((donnee, index) => {
+                if (index < rows.length && index < classes.length) {
+                    const row = rows[index];
+                    
+                    row.querySelector('.sect').value = donnee.secteur || 1;
+                    row.querySelector('.inscrits-g').value = donnee.inscrits.G || 0;
+                    row.querySelector('.inscrits-f').value = donnee.inscrits.F || 0;
+                    row.querySelector('.inscrits-t').value = donnee.inscrits.T || 0;
+                    row.querySelector('.composants-g').value = donnee.composants.G || 0;
+                    row.querySelector('.composants-f').value = donnee.composants.F || 0;
+                    row.querySelector('.composants-t').value = donnee.composants.T || 0;
+                    row.querySelector('.moyenne-g').value = donnee.moyenne.G || 0;
+                    row.querySelector('.moyenne-f').value = donnee.moyenne.F || 0;
+                    row.querySelector('.moyenne-t').value = donnee.moyenne.T || 0;
+                    row.querySelector('.pourc-total').value = donnee.pourcTotal || 0;
+                    row.querySelector('.plus-forte').value = donnee.plusForteMoyenne || 0;
+                    row.querySelector('.plus-faible').value = donnee.plusFaibleMoyenne || 0;
+                    
+                    disciplines.forEach(d => {
+                        row.querySelector(`.disc-${d.toLowerCase()}`).value = donnee.disciplines[d] || 0;
+                    });
+                }
+            });
+            
+            calculerTotaux();
+        }
+        
+        // Mettre à jour l'historique
+        function mettreAJourHistorique() {
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            const historiqueDiv = document.getElementById('historique');
+            
+            if (historique.length === 0) {
+                historiqueDiv.innerHTML = '<p>Aucun enregistrement trouvé.</p>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%;"><thead><tr><th>Date</th><th>Établissement</th><th>Année scolaire</th><th>Trimestre</th><th>Actions</th></tr></thead><tbody>';
+            
+            historique.slice().reverse().forEach((item, index) => {
+                html += `
+                    <tr>
+                        <td>${item.dateEnregistrement}</td>
+                        <td>${item.etablissement}</td>
+                        <td>${item.anneeScolaire}</td>
+                        <td>${item.trimestre}</td>
+                        <td>
+                            <button onclick="chargerEnregistrement(${historique.length - 1 - index})" class="btn" style="padding: 5px 10px;">Charger</button>
+                            <button onclick="supprimerEnregistrement(${historique.length - 1 - index})" class="btn btn-danger" style="padding: 5px 10px;">Supprimer</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            historiqueDiv.innerHTML = html;
+        }
+        
+        // Charger un enregistrement spécifique
+        function chargerEnregistrement(index) {
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            
+            if (index >= 0 && index < historique.length) {
+                const donnees = historique[index];
+                
+                document.getElementById('nom_etablissement').value = donnees.etablissement || '';
+                document.getElementById('annee_scolaire').value = donnees.anneeScolaire || '';
+                document.getElementById('trimestre').value = donnees.trimestre || '';
+                document.getElementById('directeur').value = donnees.directeur || '';
+                
+                if (donnees.effectifs) {
+                    chargerDonneesTableau('table-effectifs', donnees.effectifs);
+                }
+                
+                if (donnees.trimestre) {
+                    chargerDonneesTableau('table-trimestre', donnees.trimestre);
+                }
+                
+                // Basculer vers l'onglet de saisie
+                switchTab('saisie');
+                
+                showAlert(`Enregistrement du ${donnees.dateEnregistrement} chargé avec succès!`, 'success');
+            }
+        }
+        
+        // Supprimer un enregistrement
+        function supprimerEnregistrement(index) {
+            if (confirm('Voulez-vous vraiment supprimer cet enregistrement?')) {
+                const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+                
+                if (index >= 0 && index < historique.length) {
+                    historique.splice(index, 1);
+                    localStorage.setItem('historiqueResultats', JSON.stringify(historique));
+                    mettreAJourHistorique();
+                    actualiserStatistiques();
+                    showAlert('Enregistrement supprimé avec succès!', 'success');
+                }
+            }
+        }
+        
+        // Générer l'analyse des données
+        function genererAnalyse() {
+            // Basculer vers l'onglet d'analyse
+            switchTab('resultats');
+            
+            // Générer une analyse par défaut
+            analyserReussite();
+        }
+        
+        // Vider les analyses
+        function viderAnalyses() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les analyses affichées ?')) {
+                document.getElementById('resultat-analyse').innerHTML = '';
+                document.getElementById('resultat-analyse').style.display = 'none';
+                
+                // Détruire le graphique s'il existe
+                if (chart) {
+                    chart.destroy();
+                    chart = null;
+                }
+                
+                document.getElementById('graphiques').innerHTML = '<p>Les graphiques s\'afficheront ici après analyse.</p>';
+                
+                showAlert('Analyses effacées avec succès!', 'success');
+            }
+        }
+        
+        // Analyser les taux de réussite
+        function analyserReussite() {
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            const donneesTrimestre = collecterDonneesTableau('table-trimestre');
+            
+            let html = '<h4>Analyse des taux de réussite</h4>';
+            
+            // Calculer les totaux
+            let totalComposants = 0;
+            let totalMoyenne = 0;
+            let totalComposantsTrimestre = 0;
+            let totalMoyenneTrimestre = 0;
+            
+            donneesEffectifs.forEach(donnee => {
+                totalComposants += donnee.composants.T;
+                totalMoyenne += donnee.moyenne.T;
+            });
+            
+            donneesTrimestre.forEach(donnee => {
+                totalComposantsTrimestre += donnee.composants.T;
+                totalMoyenneTrimestre += donnee.moyenne.T;
+            });
+            
+            const tauxReussiteComposition = totalComposants > 0 ? (totalMoyenne / totalComposants * 100).toFixed(2) : '0.00';
+            const tauxReussiteTrimestre = totalComposantsTrimestre > 0 ? (totalMoyenneTrimestre / totalComposantsTrimestre * 100).toFixed(2) : '0.00';
+            
+            html += `
+                <div class="result-item">
+                    <span class="result-label">Taux de réussite (composition):</span> ${tauxReussiteComposition}%
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Taux de réussite (trimestre):</span> ${tauxReussiteTrimestre}%
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Évolution:</span> ${(tauxReussiteTrimestre - tauxReussiteComposition).toFixed(2)}%
+                </div>
+            `;
+            
+            // Analyser par classe
+            html += '<h4 style="margin-top: 20px;">Taux de réussite par classe</h4>';
+            
+            donneesEffectifs.forEach(donnee => {
+                const tauxClasse = donnee.composants.T > 0 ? (donnee.moyenne.T / donnee.composants.T * 100).toFixed(2) : '0.00';
+                html += `
+                    <div class="result-item">
+                        <span class="result-label">${donnee.classe}:</span> ${tauxClasse}%
+                    </div>
+                `;
+            });
+            
+            // Trouver la classe avec le meilleur taux
+            let meilleureClasse = '';
+            let meilleurTaux = 0;
+            
+            donneesEffectifs.forEach(donnee => {
+                const taux = donnee.composants.T > 0 ? (donnee.moyenne.T / donnee.composants.T * 100) : 0;
+                if (taux > meilleurTaux) {
+                    meilleurTaux = taux;
+                    meilleureClasse = donnee.classe;
+                }
+            });
+            
+            html += `
+                <div class="result-item" style="margin-top: 10px; font-weight: bold;">
+                    <span class="result-label">Classe avec le meilleur taux:</span> ${meilleureClasse} (${meilleurTaux.toFixed(2)}%)
+                </div>
+            `;
+            
+            document.getElementById('resultat-analyse').innerHTML = html;
+            document.getElementById('resultat-analyse').style.display = 'block';
+            
+            // Générer un graphique
+            genererGraphiqueReussite(donneesEffectifs);
+        }
+        
+        // Comparer les classes
+        function comparerClasses() {
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            
+            let html = '<h4>Comparaison des classes</h4>';
+            
+            // Créer un tableau de comparaison
+            html += '<table style="width: 100%; margin-top: 10px;"><thead><tr><th>Classe</th><th>Inscrits</th><th>Composants</th><th>Ont la moyenne</th><th>Taux de réussite</th><th>Moyenne la plus forte</th><th>Moyenne la plus faible</th></tr></thead><tbody>';
+            
+            donneesEffectifs.forEach(donnee => {
+                const tauxReussite = donnee.composants.T > 0 ? (donnee.moyenne.T / donnee.composants.T * 100).toFixed(2) : '0.00';
+                html += `
+                    <tr>
+                        <td>${donnee.classe}</td>
+                        <td>${donnee.inscrits.T}</td>
+                        <td>${donnee.composants.T}</td>
+                        <td>${donnee.moyenne.T}</td>
+                        <td>${tauxReussite}%</td>
+                        <td>${donnee.plusForteMoyenne.toFixed(2)}</td>
+                        <td>${donnee.plusFaibleMoyenne.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            
+            document.getElementById('resultat-analyse').innerHTML = html;
+            document.getElementById('resultat-analyse').style.display = 'block';
+            
+            // Générer un graphique de comparaison
+            genererGraphiqueComparaison(donneesEffectifs);
+        }
+        
+        // Analyser les performances par discipline
+        function analyserDisciplines() {
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            
+            // Calculer les totaux par discipline
+            const totauxDisciplines = {};
+            let totalComposants = 0;
+            
+            disciplines.forEach(d => {
+                totauxDisciplines[d] = 0;
+            });
+            
+            donneesEffectifs.forEach(donnee => {
+                totalComposants += donnee.composants.T;
+                disciplines.forEach(d => {
+                    totauxDisciplines[d] += donnee.disciplines[d] || 0;
+                });
+            });
+            
+            // Calculer les pourcentages
+            const pourcentagesDisciplines = {};
+            disciplines.forEach(d => {
+                pourcentagesDisciplines[d] = totalComposants > 0 ? (totauxDisciplines[d] / totalComposants * 100).toFixed(2) : '0.00';
+            });
+            
+            // Trouver la discipline avec le meilleur taux
+            let meilleureDiscipline = '';
+            let meilleurPourcentage = 0;
+            
+            disciplines.forEach(d => {
+                const pourcentage = parseFloat(pourcentagesDisciplines[d]);
+                if (pourcentage > meilleurPourcentage) {
+                    meilleurPourcentage = pourcentage;
+                    meilleureDiscipline = d;
+                }
+            });
+            
+            // Trouver la discipline avec le taux le plus faible
+            let plusFaibleDiscipline = '';
+            let plusFaiblePourcentage = 100;
+            
+            disciplines.forEach(d => {
+                const pourcentage = parseFloat(pourcentagesDisciplines[d]);
+                if (pourcentage < plusFaiblePourcentage && pourcentage > 0) {
+                    plusFaiblePourcentage = pourcentage;
+                    plusFaibleDiscipline = d;
+                }
+            });
+            
+            let html = '<h4>Performances par discipline</h4>';
+            html += '<table style="width: 100%; margin-top: 10px;"><thead><tr><th>Discipline</th><th>Élèves ayant la moyenne</th><th>Pourcentage</th></tr></thead><tbody>';
+            
+            disciplines.forEach(d => {
+                html += `
+                    <tr>
+                        <td>${d}</td>
+                        <td>${totauxDisciplines[d]}</td>
+                        <td>${pourcentagesDisciplines[d]}%</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            
+            html += `
+                <div style="margin-top: 15px;">
+                    <div class="result-item">
+                        <span class="result-label">Discipline avec le meilleur taux:</span> ${meilleureDiscipline} (${meilleurPourcentage}%)
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Discipline avec le taux le plus faible:</span> ${plusFaibleDiscipline} (${plusFaiblePourcentage}%)
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultat-analyse').innerHTML = html;
+            document.getElementById('resultat-analyse').style.display = 'block';
+            
+            // Générer un graphique des disciplines
+            genererGraphiqueDisciplines(pourcentagesDisciplines);
+        }
+        
+        // Analyser par genre
+        function analyserParGenre() {
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            
+            // Calculer les totaux par genre
+            let totalGarcons = 0, totalFilles = 0;
+            let reussiteGarcons = 0, reussiteFilles = 0;
+            
+            donneesEffectifs.forEach(donnee => {
+                totalGarcons += donnee.composants.G;
+                totalFilles += donnee.composants.F;
+                reussiteGarcons += donnee.moyenne.G;
+                reussiteFilles += donnee.moyenne.F;
+            });
+            
+            const tauxReussiteGarcons = totalGarcons > 0 ? (reussiteGarcons / totalGarcons * 100).toFixed(2) : '0.00';
+            const tauxReussiteFilles = totalFilles > 0 ? (reussiteFilles / totalFilles * 100).toFixed(2) : '0.00';
+            
+            let html = '<h4>Analyse par genre</h4>';
+            html += `
+                <div class="result-item">
+                    <span class="result-label">Garçons inscrits:</span> ${totalGarcons}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Filles inscrites:</span> ${totalFilles}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Taux de réussite garçons:</span> ${tauxReussiteGarcons}%
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Taux de réussite filles:</span> ${tauxReussiteFilles}%
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Différence:</span> ${(tauxReussiteFilles - tauxReussiteGarcons).toFixed(2)}%
+                </div>
+            `;
+            
+            // Ajouter une analyse par classe
+            html += '<h4 style="margin-top: 20px;">Par classe</h4>';
+            
+            donneesEffectifs.forEach(donnee => {
+                const tauxGarcons = donnee.composants.G > 0 ? (donnee.moyenne.G / donnee.composants.G * 100).toFixed(2) : 'N/A';
+                const tauxFilles = donnee.composants.F > 0 ? (donnee.moyenne.F / donnee.composants.F * 100).toFixed(2) : 'N/A';
+                
+                html += `
+                    <div class="result-item">
+                        <span class="result-label">${donnee.classe} (G/F):</span> ${tauxGarcons}% / ${tauxFilles}%
+                    </div>
+                `;
+            });
+            
+            document.getElementById('resultat-analyse').innerHTML = html;
+            document.getElementById('resultat-analyse').style.display = 'block';
+            
+            // Générer un graphique par genre
+            genererGraphiqueGenre(totalGarcons, totalFilles, reussiteGarcons, reussiteFilles);
+        }
+        
+        // Générer un graphique de réussite
+        function genererGraphiqueReussite(donnees) {
+            const ctx = document.getElementById('chart-performance').getContext('2d');
+            
+            // Détruire le graphique précédent s'il existe
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const labels = donnees.map(d => d.classe);
+            const tauxReussite = donnees.map(d => d.composants.T > 0 ? (d.moyenne.T / d.composants.T * 100) : 0);
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Taux de réussite (%)',
+                        data: tauxReussite,
+                        backgroundColor: ['#0066cc', '#28a745', '#ffc107', '#dc3545'],
+                        borderColor: ['#0052a3', '#218838', '#e0a800', '#c82333'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Pourcentage (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Taux de réussite par classe'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Générer un graphique de comparaison
+        function genererGraphiqueComparaison(donnees) {
+            const ctx = document.getElementById('chart-performance').getContext('2d');
+            
+            // Détruire le graphique précédent s'il existe
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const labels = donnees.map(d => d.classe);
+            const inscrits = donnees.map(d => d.inscrits.T);
+            const composants = donnees.map(d => d.composants.T);
+            const moyenne = donnees.map(d => d.moyenne.T);
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Inscrits',
+                            data: inscrits,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Composants',
+                            data: composants,
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Ont la moyenne',
+                            data: moyenne,
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre d\'élèves'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparaison des effectifs par classe'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Générer un graphique des disciplines
+        function genererGraphiqueDisciplines(pourcentages) {
+            const ctx = document.getElementById('chart-performance').getContext('2d');
+            
+            // Détruire le graphique précédent s'il existe
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const labels = Object.keys(pourcentages);
+            const data = Object.values(pourcentages).map(v => parseFloat(v));
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pourcentage d\'élèves ayant la moyenne',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(153, 102, 255, 0.5)',
+                            'rgba(255, 159, 64, 0.5)',
+                            'rgba(201, 203, 207, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(201, 203, 207, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Pourcentage (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Performances par discipline'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Générer un graphique par genre
+        function genererGraphiqueGenre(totalGarcons, totalFilles, reussiteGarcons, reussiteFilles) {
+            const ctx = document.getElementById('chart-performance').getContext('2d');
+            
+            // Détruire le graphique précédent s'il existe
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const tauxReussiteGarcons = totalGarcons > 0 ? (reussiteGarcons / totalGarcons * 100) : 0;
+            const tauxReussiteFilles = totalFilles > 0 ? (reussiteFilles / totalFilles * 100) : 0;
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Garçons', 'Filles'],
+                    datasets: [{
+                        label: 'Taux de réussite (%)',
+                        data: [tauxReussiteGarcons, tauxReussiteFilles],
+                        backgroundColor: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 99, 132, 0.5)'],
+                        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Pourcentage (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Taux de réussite par genre'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Exporter la liste du personnel
+        function exporterPersonnel() {
+            const donneesPersonnel = collecterDonneesPersonnel();
+            
+            let csvContent = "Matricule,Nom et prénoms,Sexe,Date de naissance,Diplôme académique,Diplôme professionnel,Discipline,Statut,Grade,Catégorie,Classe et échelon,Date de prise de service,Date engagement,Date présumée retraite,Fonction occupée,Classes tenues,Ancienneté région,Ancienneté préfecture,Ancienneté poste,Banque,Régions de service,Contact\n";
+            
+            donneesPersonnel.forEach(personne => {
+                const row = [
+                    personne.matricule,
+                    `"${personne.nom}"`,
+                    personne.sexe,
+                    personne.naissance,
+                    `"${personne.diplomeAcademique}"`,
+                    `"${personne.diplomeProfessionnel}"`,
+                    personne.discipline,
+                    personne.statut,
+                    personne.grade,
+                    personne.categorie,
+                    personne.classeEchelon,
+                    personne.dateService,
+                    personne.dateEngagement,
+                    personne.dateRetraite,
+                    personne.fonction,
+                    `"${personne.classesTenues}"`,
+                    personne.ancienneteRegion,
+                    personne.anciennetePrefecture,
+                    personne.anciennetePoste,
+                    personne.banque,
+                    personne.regionsService,
+                    personne.contact
+                ].join(',');
+                
+                csvContent += row + "\n";
+            });
+            
+            // Télécharger le fichier CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `personnel_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Liste du personnel exportée avec succès en format CSV!', 'success');
+        }
+        
+        // Exporter les données
+        function exporterDonnees() {
+            const format = document.getElementById('format-export').value;
+            const options = Array.from(document.getElementById('donnees-export').selectedOptions).map(option => option.value);
+            
+            // Collecter les données
+            const donnees = {
+                etablissement: document.getElementById('nom_etablissement').value,
+                anneeScolaire: document.getElementById('annee_scolaire').value,
+                trimestre: document.getElementById('trimestre').value,
+                directeur: document.getElementById('directeur').value,
+                dateExport: new Date().toLocaleString()
+            };
+            
+            if (options.includes('resultats')) {
+                donnees.resultats = collecterDonneesTableau('table-effectifs');
+            }
+            
+            if (options.includes('trimestre')) {
+                donnees.trimestre = collecterDonneesTableau('table-trimestre');
+            }
+            
+            if (options.includes('personnel')) {
+                donnees.personnel = collecterDonneesPersonnel();
+            }
+            
+            // En fonction du format
+            if (format === 'json') {
+                const dataStr = JSON.stringify(donnees, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `donnees_${donnees.etablissement.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.json`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showAlert('Données exportées avec succès en format JSON!', 'success');
+            } else if (format === 'csv') {
+                // Pour simplifier, on exporte uniquement les résultats
+                if (options.includes('resultats')) {
+                    let csvContent = "Classe,Secteur,Inscrits G,Inscrits F,Inscrits T,Composants G,Composants F,Composants T,Moyenne G,Moyenne F,Moyenne T,Pourcentage total,Plus forte moyenne,Plus faible moyenne," + disciplines.join(',') + "\n";
+                    
+                    donnees.resultats.forEach(item => {
+                        const row = [
+                            item.classe,
+                            item.secteur,
+                            item.inscrits.G,
+                            item.inscrits.F,
+                            item.inscrits.T,
+                            item.composants.G,
+                            item.composants.F,
+                            item.composants.T,
+                            item.moyenne.G,
+                            item.moyenne.F,
+                            item.moyenne.T,
+                            item.pourcTotal,
+                            item.plusForteMoyenne,
+                            item.plusFaibleMoyenne
+                        ].concat(disciplines.map(d => item.disciplines[d])).join(',');
+                        
+                        csvContent += row + "\n";
+                    });
+                    
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `resultats_${donnees.etablissement.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showAlert('Données exportées avec succès en format CSV!', 'success');
+                }
+            } else if (format === 'pdf') {
+                // Générer un PDF
+                genererPDFDonnees(donnees);
+            } else {
+                // Pour Excel, on affiche un message
+                document.getElementById('export-result').innerHTML = `
+                    <h4>Exportation en ${format.toUpperCase()}</h4>
+                    <p>L'exportation en format ${format.toUpperCase()} nécessite une connexion avec un serveur backend.</p>
+                    <p>Utilisez plutôt l'exportation CSV ou PDF pour le moment.</p>
+                `;
+                document.getElementById('export-result').style.display = 'block';
+            }
+        }
+        
+        // Générer un PDF avec les données
+        function genererPDFDonnees(donnees) {
+            const doc = new jsPDF();
+            const etablissement = donnees.etablissement || 'Établissement non spécifié';
+            const anneeScolaire = donnees.anneeScolaire || 'Non spécifié';
+            const trimestre = donnees.trimestre || 'Non spécifié';
+            const dateExport = donnees.dateExport || new Date().toLocaleString();
+            
+            // En-tête
+            doc.setFontSize(16);
+            doc.setTextColor(0, 102, 204);
+            doc.text('ESODI - SYSTÈME DE SAISIE ET D\'ANALYSE DES RÉSULTATS SCOLAIRES', 105, 15, { align: 'center' });
+            doc.text('Direction Régionale de l\'éducation de la Région KARA', 105, 22, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('RÉPUBLIQUE TOGOLAISE - Travail - Liberté - Patrie', 105, 30, { align: 'center' });
+            
+            doc.setFontSize(14);
+            doc.text('RAPPORT DES RÉSULTATS SCOLAIRES', 105, 40, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Établissement: ${etablissement}`, 20, 50);
+            doc.text(`Année scolaire: ${anneeScolaire}`, 20, 57);
+            doc.text(`Trimestre: ${trimestre}`, 20, 64);
+            doc.text(`Date d'exportation: ${dateExport}`, 20, 71);
+            
+            let yPosition = 80;
+            
+            // Résultats de la composition
+            if (donnees.resultats && donnees.resultats.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(0, 102, 204);
+                doc.text('RÉSULTATS DE LA COMPOSITION', 20, yPosition);
+                yPosition += 10;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                
+                // Préparer les données du tableau
+                const tableData = donnees.resultats.map(item => {
+                    return [
+                        item.classe,
+                        item.inscrits.T.toString(),
+                        item.composants.T.toString(),
+                        item.moyenne.T.toString(),
+                        item.pourcTotal.toFixed(2) + '%'
+                    ];
+                });
+                
+                doc.autoTable({
+                    startY: yPosition,
+                    head: [['Classe', 'Inscrits', 'Composants', 'Ont la moyenne', 'Taux']],
+                    body: tableData,
+                    theme: 'striped',
+                    headStyles: { fillColor: [0, 102, 204] }
+                });
+                
+                yPosition = doc.lastAutoTable.finalY + 10;
+            }
+            
+            // Personnel enseignant
+            if (donnees.personnel && donnees.personnel.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(0, 102, 204);
+                doc.text('PERSONNEL ENSEIGNANT', 20, yPosition);
+                yPosition += 10;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                
+                // Tableau simplifié du personnel
+                const tableDataPersonnel = donnees.personnel.map(personne => {
+                    return [
+                        personne.nom,
+                        personne.discipline,
+                        personne.statut,
+                        personne.grade,
+                        personne.classesTenues
+                    ];
+                });
+                
+                doc.autoTable({
+                    startY: yPosition,
+                    head: [['Nom', 'Discipline', 'Statut', 'Grade', 'Classes tenues']],
+                    body: tableDataPersonnel,
+                    theme: 'striped',
+                    headStyles: { fillColor: [0, 102, 204] }
+                });
+            }
+            
+            // Pied de page
+            const pageCount = doc.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Page ${i} sur ${pageCount} - ESODI Système de Saisie des Résultats Scolaires`, 105, 285, { align: 'center' });
+                doc.text('© 2025 Direction Régionale de l\'éducation de la Région KARA - République Togolaise', 105, 290, { align: 'center' });
+            }
+            
+            // Sauvegarder le PDF
+            doc.save(`rapport_${etablissement.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
+            
+            showAlert('PDF généré avec succès!', 'success');
+        }
+        
+        // Générer un PDF complet
+        function genererPDFComplet() {
+            const nomEtablissement = document.getElementById('nom_etablissement').value;
+            const anneeScolaire = document.getElementById('annee_scolaire').value;
+            const trimestre = document.getElementById('trimestre').value;
+            const directeur = document.getElementById('directeur').value;
+            
+            // Collecter les données
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            const donneesTrimestre = collecterDonneesTableau('table-trimestre');
+            const donneesPersonnel = collecterDonneesPersonnel();
+            
+            // Préparer les données pour le PDF
+            const donnees = {
+                etablissement: nomEtablissement,
+                anneeScolaire: anneeScolaire,
+                trimestre: trimestre,
+                directeur: directeur,
+                dateExport: new Date().toLocaleString(),
+                resultats: donneesEffectifs,
+                trimestre: donneesTrimestre,
+                personnel: donneesPersonnel
+            };
+            
+            // Générer le PDF
+            genererPDFDonnees(donnees);
+        }
+        
+        // Générer un PDF simple
+        function genererPDF() {
+            const nomEtablissement = document.getElementById('nom_etablissement').value;
+            const anneeScolaire = document.getElementById('annee_scolaire').value;
+            const trimestre = document.getElementById('trimestre').value;
+            
+            const doc = new jsPDF();
+            
+            // En-tête
+            doc.setFontSize(16);
+            doc.setTextColor(0, 102, 204);
+            doc.text('ESODI - SYSTÈME DE SAISIE DES RÉSULTATS SCOLAIRES', 105, 15, { align: 'center' });
+            doc.text('Direction Régionale de l\'éducation de la Région KARA', 105, 22, { align: 'center' });
+            
+            doc.setFontSize(14);
+            doc.text('FICHE DE RÉSULTATS SCOLAIRES', 105, 32, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Établissement: ${nomEtablissement}`, 20, 45);
+            doc.text(`Année scolaire: ${anneeScolaire}`, 20, 52);
+            doc.text(`Trimestre: ${trimestre}`, 20, 59);
+            doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 20, 66);
+            
+            // Tableau des résultats
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            const tableData = donneesEffectifs.map(item => {
+                const taux = item.composants.T > 0 ? (item.moyenne.T / item.composants.T * 100).toFixed(2) : '0.00';
+                return [
+                    item.classe,
+                    item.inscrits.T.toString(),
+                    item.composants.T.toString(),
+                    item.moyenne.T.toString(),
+                    taux + '%'
+                ];
+            });
+            
+            doc.autoTable({
+                startY: 75,
+                head: [['Classe', 'Inscrits', 'Composants', 'Réussite', 'Taux']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 102, 204] }
+            });
+            
+            // Calcul du taux global
+            let totalComposants = 0;
+            let totalMoyenne = 0;
+            
+            donneesEffectifs.forEach(donnee => {
+                totalComposants += donnee.composants.T;
+                totalMoyenne += donnee.moyenne.T;
+            });
+            
+            const tauxGlobal = totalComposants > 0 ? (totalMoyenne / totalComposants * 100).toFixed(2) : '0.00';
+            
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(12);
+            doc.text(`Taux de réussite global: ${tauxGlobal}%`, 20, finalY);
+            
+            // Pied de page
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Document généré automatiquement par ESODI - Système de saisie des résultats', 105, 285, { align: 'center' });
+            
+            // Sauvegarder
+            doc.save(`resultats_${nomEtablissement.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
+            
+            showAlert('PDF généré avec succès!', 'success');
+        }
+        
+        // Générer un rapport complet
+        function genererRapport() {
+            const nomEtablissement = document.getElementById('nom_etablissement').value;
+            const anneeScolaire = document.getElementById('annee_scolaire').value;
+            const trimestre = document.getElementById('trimestre').value;
+            
+            // Collecter les données
+            const donneesEffectifs = collecterDonneesTableau('table-effectifs');
+            const donneesTrimestre = collecterDonneesTableau('table-trimestre');
+            const donneesPersonnel = collecterDonneesPersonnel();
+            
+            // Calculer les statistiques
+            let totalComposants = 0;
+            let totalMoyenne = 0;
+            
+            donneesEffectifs.forEach(donnee => {
+                totalComposants += donnee.composants.T;
+                totalMoyenne += donnee.moyenne.T;
+            });
+            
+            const tauxReussite = totalComposants > 0 ? (totalMoyenne / totalComposants * 100).toFixed(2) : '0.00';
+            
+            // Générer le contenu HTML du rapport
+            let html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Rapport des résultats - ${nomEtablissement}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; }
+                        h1, h2, h3 { color: #0066cc; }
+                        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        th { background-color: #0066cc; color: white; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .section { margin-bottom: 30px; }
+                        .stats { background-color: #f5f5f5; padding: 15px; border-radius: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>ESODI - SYSTÈME DE SAISIE ET D'ANALYSE DES RÉSULTATS SCOLAIRES</h1>
+                        <h2>Direction Régionale de l'éducation de la Région KARA</h2>
+                        <h2>RÉPUBLIQUE TOGOLAISE - Travail - Liberté - Patrie</h2>
+                        <h2>RAPPORT DES RÉSULTATS SCOLAIRES</h2>
+                        <h3>${nomEtablissement}</h3>
+                        <p>Année scolaire: ${anneeScolaire} | Trimestre: ${trimestre}</p>
+                        <p>Date du rapport: ${new Date().toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Statistiques générales</h2>
+                        <div class="stats">
+                            <p><strong>Total des composants:</strong> ${totalComposants}</p>
+                            <p><strong>Total ayant la moyenne:</strong> ${totalMoyenne}</p>
+                            <p><strong>Taux de réussite général:</strong> ${tauxReussite}%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Résultats de la composition par classe</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Classe</th>
+                                    <th>Inscrits</th>
+                                    <th>Composants</th>
+                                    <th>Ont la moyenne</th>
+                                    <th>Taux de réussite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            donneesEffectifs.forEach(donnee => {
+                const tauxClasse = donnee.composants.T > 0 ? (donnee.moyenne.T / donnee.composants.T * 100).toFixed(2) : '0.00';
+                html += `
+                    <tr>
+                        <td>${donnee.classe}</td>
+                        <td>${donnee.inscrits.T}</td>
+                        <td>${donnee.composants.T}</td>
+                        <td>${donnee.moyenne.T}</td>
+                        <td>${tauxClasse}%</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Personnel enseignant</h2>
+                        <p><strong>Nombre d'enseignants:</strong> ${donneesPersonnel.length}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Discipline</th>
+                                    <th>Statut</th>
+                                    <th>Grade</th>
+                                    <th>Classes tenues</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            donneesPersonnel.forEach(personne => {
+                html += `
+                    <tr>
+                        <td>${personne.nom}</td>
+                        <td>${personne.discipline}</td>
+                        <td>${personne.statut}</td>
+                        <td>${personne.grade}</td>
+                        <td>${personne.classesTenues}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Analyse et recommandations</h2>
+                        <p>Le taux de réussite général de l'établissement est de <strong>${tauxReussite}%</strong>.</p>
+            `;
+            
+            // Ajouter des recommandations en fonction du taux de réussite
+            const tauxNum = parseFloat(tauxReussite);
+            if (tauxNum < 40) {
+                html += `<p><strong>Recommandation:</strong> Le taux de réussite est faible. Il est recommandé de mettre en place des séances de soutien scolaire et de revoir les méthodes d'enseignement.</p>`;
+            } else if (tauxNum < 60) {
+                html += `<p><strong>Recommandation:</strong> Le taux de réussite est moyen. Des efforts supplémentaires sont nécessaires, particulièrement dans les disciplines avec les taux les plus faibles.</p>`;
+            } else if (tauxNum < 80) {
+                html += `<p><strong>Recommandation:</strong> Le taux de réussite est satisfaisant. Maintenir les efforts et cibler les élèves en difficulté.</p>`;
+            } else {
+                html += `<p><strong>Recommandation:</strong> Le taux de réussite est excellent. Continuer sur cette lancée et partager les bonnes pratiques.</p>`;
+            }
+            
+            html += `
+                        <p>Ce rapport a été généré automatiquement par le système ESODI de saisie des résultats scolaires.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Ouvrir le rapport dans une nouvelle fenêtre
+            const newWindow = window.open();
+            newWindow.document.write(html);
+            newWindow.document.close();
+            
+            showAlert('Rapport généré avec succès!', 'success');
+        }
+        
+        // Charger l'historique
+        function chargerHistorique() {
+            mettreAJourHistorique();
+            showAlert('Historique actualisé!', 'success');
+        }
+        
+        // Exporter l'historique en PDF
+        function exporterHistoriquePDF() {
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            
+            if (historique.length === 0) {
+                showAlert('Aucun historique à exporter!', 'error');
+                return;
+            }
+            
+            const doc = new jsPDF();
+            
+            // En-tête
+            doc.setFontSize(16);
+            doc.setTextColor(0, 102, 204);
+            doc.text('ESODI - HISTORIQUE DES ENREGISTREMENTS', 105, 15, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Total des enregistrements: ${historique.length}`, 20, 30);
+            doc.text(`Date d'export: ${new Date().toLocaleString()}`, 20, 37);
+            
+            // Tableau des enregistrements
+            const tableData = historique.map((item, index) => {
+                return [
+                    (index + 1).toString(),
+                    item.etablissement,
+                    item.anneeScolaire,
+                    item.trimestre,
+                    item.dateEnregistrement
+                ];
+            });
+            
+            doc.autoTable({
+                startY: 45,
+                head: [['N°', 'Établissement', 'Année scolaire', 'Trimestre', 'Date d\'enregistrement']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 102, 204] }
+            });
+            
+            // Sauvegarder
+            doc.save(`historique_enregistrements_${new Date().toISOString().slice(0, 10)}.pdf`);
+            
+            showAlert('Historique exporté en PDF avec succès!', 'success');
+        }
+        
+        // === FONCTIONS POUR L'ONGLET COMPARAISON ===
+        
+        // Charger la liste des établissements pour la comparaison
+        function chargerEtablissementsComparaison() {
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            const listeDiv = document.getElementById('liste-etablissements-comparaison');
+            
+            if (historique.length === 0) {
+                listeDiv.innerHTML = '<p>Aucun établissement enregistré pour la comparaison.</p>';
+                return;
+            }
+            
+            // Extraire les établissements uniques
+            const etablissementsUniques = [];
+            const etablissementsVus = new Set();
+            
+            historique.forEach((item, index) => {
+                const key = `${item.etablissement}-${item.anneeScolaire}-${item.trimestre}`;
+                if (!etablissementsVus.has(key)) {
+                    etablissementsVus.add(key);
+                    etablissementsUniques.push({
+                        id: index,
+                        etablissement: item.etablissement,
+                        anneeScolaire: item.anneeScolaire,
+                        trimestre: item.trimestre,
+                        dateEnregistrement: item.dateEnregistrement
+                    });
+                }
+            });
+            
+            let html = '<div class="comparaison-etablissement">';
+            html += '<p><strong>Sélectionnez les établissements à comparer :</strong></p>';
+            html += '<div style="max-height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">';
+            
+            etablissementsUniques.forEach(etablissement => {
+                const isSelected = etablissementsSelectionnes.includes(etablissement.id);
+                html += `
+                    <div style="margin-bottom: 8px; padding: 8px; background-color: ${isSelected ? '#e9f7fe' : 'white'}; border: 1px solid #ddd; border-radius: 4px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" 
+                                   value="${etablissement.id}" 
+                                   ${isSelected ? 'checked' : ''}
+                                   onchange="toggleEtablissementComparaison(${etablissement.id})"
+                                   style="margin-right: 10px;">
+                            <div>
+                                <strong>${etablissement.etablissement}</strong><br>
+                                <small>${etablissement.anneeScolaire} - Trimestre ${etablissement.trimestre}</small><br>
+                                <small style="color: #666;">Enregistré le: ${etablissement.dateEnregistrement}</small>
+                            </div>
+                        </label>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            html += `<p style="margin-top: 10px;"><strong>${etablissementsSelectionnes.length} établissement(s) sélectionné(s)</strong></p>`;
+            html += '</div>';
+            
+            listeDiv.innerHTML = html;
+        }
+        
+        // Basculer la sélection d'un établissement pour la comparaison
+        function toggleEtablissementComparaison(id) {
+            const index = etablissementsSelectionnes.indexOf(id);
+            if (index === -1) {
+                etablissementsSelectionnes.push(id);
+            } else {
+                etablissementsSelectionnes.splice(index, 1);
+            }
+            
+            // Mettre à jour l'affichage
+            chargerEtablissementsComparaison();
+        }
+        
+        // Comparer les établissements sélectionnés
+        function comparerEtablissementsSelectionnes() {
+            if (etablissementsSelectionnes.length < 2) {
+                showAlert('Veuillez sélectionner au moins 2 établissements pour la comparaison', 'error');
+                return;
+            }
+            
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            const etablissementsAComparer = [];
+            
+            // Récupérer les données des établissements sélectionnés
+            etablissementsSelectionnes.forEach(id => {
+                if (id >= 0 && id < historique.length) {
+                    etablissementsAComparer.push(historique[id]);
+                }
+            });
+            
+            if (etablissementsAComparer.length < 2) {
+                showAlert('Données insuffisantes pour la comparaison', 'error');
+                return;
+            }
+            
+            // Afficher les résultats de comparaison
+            afficherResultatsComparaison(etablissementsAComparer);
+            
+            // Basculer vers l'onglet comparaison
+            switchTab('comparaison');
+        }
+        
+        // Afficher les résultats de la comparaison
+        function afficherResultatsComparaison(etablissements) {
+            const tableauComparaison = document.getElementById('tableau-comparaison');
+            const detailsComparaison = document.getElementById('details-comparaison');
+            
+            // Calculer les statistiques pour chaque établissement
+            const statistiquesEtablissements = etablissements.map(etablissement => {
+                let totalInscrits = 0;
+                let totalComposants = 0;
+                let totalMoyenne = 0;
+                let totalGarcons = 0;
+                let totalFilles = 0;
+                let reussiteGarcons = 0;
+                let reussiteFilles = 0;
+                
+                if (etablissement.effectifs) {
+                    etablissement.effectifs.forEach(classe => {
+                        totalInscrits += classe.inscrits.T || 0;
+                        totalComposants += classe.composants.T || 0;
+                        totalMoyenne += classe.moyenne.T || 0;
+                        totalGarcons += classe.composants.G || 0;
+                        totalFilles += classe.composants.F || 0;
+                        reussiteGarcons += classe.moyenne.G || 0;
+                        reussiteFilles += classe.moyenne.F || 0;
+                    });
+                }
+                
+                const tauxReussite = totalComposants > 0 ? (totalMoyenne / totalComposants * 100).toFixed(2) : '0.00';
+                const tauxReussiteGarcons = totalGarcons > 0 ? (reussiteGarcons / totalGarcons * 100).toFixed(2) : '0.00';
+                const tauxReussiteFilles = totalFilles > 0 ? (reussiteFilles / totalFilles * 100).toFixed(2) : '0.00';
+                
+                return {
+                    nom: etablissement.etablissement,
+                    anneeScolaire: etablissement.anneeScolaire,
+                    trimestre: etablissement.trimestre,
+                    totalInscrits,
+                    totalComposants,
+                    totalMoyenne,
+                    tauxReussite: parseFloat(tauxReussite),
+                    totalGarcons,
+                    totalFilles,
+                    tauxReussiteGarcons: parseFloat(tauxReussiteGarcons),
+                    tauxReussiteFilles: parseFloat(tauxReussiteFilles)
+                };
+            });
+            
+            // Trouver les meilleurs et pires taux
+            const meilleurTaux = Math.max(...statistiquesEtablissements.map(e => e.tauxReussite));
+            const pireTaux = Math.min(...statistiquesEtablissements.map(e => e.tauxReussite));
+            const etablissementMeilleur = statistiquesEtablissements.find(e => e.tauxReussite === meilleurTaux);
+            const etablissementPire = statistiquesEtablissements.find(e => e.tauxReussite === pireTaux);
+            
+            // Générer le tableau de comparaison
+            let html = '<table style="width: 100%; margin-top: 10px;"><thead><tr>';
+            html += '<th>Établissement</th>';
+            html += '<th>Année scolaire</th>';
+            html += '<th>Trimestre</th>';
+            html += '<th>Inscrits</th>';
+            html += '<th>Composants</th>';
+            html += '<th>Réussite</th>';
+            html += '<th>Taux de réussite</th>';
+            html += '<th>Garçons (%)</th>';
+            html += '<th>Filles (%)</th>';
+            html += '</tr></thead><tbody>';
+            
+            statistiquesEtablissements.forEach(stat => {
+                const estMeilleur = stat.tauxReussite === meilleurTaux;
+                const estPire = stat.tauxReussite === pireTaux;
+                
+                html += `<tr style="${estMeilleur ? 'background-color: #d4edda;' : estPire ? 'background-color: #f8d7da;' : ''}">`;
+                html += `<td><strong>${stat.nom}</strong></td>`;
+                html += `<td>${stat.anneeScolaire}</td>`;
+                html += `<td>${stat.trimestre}</td>`;
+                html += `<td>${stat.totalInscrits}</td>`;
+                html += `<td>${stat.totalComposants}</td>`;
+                html += `<td>${stat.totalMoyenne}</td>`;
+                html += `<td><strong>${stat.tauxReussite}%</strong></td>`;
+                html += `<td>${stat.tauxReussiteGarcons}%</td>`;
+                html += `<td>${stat.tauxReussiteFilles}%</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            
+            // Ajouter un résumé
+            html += `<div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">`;
+            html += `<h5>Résumé de la comparaison</h5>`;
+            html += `<p><strong>Meilleur taux de réussite:</strong> ${etablissementMeilleur.nom} (${etablissementMeilleur.tauxReussite}%)</p>`;
+            html += `<p><strong>Taux de réussite le plus faible:</strong> ${etablissementPire.nom} (${etablissementPire.tauxReussite}%)</p>`;
+            html += `<p><strong>Écart entre le meilleur et le pire:</strong> ${(meilleurTaux - pireTaux).toFixed(2)}%</p>`;
+            html += `<p><strong>Moyenne des taux de réussite:</strong> ${(statistiquesEtablissements.reduce((sum, e) => sum + e.tauxReussite, 0) / statistiquesEtablissements.length).toFixed(2)}%</p>`;
+            html += `</div>`;
+            
+            tableauComparaison.innerHTML = html;
+            document.getElementById('resultats-comparaison').style.display = 'block';
+            
+            // Générer les graphiques de comparaison
+            genererGraphiquesComparaison(statistiquesEtablissements);
+            
+            // Afficher les détails détaillés
+            afficherDetailsComparaison(etablissements, statistiquesEtablissements);
+        }
+        
+        // Générer les graphiques pour la comparaison
+        function genererGraphiquesComparaison(statistiquesEtablissements) {
+            // Détruire les graphiques précédents
+            if (chartComparaisonReussite) chartComparaisonReussite.destroy();
+            if (chartComparaisonEffectifs) chartComparaisonEffectifs.destroy();
+            if (chartComparaisonDisciplines) chartComparaisonDisciplines.destroy();
+            
+            const labels = statistiquesEtablissements.map(e => `${e.nom} (${e.anneeScolaire})`);
+            const tauxReussite = statistiquesEtablissements.map(e => e.tauxReussite);
+            const inscrits = statistiquesEtablissements.map(e => e.totalInscrits);
+            const composants = statistiquesEtablissements.map(e => e.totalComposants);
+            const moyenne = statistiquesEtablissements.map(e => e.totalMoyenne);
+            
+            // Graphique des taux de réussite
+            const ctxReussite = document.getElementById('chart-comparaison-reussite').getContext('2d');
+            chartComparaisonReussite = new Chart(ctxReussite, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Taux de réussite (%)',
+                        data: tauxReussite,
+                        backgroundColor: 'rgba(0, 102, 204, 0.5)',
+                        borderColor: 'rgba(0, 102, 204, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Pourcentage (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparaison des taux de réussite'
+                        }
+                    }
+                }
+            });
+            
+            // Graphique des effectifs
+            const ctxEffectifs = document.getElementById('chart-comparaison-effectifs').getContext('2d');
+            chartComparaisonEffectifs = new Chart(ctxEffectifs, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Inscrits',
+                            data: inscrits,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Composants',
+                            data: composants,
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Réussite',
+                            data: moyenne,
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre d\'élèves'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparaison des effectifs'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Afficher les détails détaillés de la comparaison
+        function afficherDetailsComparaison(etablissements, statistiquesEtablissements) {
+            const detailsDiv = document.getElementById('details-comparaison');
+            let html = '<h4>Analyse détaillée par établissement</h4>';
+            
+            etablissements.forEach((etablissement, index) => {
+                const stats = statistiquesEtablissements[index];
+                
+                html += `<div class="comparaison-etablissement" style="margin-bottom: 20px;">`;
+                html += `<h5>${etablissement.etablissement} (${etablissement.anneeScolaire}, Trimestre ${etablissement.trimestre})</h5>`;
+                html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 10px;">`;
+                html += `<div><strong>Inscrits:</strong> ${stats.totalInscrits}</div>`;
+                html += `<div><strong>Composants:</strong> ${stats.totalComposants}</div>`;
+                html += `<div><strong>Réussite:</strong> ${stats.totalMoyenne}</div>`;
+                html += `<div><strong>Taux de réussite:</strong> ${stats.tauxReussite}%</div>`;
+                html += `<div><strong>Garçons:</strong> ${stats.tauxReussiteGarcons}%</div>`;
+                html += `<div><strong>Filles:</strong> ${stats.tauxReussiteFilles}%</div>`;
+                html += `</div>`;
+                
+                // Analyse par classe si disponible
+                if (etablissement.effectifs && etablissement.effectifs.length > 0) {
+                    html += `<h6 style="margin-top: 15px;">Analyse par classe</h6>`;
+                    html += `<table style="width: 100%; margin-top: 10px; font-size: 0.9em;"><thead><tr><th>Classe</th><th>Inscrits</th><th>Composants</th><th>Réussite</th><th>Taux</th></tr></thead><tbody>`;
+                    
+                    etablissement.effectifs.forEach(classe => {
+                        const tauxClasse = classe.composants.T > 0 ? (classe.moyenne.T / classe.composants.T * 100).toFixed(2) : '0.00';
+                        html += `<tr>`;
+                        html += `<td>${classe.classe}</td>`;
+                        html += `<td>${classe.inscrits.T}</td>`;
+                        html += `<td>${classe.composants.T}</td>`;
+                        html += `<td>${classe.moyenne.T}</td>`;
+                        html += `<td>${tauxClasse}%</td>`;
+                        html += `</tr>`;
+                    });
+                    
+                    html += `</tbody></table>`;
+                }
+                
+                html += `</div>`;
+            });
+            
+            detailsDiv.innerHTML = html;
+            detailsDiv.style.display = 'block';
+        }
+        
+        // Vider la comparaison
+        function viderComparaison() {
+            if (confirm('Voulez-vous effacer la comparaison en cours ?')) {
+                etablissementsSelectionnes = [];
+                document.getElementById('resultats-comparaison').style.display = 'none';
+                document.getElementById('details-comparaison').style.display = 'none';
+                
+                // Détruire les graphiques
+                if (chartComparaisonReussite) {
+                    chartComparaisonReussite.destroy();
+                    chartComparaisonReussite = null;
+                }
+                if (chartComparaisonEffectifs) {
+                    chartComparaisonEffectifs.destroy();
+                    chartComparaisonEffectifs = null;
+                }
+                if (chartComparaisonDisciplines) {
+                    chartComparaisonDisciplines.destroy();
+                    chartComparaisonDisciplines = null;
+                }
+                
+                // Recharger la liste des établissements
+                chargerEtablissementsComparaison();
+                
+                showAlert('Comparaison effacée avec succès!', 'success');
+            }
+        }
+        
+        // Supprimer toutes les données
+        function supprimerToutesDonnees() {
+            if (confirm('⚠️ ATTENTION ! Cette action va supprimer TOUTES les données du système (historique, données actuelles, sauvegardes). Cette opération est IRREVERSIBLE. Voulez-vous vraiment continuer ?')) {
+                // Supprimer toutes les données du localStorage
+                localStorage.removeItem('historiqueResultats');
+                localStorage.removeItem('donneesActuelles');
+                localStorage.removeItem('sauvegardes');
+                localStorage.removeItem('historiqueImport');
+                
+                // Réinitialiser les tableaux
+                viderTableaux();
+                viderPersonnel();
+                
+                // Réinitialiser les champs
+                document.getElementById('nom_etablissement').value = '';
+                document.getElementById('annee_scolaire').value = '';
+                document.getElementById('trimestre').value = '';
+                document.getElementById('directeur').value = '';
+                
+                // Réinitialiser la comparaison
+                etablissementsSelectionnes = [];
+                viderComparaison();
+                
+                // Mettre à jour l'interface
+                mettreAJourHistorique();
+                chargerSauvegardes();
+                actualiserStatistiques();
+                actualiserHistoriqueImport();
+                chargerEtablissementsComparaison();
+                
+                showAlert('TOUTES les données ont été supprimées avec succès!', 'success');
+            }
+        }
+        
+        // Supprimer l'historique
+        function supprimerHistorique() {
+            if (confirm('Voulez-vous vraiment supprimer tout l\'historique des enregistrements ?')) {
+                localStorage.removeItem('historiqueResultats');
+                mettreAJourHistorique();
+                actualiserStatistiques();
+                chargerEtablissementsComparaison();
+                showAlert('Historique supprimé avec succès!', 'success');
+            }
+        }
+        
+        // Supprimer les données actuelles
+        function supprimerDonneesActuelles() {
+            if (confirm('Voulez-vous vraiment supprimer les données actuelles (non enregistrées) ?')) {
+                localStorage.removeItem('donneesActuelles');
+                viderTableaux();
+                showAlert('Données actuelles supprimées avec succès!', 'success');
+            }
+        }
+        
+        // Actualiser les statistiques
+        function actualiserStatistiques() {
+            const historique = JSON.parse(localStorage.getItem('historiqueResultats') || '[]');
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            const historiqueImport = JSON.parse(localStorage.getItem('historiqueImport') || '[]');
+            
+            let html = `
+                <div class="result-item">
+                    <span class="result-label">Enregistrements dans l'historique:</span> ${historique.length}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Sauvegardes disponibles:</span> ${sauvegardes.length}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Importations effectuées:</span> ${historiqueImport.length}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Données actuelles sauvegardées:</span> ${localStorage.getItem('donneesActuelles') ? 'Oui' : 'Non'}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Dernière mise à jour:</span> ${new Date().toLocaleString()}
+                </div>
+            `;
+            
+            document.getElementById('statistiques-systeme').innerHTML = html;
+        }
+        
+        // Sauvegarder la configuration
+        function sauvegarderConfiguration() {
+            // Créer un objet de configuration
+            const configuration = {
+                nom_etablissement: document.getElementById('nom_etablissement').value,
+                annee_scolaire: document.getElementById('annee_scolaire').value,
+                trimestre: document.getElementById('trimestre').value,
+                directeur: document.getElementById('directeur').value,
+                date_sauvegarde: new Date().toLocaleString()
+            };
+            
+            // Sauvegarder dans le localStorage
+            localStorage.setItem('configuration_systeme', JSON.stringify(configuration));
+            
+            showAlert('Configuration sauvegardée avec succès!', 'success');
+        }
+        
+        // Restaurer la configuration
+        function restaurerConfiguration() {
+            const configuration = JSON.parse(localStorage.getItem('configuration_systeme'));
+            
+            if (configuration) {
+                document.getElementById('nom_etablissement').value = configuration.nom_etablissement || '';
+                document.getElementById('annee_scolaire').value = configuration.annee_scolaire || '';
+                document.getElementById('trimestre').value = configuration.trimestre || '';
+                document.getElementById('directeur').value = configuration.directeur || '';
+                
+                showAlert('Configuration restaurée avec succès!', 'success');
+            } else {
+                showAlert('Aucune configuration sauvegardée trouvée!', 'error');
+            }
+        }
+        
+        // Créer une sauvegarde
+        function creerSauvegarde() {
+            const nomSauvegarde = document.getElementById('nom-sauvegarde').value || `Sauvegarde du ${new Date().toLocaleDateString()}`;
+            
+            // Collecter toutes les données
+            const sauvegarde = {
+                nom: nomSauvegarde,
+                date: new Date().toLocaleString(),
+                historique: JSON.parse(localStorage.getItem('historiqueResultats') || '[]'),
+                donneesActuelles: JSON.parse(localStorage.getItem('donneesActuelles') || '{}'),
+                historiqueImport: JSON.parse(localStorage.getItem('historiqueImport') || '[]'),
+                configuration: {
+                    nom_etablissement: document.getElementById('nom_etablissement').value,
+                    annee_scolaire: document.getElementById('annee_scolaire').value,
+                    trimestre: document.getElementById('trimestre').value,
+                    directeur: document.getElementById('directeur').value
+                }
+            };
+            
+            // Sauvegarder
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            sauvegardes.push(sauvegarde);
+            localStorage.setItem('sauvegardes', JSON.stringify(sauvegardes));
+            
+            // Mettre à jour l'affichage
+            chargerSauvegardes();
+            actualiserStatistiques();
+            
+            showAlert(`Sauvegarde "${nomSauvegarde}" créée avec succès!`, 'success');
+        }
+        
+        // Charger les sauvegardes
+        function chargerSauvegardes() {
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            const contenuSauvegardes = document.getElementById('contenu-sauvegardes');
+            
+            if (sauvegardes.length === 0) {
+                contenuSauvegardes.innerHTML = '<p>Aucune sauvegarde disponible.</p>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%;"><thead><tr><th>Nom</th><th>Date</th><th>Enregistrements</th><th>Importations</th><th>Actions</th></tr></thead><tbody>';
+            
+            sauvegardes.slice().reverse().forEach((sauvegarde, index) => {
+                html += `
+                    <tr>
+                        <td>${sauvegarde.nom}</td>
+                        <td>${sauvegarde.date}</td>
+                        <td>${sauvegarde.historique ? sauvegarde.historique.length : 0}</td>
+                        <td>${sauvegarde.historiqueImport ? sauvegarde.historiqueImport.length : 0}</td>
+                        <td>
+                            <button onclick="restaurerSauvegardeIndex(${sauvegardes.length - 1 - index})" class="btn" style="padding: 5px 10px;">Restaurer</button>
+                            <button onclick="supprimerSauvegardeIndex(${sauvegardes.length - 1 - index})" class="btn btn-danger" style="padding: 5px 10px;">Supprimer</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            contenuSauvegardes.innerHTML = html;
+        }
+        
+        // Restaurer une sauvegarde
+        function restaurerSauvegarde() {
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            
+            if (sauvegardes.length === 0) {
+                showAlert('Aucune sauvegarde disponible!', 'error');
+                return;
+            }
+            
+            // Pour simplifier, on restaure la dernière sauvegarde
+            const derniereSauvegarde = sauvegardes[sauvegardes.length - 1];
+            
+            if (confirm(`Voulez-vous restaurer la sauvegarde "${derniereSauvegarde.nom}" ? Les données actuelles seront écrasées.`)) {
+                // Restaurer l'historique
+                if (derniereSauvegarde.historique) {
+                    localStorage.setItem('historiqueResultats', JSON.stringify(derniereSauvegarde.historique));
+                }
+                
+                // Restaurer les données actuelles
+                if (derniereSauvegarde.donneesActuelles) {
+                    localStorage.setItem('donneesActuelles', JSON.stringify(derniereSauvegarde.donneesActuelles));
+                }
+                
+                // Restaurer l'historique des importations
+                if (derniereSauvegarde.historiqueImport) {
+                    localStorage.setItem('historiqueImport', JSON.stringify(derniereSauvegarde.historiqueImport));
+                }
+                
+                // Restaurer la configuration
+                if (derniereSauvegarde.configuration) {
+                    document.getElementById('nom_etablissement').value = derniereSauvegarde.configuration.nom_etablissement || '';
+                    document.getElementById('annee_scolaire').value = derniereSauvegarde.configuration.annee_scolaire || '';
+                    document.getElementById('trimestre').value = derniereSauvegarde.configuration.trimestre || '';
+                    document.getElementById('directeur').value = derniereSauvegarde.configuration.directeur || '';
+                }
+                
+                // Recharger les données
+                chargerDonnees();
+                mettreAJourHistorique();
+                actualiserStatistiques();
+                actualiserHistoriqueImport();
+                chargerEtablissementsComparaison();
+                
+                showAlert(`Sauvegarde "${derniereSauvegarde.nom}" restaurée avec succès!`, 'success');
+            }
+        }
+        
+        // Restaurer une sauvegarde par index
+        function restaurerSauvegardeIndex(index) {
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            
+            if (index >= 0 && index < sauvegardes.length) {
+                const sauvegarde = sauvegardes[index];
+                
+                if (confirm(`Voulez-vous restaurer la sauvegarde "${sauvegarde.nom}" ? Les données actuelles seront écrasées.`)) {
+                    // Restaurer l'historique
+                    if (sauvegarde.historique) {
+                        localStorage.setItem('historiqueResultats', JSON.stringify(sauvegarde.historique));
+                    }
+                    
+                    // Restaurer les données actuelles
+                    if (sauvegarde.donneesActuelles) {
+                        localStorage.setItem('donneesActuelles', JSON.stringify(sauvegarde.donneesActuelles));
+                    }
+                    
+                    // Restaurer l'historique des importations
+                    if (sauvegarde.historiqueImport) {
+                        localStorage.setItem('historiqueImport', JSON.stringify(sauvegarde.historiqueImport));
+                    }
+                    
+                    // Restaurer la configuration
+                    if (sauvegarde.configuration) {
+                        document.getElementById('nom_etablissement').value = sauvegarde.configuration.nom_etablissement || '';
+                        document.getElementById('annee_scolaire').value = sauvegarde.configuration.annee_scolaire || '';
+                        document.getElementById('trimestre').value = sauvegarde.configuration.trimestre || '';
+                        document.getElementById('directeur').value = sauvegarde.configuration.directeur || '';
+                    }
+                    
+                    // Recharger les données
+                    chargerDonnees();
+                    mettreAJourHistorique();
+                    actualiserStatistiques();
+                    actualiserHistoriqueImport();
+                    chargerEtablissementsComparaison();
+                    
+                    showAlert(`Sauvegarde "${sauvegarde.nom}" restaurée avec succès!`, 'success');
+                }
+            }
+        }
+        
+        // Supprimer une sauvegarde par index
+        function supprimerSauvegardeIndex(index) {
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            
+            if (index >= 0 && index < sauvegardes.length) {
+                const sauvegarde = sauvegardes[index];
+                
+                if (confirm(`Voulez-vous vraiment supprimer la sauvegarde "${sauvegarde.nom}" ?`)) {
+                    sauvegardes.splice(index, 1);
+                    localStorage.setItem('sauvegardes', JSON.stringify(sauvegardes));
+                    chargerSauvegardes();
+                    actualiserStatistiques();
+                    showAlert('Sauvegarde supprimée avec succès!', 'success');
+                }
+            }
+        }
+        
+        // Exporter une sauvegarde
+        function exporterSauvegarde() {
+            const sauvegardes = JSON.parse(localStorage.getItem('sauvegardes') || '[]');
+            
+            if (sauvegardes.length === 0) {
+                showAlert('Aucune sauvegarde à exporter!', 'error');
+                return;
+            }
+            
+            // Exporter la dernière sauvegarde
+            const derniereSauvegarde = sauvegardes[sauvegardes.length - 1];
+            const dataStr = JSON.stringify(derniereSauvegarde, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `sauvegarde_${derniereSauvegarde.nom.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Sauvegarde exportée avec succès!', 'success');
+        }
+        
+        // Basculer entre les onglets
+        function switchTab(tabName) {
+            // Masquer tous les onglets
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Désactiver tous les onglets
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activer l'onglet sélectionné
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activer le bouton de l'onglet
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent.includes(tabName === 'saisie' ? 'Saisie' : 
+                                            tabName === 'resultats' ? 'Résultats' :
+                                            tabName === 'comparaison' ? 'Comparaison' :
+                                            tabName === 'personnel' ? 'Personnel' : 
+                                            tabName === 'export' ? 'Exportation' :
+                                            tabName === 'import' ? 'Importation' : 'Administration')) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Si on bascule vers l'administration, actualiser les statistiques
+            if (tabName === 'administration') {
+                actualiserStatistiques();
+            }
+        }
+        
+        // Afficher une alerte
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alert-message');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+            
+            // Masquer l'alerte après 5 secondes
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
