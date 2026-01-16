@@ -14,8 +14,9 @@
         }
 
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                        url('Collaboration.jpeg') center/cover no-repeat fixed;
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                url('Collaboration.jpeg') center/cover no-repeat fixed;
             color: white;
             min-height: 100vh;
             display: flex;
@@ -24,17 +25,31 @@
             align-items: center;
             padding: 20px;
             text-align: center;
+            position: relative;
+        }
+
+        /* Overlay plus léger pour voir l'image */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             width: 100%;
             padding: 40px;
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin: auto;
         }
 
         .logo {
@@ -42,177 +57,228 @@
         }
 
         .logo i {
-            font-size: 4rem;
+            font-size: 4.5rem;
             color: #3498db;
             margin-bottom: 15px;
             background: linear-gradient(45deg, #3498db, #2ecc71);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
+            font-size: 4rem;
+            margin-bottom: 25px;
             color: white;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-            line-height: 1.2;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.6);
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
-            font-size: 1.5rem;
-            margin-bottom: 40px;
-            color: #ecf0f1;
-            max-width: 800px;
+            font-size: 1.8rem;
+            margin-bottom: 50px;
+            color: #f8f9fa;
+            max-width: 900px;
             margin-left: auto;
             margin-right: auto;
-            line-height: 1.6;
+            line-height: 1.7;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         }
 
         .highlight {
             color: #3498db;
             font-weight: bold;
-        }
-
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 50px 0;
-            flex-wrap: wrap;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            width: 250px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #3498db;
-        }
-
-        .feature-title {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .feature-desc {
-            font-size: 0.95rem;
-            color: #bdc3c7;
-            line-height: 1.5;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .stakeholders {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 40px;
             margin: 60px 0;
-            flex-wrap: wrap;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .stakeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 25px;
-            border-radius: 15px;
-            width: 180px;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 35px 25px;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
         }
 
         .stakeholder:hover {
-            transform: scale(1.05);
-            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-15px) scale(1.03);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(52, 152, 219, 0.5);
         }
 
         .stakeholder-icon {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #3498db, #2ecc71);
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.9), rgba(46, 204, 113, 0.9));
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
-            font-size: 2rem;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .stakeholder-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
         }
 
         .stakeholder-desc {
-            font-size: 0.9rem;
-            color: #95a5a6;
+            font-size: 1.05rem;
+            color: #ecf0f1;
             text-align: center;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin: 70px 0;
+            max-width: 1300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 35px 30px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-color: rgba(52, 152, 219, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            color: #3498db;
+            align-self: center;
+        }
+
+        .feature-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .feature-desc {
+            font-size: 1.1rem;
+            color: #e8f4fc;
+            line-height: 1.7;
+            text-align: center;
+            flex-grow: 1;
         }
 
         .cta-section {
-            margin: 50px 0 30px;
+            margin: 60px 0 40px;
         }
 
         .btn {
-            padding: 20px 50px;
-            font-size: 1.3rem;
-            font-weight: 600;
+            padding: 22px 60px;
+            font-size: 1.5rem;
+            font-weight: 700;
             border: none;
-            border-radius: 50px;
+            border-radius: 60px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: inline-flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             text-decoration: none;
-            background: linear-gradient(45deg, #3498db, #2ecc71);
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.9), rgba(46, 204, 113, 0.9));
             color: white;
-            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
         }
 
         .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(52, 152, 219, 0.5);
-            background: linear-gradient(45deg, #2980b9, #27ae60);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 25px 60px rgba(52, 152, 219, 0.6);
+            background: linear-gradient(135deg, rgba(41, 128, 185, 0.9), rgba(39, 174, 96, 0.9));
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn i {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
         }
 
         .footer {
-            margin-top: 40px;
-            color: #95a5a6;
-            font-size: 0.9rem;
+            margin-top: 50px;
+            color: #dfe6e9;
+            font-size: 1.1rem;
             text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
         }
 
         /* Animation */
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
             }
         }
 
@@ -240,45 +306,169 @@
             opacity: 0;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Responsive Design Avancé */
+        @media (max-width: 1600px) {
+            .container {
+                max-width: 1200px;
+            }
+            
             h1 {
-                font-size: 2.5rem;
+                font-size: 3.5rem;
             }
             
             .subtitle {
-                font-size: 1.2rem;
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 1000px;
+                padding: 35px;
+            }
+            
+            h1 {
+                font-size: 3rem;
+            }
+            
+            .subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .stakeholders {
+                gap: 30px;
+            }
+            
+            .features {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                max-width: 800px;
+                padding: 30px;
+            }
+            
+            h1 {
+                font-size: 2.7rem;
+            }
+            
+            .subtitle {
+                font-size: 1.3rem;
+                margin-bottom: 40px;
+            }
+            
+            .stakeholder-icon {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2rem;
+            }
+            
+            .stakeholder-title {
+                font-size: 1.3rem;
+            }
+            
+            .feature-card {
+                padding: 30px 25px;
+            }
+            
+            .btn {
+                padding: 20px 50px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
             }
             
             .container {
                 padding: 25px 20px;
+                border-radius: 20px;
             }
             
-            .features {
-                gap: 20px;
+            h1 {
+                font-size: 2.3rem;
+                margin-bottom: 20px;
             }
             
-            .feature-card {
-                width: 100%;
-                max-width: 300px;
+            .subtitle {
+                font-size: 1.2rem;
+                margin-bottom: 35px;
+            }
+            
+            .logo i {
+                font-size: 3.5rem;
             }
             
             .stakeholders {
-                gap: 20px;
+                gap: 25px;
+                margin: 45px 0;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
             
             .stakeholder {
-                width: 150px;
-                padding: 20px;
+                padding: 25px 20px;
+            }
+            
+            .stakeholder-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .stakeholder-title {
+                font-size: 1.2rem;
+            }
+            
+            .stakeholder-desc {
+                font-size: 1rem;
+            }
+            
+            .features {
+                gap: 25px;
+                margin: 50px 0;
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-card {
+                padding: 25px 20px;
+            }
+            
+            .feature-icon {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+            }
+            
+            .feature-title {
+                font-size: 1.4rem;
+            }
+            
+            .feature-desc {
+                font-size: 1.05rem;
             }
             
             .btn {
                 padding: 18px 40px;
                 font-size: 1.2rem;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .footer {
+                font-size: 1rem;
+                margin-top: 40px;
+                padding-top: 25px;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 576px) {
             h1 {
                 font-size: 2rem;
             }
@@ -287,33 +477,182 @@
                 font-size: 1.1rem;
             }
             
-            .feature-card {
-                padding: 20px;
+            .logo i {
+                font-size: 3rem;
+            }
+            
+            .stakeholders {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
             
             .stakeholder {
-                width: 130px;
-                padding: 15px;
+                max-width: 350px;
+                margin: 0 auto;
             }
             
-            .stakeholder-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 1.7rem;
+            .feature-card {
+                max-width: 350px;
+                margin: 0 auto;
             }
             
             .btn {
                 padding: 16px 30px;
                 font-size: 1.1rem;
-                width: 100%;
-                justify-content: center;
+            }
+            
+            .footer {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .btn {
+                padding: 15px 25px;
+                font-size: 1rem;
+            }
+            
+            .stakeholder-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+            
+            .stakeholder-title {
+                font-size: 1.1rem;
+            }
+            
+            .feature-icon {
+                font-size: 2rem;
+            }
+            
+            .feature-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Pour les très grands écrans (4K et plus) */
+        @media (min-width: 2000px) {
+            .container {
+                max-width: 1800px;
+                padding: 60px;
+            }
+            
+            h1 {
+                font-size: 5rem;
+            }
+            
+            .subtitle {
+                font-size: 2.2rem;
+            }
+            
+            .stakeholder-icon {
+                width: 140px;
+                height: 140px;
+                font-size: 3.5rem;
+            }
+            
+            .stakeholder-title {
+                font-size: 2rem;
+            }
+            
+            .stakeholder-desc {
+                font-size: 1.4rem;
+            }
+            
+            .feature-icon {
+                font-size: 4rem;
+            }
+            
+            .feature-title {
+                font-size: 2rem;
+            }
+            
+            .feature-desc {
+                font-size: 1.4rem;
+            }
+            
+            .btn {
+                padding: 30px 80px;
+                font-size: 2rem;
+            }
+        }
+
+        /* Orientation paysage sur mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 10px auto;
+            }
+            
+            .stakeholders {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin: 30px 0;
+            }
+            
+            .stakeholder {
+                padding: 15px 10px;
+            }
+            
+            .features {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin: 30px 0;
+            }
+            
+            .feature-card {
+                padding: 20px 15px;
+            }
+        }
+
+        /* Support pour les appareils tactiles */
+        @media (hover: none) and (pointer: coarse) {
+            .stakeholder:hover,
+            .feature-card:hover,
+            .btn:hover {
+                transform: none;
+            }
+            
+            .stakeholder:active,
+            .feature-card:active {
+                transform: scale(0.98);
+            }
+            
+            .btn:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Mode d'économie d'énergie */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
     <div class="container fade-in">
-        <div class="logo">
+        <div class="logo float-animation">
             <i class="fas fa-handshake"></i>
         </div>
         
@@ -331,7 +670,7 @@
                     <i class="fas fa-chalkboard-teacher"></i>
                 </div>
                 <div class="stakeholder-title">Enseignants</div>
-                <div class="stakeholder-desc">Partage d'expériences et de ressources pédagogiques</div>
+                <div class="stakeholder-desc">Partage d'expériences et de ressources pédagogiques innovantes</div>
             </div>
             
             <div class="stakeholder">
@@ -339,7 +678,7 @@
                     <i class="fas fa-user-tie"></i>
                 </div>
                 <div class="stakeholder-title">Directeurs d'Écoles</div>
-                <div class="stakeholder-desc">Coordination et supervision des activités pédagogiques</div>
+                <div class="stakeholder-desc">Coordination stratégique et supervision des activités pédagogiques</div>
             </div>
             
             <div class="stakeholder">
@@ -347,7 +686,7 @@
                     <i class="fas fa-user-shield"></i>
                 </div>
                 <div class="stakeholder-title">Inspecteurs</div>
-                <div class="stakeholder-desc">Évaluation et accompagnement des pratiques enseignantes</div>
+                <div class="stakeholder-desc">Évaluation experte et accompagnement des pratiques enseignantes</div>
             </div>
         </div>
 
@@ -358,7 +697,7 @@
                 </div>
                 <div class="feature-title">Échanges & Visio</div>
                 <div class="feature-desc">
-                    Communication en temps réel via visioconférence, messagerie instantanée et forums thématiques
+                    Communication en temps réel via visioconférence HD, messagerie instantanée et forums thématiques collaboratifs
                 </div>
             </div>
             
@@ -368,7 +707,7 @@
                 </div>
                 <div class="feature-title">Partage de Ressources</div>
                 <div class="feature-desc">
-                    Bibliothèque collaborative de cours, exercices, évaluations et supports pédagogiques
+                    Bibliothèque collaborative riche en cours, exercices, évaluations et supports pédagogiques multimédias
                 </div>
             </div>
             
@@ -378,13 +717,13 @@
                 </div>
                 <div class="feature-title">Suivi & Rapport</div>
                 <div class="feature-desc">
-                    Tableaux de bord, analyses statistiques et génération automatique de rapports
+                    Tableaux de bord interactifs, analyses statistiques avancées et génération automatique de rapports détaillés
                 </div>
             </div>
         </div>
 
         <div class="cta-section fade-in delay-4">
-            <a href="Collaboration.html" class="btn">
+            <a href="Collaboration.html" class="btn float-animation">
                 <i class="fas fa-rocket"></i>
                 Accéder à la Plateforme de Collaboration
             </a>
@@ -392,51 +731,67 @@
 
         <div class="footer fade-in delay-4">
             <p>Connectez-vous pour collaborer, partager et innover ensemble dans l'éducation</p>
-            <p style="margin-top: 10px; font-size: 0.8rem;">
-                <i class="fas fa-info-circle"></i> 
-                Compatible avec tous les navigateurs modernes. Fonctionne sur ordinateur, tablette et mobile.
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #b2bec3;">
+                <i class="fas fa-mobile-alt"></i> 
+                Compatible avec tous les navigateurs et appareils • 
+                <i class="fas fa-shield-alt"></i> 
+                Sécurité et confidentialité garanties
             </p>
         </div>
     </div>
 
     <script>
-        // Animation au chargement
+        // Animation et interactions
         document.addEventListener('DOMContentLoaded', function() {
-            // Ajouter la classe d'animation aux éléments
-            const animatedElements = document.querySelectorAll('.fade-in');
-            animatedElements.forEach(element => {
-                element.style.animationPlayState = 'running';
-            });
-            
-            // Vérifier si le fichier Collaboration.html existe
+            // Gestion de la vérification du fichier
             checkCollaborationFile();
             
-            // Ajouter un effet de survol amélioré
-            const cards = document.querySelectorAll('.feature-card, .stakeholder');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.zIndex = '10';
+            // Améliorer l'expérience tactile
+            const interactiveElements = document.querySelectorAll('.stakeholder, .feature-card, .btn');
+            
+            interactiveElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.classList.add('active-touch');
                 });
                 
-                card.addEventListener('mouseleave', function() {
-                    this.style.zIndex = '1';
+                element.addEventListener('touchend', function() {
+                    setTimeout(() => this.classList.remove('active-touch'), 150);
                 });
             });
+            
+            // Adaptation dynamique pour très petits écrans
+            function adaptToScreen() {
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                
+                if (screenWidth < 400 || screenHeight < 500) {
+                    document.body.style.padding = '10px';
+                    document.querySelector('.container').style.padding = '15px 10px';
+                }
+            }
+            
+            adaptToScreen();
+            window.addEventListener('resize', adaptToScreen);
+            
+            // Amélioration pour les préférences de réduction de mouvement
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.float-animation').forEach(el => {
+                    el.style.animation = 'none';
+                });
+            }
         });
 
         function checkCollaborationFile() {
-            // Vérifier si le fichier Collaboration.html existe
             fetch('Collaboration.html')
                 .then(response => {
                     if (!response.ok) {
                         console.warn('Le fichier Collaboration.html n\'a pas été trouvé.');
-                        // Afficher un message discret si le fichier n'existe pas
                         const btn = document.querySelector('.btn');
                         if (btn) {
-                            btn.insertAdjacentHTML('afterend', 
-                                '<p style="color: #e74c3c; margin-top: 10px; font-size: 0.9rem;">' +
-                                '<i class="fas fa-exclamation-triangle"></i> ' +
-                                'Le fichier Collaboration.html n\'a pas été trouvé sur le serveur.</p>');
+                            const warning = document.createElement('p');
+                            warning.style.cssText = 'color: #e74c3c; margin-top: 15px; font-size: 0.9rem; background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 8px;';
+                            warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Le fichier Collaboration.html n\'a pas été trouvé sur le serveur.';
+                            btn.parentNode.insertBefore(warning, btn.nextSibling);
                         }
                     }
                 })
