@@ -14,6 +14,7 @@
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
             --info-color: #9b59b6;
+            --data-analysis-color: #1abc9c;
             --dark-color: #2c3e50;
             --light-color: #f5f5f5;
             --gray-color: #7f8c8d;
@@ -270,6 +271,17 @@
             background-color: #c0392b;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-data-analysis {
+            background-color: var(--data-analysis-color);
+            color: white;
+        }
+
+        .btn-data-analysis:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
         }
 
         /* Section Features */
@@ -569,6 +581,9 @@
                 <li class="nav-tab" data-tab="inspectors">
                     <i class="fas fa-user-shield"></i> Inspecteurs
                 </li>
+                <li class="nav-tab" data-tab="data-analysis">
+                    <i class="fas fa-chart-bar"></i> Analyse des données
+                </li>
                 <li class="nav-tab" data-tab="about">
                     <i class="fas fa-info-circle"></i> À propos
                 </li>
@@ -675,6 +690,32 @@
                             <button id="inspectorAccessBtn" class="btn btn-warning">
                                 <i class="fas fa-sign-in-alt"></i> Accéder à l'interface Inspecteurs
                             </button>
+                        </div>
+                    </div>
+
+                    <div class="card animate-pulse" style="animation-delay: 1s;">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--data-analysis-color), #16a085);">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3>Analyse des Données</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                Accédez aux outils d'analyse avancée des données pédagogiques. Visualisez les tendances, 
+                                générez des rapports statistiques et obtenez des insights pour optimiser la gestion.
+                            </p>
+                            <p>
+                                <strong>Fonctionnalités principales :</strong>
+                            </p>
+                            <ul style="text-align: left; margin-bottom: 20px; padding-left: 20px;">
+                                <li>Visualisations interactives</li>
+                                <li>Analyses statistiques</li>
+                                <li>Rapports détaillés</li>
+                                <li>Tendances et prévisions</li>
+                                <li>Export des données</li>
+                            </ul>
+                            <a href="Analyse.html" class="btn btn-data-analysis">
+                                <i class="fas fa-sign-in-alt"></i> Accéder à l'analyse des données
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -858,6 +899,147 @@
             </div>
         </div>
 
+        <!-- Onglet Analyse des données -->
+        <div id="data-analysis" class="tab-content">
+            <div class="welcome-section">
+                <h2><i class="fas fa-chart-bar"></i> Analyse des Données</h2>
+                <p>
+                    L'interface d'analyse des données vous offre des outils puissants pour visualiser, 
+                    analyser et interpréter les données pédagogiques et administratives de votre établissement.
+                </p>
+                
+                <div style="margin: 40px 0;">
+                    <a href="Analyse.html" class="btn btn-data-analysis" style="width: auto; padding: 15px 40px; font-size: 1.2rem;">
+                        <i class="fas fa-external-link-alt"></i> Ouvrir l'analyse des données
+                    </a>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <div class="section-title">
+                    <h2>Fonctionnalités d'Analyse des Données</h2>
+                    <p>Outils avancés de visualisation et d'analyse statistique</p>
+                </div>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--data-analysis-color), #16a085);">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Visualisations Interactives</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Explorez vos données avec des graphiques interactifs et dynamiques</p>
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Graphiques en courbes et histogrammes</li>
+                                <li>Camemberts et diagrammes circulaires</li>
+                                <li>Cartes thermiques et treemaps</li>
+                                <li>Graphiques en radar et bulles</li>
+                                <li>Filtres interactifs en temps réel</li>
+                            </ul>
+                            <a href="Analyse.html" class="btn btn-data-analysis" style="margin-top: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Accéder aux visualisations
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            <i class="fas fa-calculator"></i>
+                            <h3>Analyses Statistiques</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Effectuez des analyses statistiques approfondies sur vos données</p>
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Statistiques descriptives (moyenne, médiane, écart-type)</li>
+                                <li>Analyses de corrélations</li>
+                                <li>Tests d'hypothèses</li>
+                                <li>Analyses de tendances</li>
+                                <li>Comparaisons temporelles</li>
+                            </ul>
+                            <a href="Analyse.html" class="btn btn-primary" style="margin-top: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Accéder aux analyses
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>Rapports et Export</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Générez et exportez des rapports détaillés au format PDF, Excel ou CSV</p>
+                            <ul style="text-align: left; margin: 20px 0; padding-left: 20px;">
+                                <li>Rapports automatiques pré-formatés</li>
+                                <li>Export des données brutes</li>
+                                <li>Création de rapports personnalisés</li>
+                                <li>Partage des analyses</li>
+                                <li>Planification d'exports récurrents</li>
+                            </ul>
+                            <a href="Analyse.html" class="btn btn-warning" style="margin-top: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Accéder aux rapports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 60px;">
+                    <h2>Types d'Analyses Disponibles</h2>
+                    <p>Découvrez les différents domaines d'analyse couverts</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Analyses Démographiques</h4>
+                        <p>Répartition par âge, genre, ancienneté, etc.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--success-color), #27ae60);">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4>Analyses Pédagogiques</h4>
+                        <p>Performances, résultats, progression des élèves</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--warning-color), #d68910);">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h4>Analyses des Enseignants</h4>
+                        <p>Charges de travail, spécialisations, évaluations</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, var(--info-color), #8e44ad);">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h4>Analyses des Projets</h4>
+                        <p>Suivi des projets pédagogiques et extrascolaires</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <i class="fas fa-retirement"></i>
+                        </div>
+                        <h4>Projections de Retraite</h4>
+                        <p>Analyses prospectives des départs à la retraite</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                            <i class="fas fa-trend-up"></i>
+                        </div>
+                        <h4>Tendances et Prévisions</h4>
+                        <p>Analyses temporelles et projections futures</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Onglet À propos -->
         <div id="about" class="tab-content">
             <div class="welcome-section">
@@ -903,6 +1085,7 @@
                                 <li>Import/Export des données au format JSON</li>
                                 <li>Tableaux de bord et statistiques</li>
                                 <li>Sauvegarde et restauration des données</li>
+                                <li>Analyse avancée des données pédagogiques</li>
                             </ul>
                         </div>
                     </div>
@@ -945,6 +1128,7 @@
                 <a href="#" data-tab="home">Accueil</a>
                 <a href="#" data-tab="teachers">Enseignants</a>
                 <a href="#" data-tab="inspectors">Inspecteurs</a>
+                <a href="#" data-tab="data-analysis">Analyse des données</a>
                 <a href="#" data-tab="about">À propos</a>
             </div>
             <p>Plateforme de Gestion Pédagogique Complète - Version 1.0</p>
@@ -1144,10 +1328,12 @@
         function initEvents() {
             // Vérifier si le fichier INSPECTEUR-EDS.html existe
             checkInspectorFile();
+            
+            // Vérifier si le fichier Analyse.html existe
+            checkAnalysisFile();
         }
 
         function checkInspectorFile() {
-            // Cette fonction peut être utilisée pour vérifier si le fichier existe
             fetch('INSPECTEUR-EDS.html')
                 .then(response => {
                     if (!response.ok) {
@@ -1156,6 +1342,18 @@
                 })
                 .catch(error => {
                     console.warn('Impossible de vérifier l\'existence du fichier INSPECTEUR-EDS.html:', error);
+                });
+        }
+
+        function checkAnalysisFile() {
+            fetch('Analyse.html')
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn('Le fichier Analyse.html n\'a pas été trouvé. Assurez-vous qu\'il est bien présent dans le même répertoire.');
+                    }
+                })
+                .catch(error => {
+                    console.warn('Impossible de vérifier l\'existence du fichier Analyse.html:', error);
                 });
         }
 
