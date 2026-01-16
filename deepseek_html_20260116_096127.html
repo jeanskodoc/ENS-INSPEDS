@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme de Collaboration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('Collaboration.jpeg') center/cover no-repeat fixed;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            margin-bottom: 30px;
+        }
+
+        .logo i {
+            font-size: 4rem;
+            color: #3498db;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: #ecf0f1;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            width: 250px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            color: #bdc3c7;
+            line-height: 1.5;
+        }
+
+        .stakeholders {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 60px 0;
+            flex-wrap: wrap;
+        }
+
+        .stakeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 15px;
+            width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .stakeholder:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .stakeholder-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .stakeholder-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stakeholder-desc {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-align: center;
+        }
+
+        .cta-section {
+            margin: 50px 0 30px;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: white;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(52, 152, 219, 0.5);
+            background: linear-gradient(45deg, #2980b9, #27ae60);
+        }
+
+        .btn i {
+            font-size: 1.5rem;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: #95a5a6;
+            font-size: 0.9rem;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+            opacity: 0;
+        }
+
+        .delay-4 {
+            animation-delay: 0.8s;
+            opacity: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                padding: 25px 20px;
+            }
+            
+            .features {
+                gap: 20px;
+            }
+            
+            .feature-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .stakeholders {
+                gap: 20px;
+            }
+            
+            .stakeholder {
+                width: 150px;
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 18px 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .feature-card {
+                padding: 20px;
+            }
+            
+            .stakeholder {
+                width: 130px;
+                padding: 15px;
+            }
+            
+            .stakeholder-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 1.7rem;
+            }
+            
+            .btn {
+                padding: 16px 30px;
+                font-size: 1.1rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="logo">
+            <i class="fas fa-handshake"></i>
+        </div>
+        
+        <h1 class="fade-in delay-1">Plateforme de Collaboration</h1>
+        
+        <div class="subtitle fade-in delay-1">
+            Entre <span class="highlight">Enseignants</span>, 
+            <span class="highlight">Inspecteurs</span> et 
+            <span class="highlight">Directeurs d'Écoles</span>
+        </div>
+
+        <div class="stakeholders fade-in delay-2">
+            <div class="stakeholder">
+                <div class="stakeholder-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stakeholder-title">Enseignants</div>
+                <div class="stakeholder-desc">Partage d'expériences et de ressources pédagogiques</div>
+            </div>
+            
+            <div class="stakeholder">
+                <div class="stakeholder-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="stakeholder-title">Directeurs d'Écoles</div>
+                <div class="stakeholder-desc">Coordination et supervision des activités pédagogiques</div>
+            </div>
+            
+            <div class="stakeholder">
+                <div class="stakeholder-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="stakeholder-title">Inspecteurs</div>
+                <div class="stakeholder-desc">Évaluation et accompagnement des pratiques enseignantes</div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card fade-in delay-3">
+                <div class="feature-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="feature-title">Échanges & Visio</div>
+                <div class="feature-desc">
+                    Communication en temps réel via visioconférence, messagerie instantanée et forums thématiques
+                </div>
+            </div>
+            
+            <div class="feature-card fade-in delay-3" style="animation-delay: 0.5s">
+                <div class="feature-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <div class="feature-title">Partage de Ressources</div>
+                <div class="feature-desc">
+                    Bibliothèque collaborative de cours, exercices, évaluations et supports pédagogiques
+                </div>
+            </div>
+            
+            <div class="feature-card fade-in delay-3" style="animation-delay: 0.7s">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="feature-title">Suivi & Rapport</div>
+                <div class="feature-desc">
+                    Tableaux de bord, analyses statistiques et génération automatique de rapports
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section fade-in delay-4">
+            <a href="Collaboration.html" class="btn">
+                <i class="fas fa-rocket"></i>
+                Accéder à la Plateforme de Collaboration
+            </a>
+        </div>
+
+        <div class="footer fade-in delay-4">
+            <p>Connectez-vous pour collaborer, partager et innover ensemble dans l'éducation</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                <i class="fas fa-info-circle"></i> 
+                Compatible avec tous les navigateurs modernes. Fonctionne sur ordinateur, tablette et mobile.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Animation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajouter la classe d'animation aux éléments
+            const animatedElements = document.querySelectorAll('.fade-in');
+            animatedElements.forEach(element => {
+                element.style.animationPlayState = 'running';
+            });
+            
+            // Vérifier si le fichier Collaboration.html existe
+            checkCollaborationFile();
+            
+            // Ajouter un effet de survol amélioré
+            const cards = document.querySelectorAll('.feature-card, .stakeholder');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.zIndex = '10';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.zIndex = '1';
+                });
+            });
+        });
+
+        function checkCollaborationFile() {
+            // Vérifier si le fichier Collaboration.html existe
+            fetch('Collaboration.html')
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn('Le fichier Collaboration.html n\'a pas été trouvé.');
+                        // Afficher un message discret si le fichier n'existe pas
+                        const btn = document.querySelector('.btn');
+                        if (btn) {
+                            btn.insertAdjacentHTML('afterend', 
+                                '<p style="color: #e74c3c; margin-top: 10px; font-size: 0.9rem;">' +
+                                '<i class="fas fa-exclamation-triangle"></i> ' +
+                                'Le fichier Collaboration.html n\'a pas été trouvé sur le serveur.</p>');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.warn('Impossible de vérifier l\'existence du fichier Collaboration.html:', error);
+                });
+        }
+    </script>
+</body>
+</html>
