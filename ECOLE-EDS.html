@@ -1609,7 +1609,7 @@
                 </div>
             </div>
 
-            <!-- Onglet 4: Évaluations & Statistiques - CORRIGÉ -->
+            <!-- Onglet 4: Évaluations & Statistiques -->
             <div id="tab4" class="tab-content">
                 <div class="tab-actions">
                     <button type="button" class="btn btn-info" onclick="exportJSON('tab4')">
@@ -1721,7 +1721,7 @@
                 </div>
             </div>
 
-            <!-- Onglet 5: Projets & Activités - CORRIGÉ -->
+            <!-- Onglet 5: Projets & Activités -->
             <div id="tab5" class="tab-content">
                 <div class="tab-actions">
                     <button type="button" class="btn btn-info" onclick="exportJSON('tab5')">
@@ -2045,7 +2045,7 @@
     </div>
 
     <script>
-        // Variables globales améliorées pour la synchronisation
+        // Variables globales pour la synchronisation
         let teacherData = {
             establishment: {},
             personal: {},
@@ -2060,6 +2060,7 @@
             projects: [],
             activities: [],
             meetings: [],
+            resources: [],
             backups: [],
             logs: []
         };
@@ -2215,6 +2216,8 @@
             const teacherForm = document.getElementById('teacherForm');
             if (teacherForm) {
                 teacherForm.addEventListener('submit', handleSubmit);
+                teacherForm.addEventListener('input', syncAllData);
+                teacherForm.addEventListener('change', syncAllData);
             }
             
             // Recherche
@@ -2288,23 +2291,6 @@
             const importFile = document.getElementById('importFile');
             if (importFile) {
                 importFile.addEventListener('change', handleFileSelect);
-            }
-            
-            // Synchronisation des données
-            initDataSync();
-        }
-
-        function initDataSync() {
-            // Écouter les changements sur tous les champs du formulaire
-            const form = document.getElementById('teacherForm');
-            if (form) {
-                form.addEventListener('change', function() {
-                    syncAllData();
-                });
-                
-                form.addEventListener('input', function() {
-                    syncAllData();
-                });
             }
         }
 
@@ -2399,9 +2385,9 @@
             // Collecter les matières supplémentaires
             const subjectRows = document.querySelectorAll('#subjectsContainer .form-row');
             subjectRows.forEach((row, index) => {
-                if (index > 0) { // Ignorer la première ligne (matière principale/secondaire)
-                    const subjectInput = row.querySelector('input[type="text"]');
-                    const hoursInput = row.querySelector('input[type="number"]');
+                if (index > 0) {
+                    const subjectInput = row.querySelector('.subject-field');
+                    const hoursInput = row.querySelector('.subject-hours-field');
                     
                     if (subjectInput && subjectInput.value) {
                         teacherData.subjects.push({
@@ -3194,14 +3180,9 @@
                 if (shouldShow) visibleCount++;
             });
             
-            // Si aucun filtre n'est actif, ne pas afficher le compteur
-            if (!searchTerm && !filterSubject && !filterClass && !filterType) {
-                return;
-            }
-            
             // Afficher le nombre de résultats
             const searchBox = document.getElementById('evaluationSearch');
-            if (searchBox) {
+            if (searchBox && (searchTerm || filterSubject || filterClass || filterType)) {
                 const currentParent = searchBox.parentElement;
                 const resultCount = document.createElement('div');
                 resultCount.className = 'search-result-count';
@@ -3211,9 +3192,7 @@
                 const oldCount = currentParent.querySelector('.search-result-count');
                 if (oldCount) oldCount.remove();
                 
-                if (searchTerm || filterSubject || filterClass || filterType) {
-                    currentParent.appendChild(resultCount);
-                }
+                currentParent.appendChild(resultCount);
             }
         }
 
@@ -4015,10 +3994,7 @@
                     // Restaurer les évaluations
                     if (teacherData.evaluations && teacherData.evaluations.length > 0) {
                         counters.evaluation = teacherData.evaluations.length;
-                        teacherData.evaluations.forEach(eval => {
-                            // Recréer l'affichage des évaluations
-                            // Note: Pour une restauration complète, il faudrait recréer le HTML
-                        });
+                        // Pour une restauration complète, il faudrait recréer le HTML des évaluations
                     }
                     
                     // Restaurer les projets
@@ -4395,10 +4371,7 @@
             return count;
         }
 
-        // Les autres fonctions existantes (exportJSON, importJSON, etc.) restent similaires
-        // mais sont adaptées pour utiliser teacherData au lieu de currentData
-
-        // Fonctions de base pour les autres onglets
+        // Fonctions d'export/import
         function exportJSON(tab) {
             let data = {};
             switch(tab) {
@@ -4522,7 +4495,6 @@
             input.click();
         }
 
-        // Fonctions restantes (simplifiées pour l'exemple)
         function exportAllJSON() {
             const dataStr = JSON.stringify(teacherData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
@@ -4565,7 +4537,7 @@
             input.click();
         }
 
-        // Fonction pour le dashboard (simplifiée)
+        // Fonction pour le dashboard
         function updateDashboard() {
             updateProfileSummary();
             updateRecentActivity();
@@ -4691,10 +4663,7 @@
             syncAllData();
         }
 
-        // Les autres fonctions (addAcademicDiploma, addTraining, etc.) restent similaires
-        // mais doivent être adaptées pour synchroniser avec teacherData
-
-        // Exemple d'adaptation d'une fonction existante
+        // Fonctions pour les diplômes et formations
         function addAcademicDiploma() {
             const container = document.getElementById('academicDiplomas');
             const diplomaId = `diploma_${Date.now()}`;
@@ -4738,15 +4707,12 @@
             syncAllData();
         }
 
-        // Les autres fonctions similaires (addTraining, addLanguage, etc.) doivent être adaptées de la même manière
-
         // Fonctions utilitaires restantes
         function printForm() {
             window.print();
         }
 
         function generateQRCode() {
-            // Implémentation simplifiée
             openModal('QR Code', `
                 <div class="text-center">
                     <p>Fonctionnalité QR Code - À implémenter</p>
