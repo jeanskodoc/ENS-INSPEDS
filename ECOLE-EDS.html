@@ -1432,7 +1432,6 @@
                 <!-- Navigation secondaire -->
                 <div class="sub-tabs mb-30">
                     <div class="sub-tab active" data-subtab="planning">Planning & Emploi du temps</div>
-                    <div class="sub-tab" data-subtab="themes">Thèmes & Programmes</div>
                     <div class="sub-tab" data-subtab="lessons">Leçons & Séances</div>
                     <div class="sub-tab" data-subtab="tp">TP & Expériences</div>
                     <div class="sub-tab" data-subtab="resources">Ressources & Supports</div>
@@ -1470,21 +1469,6 @@
                             <button type="button" class="btn btn-secondary mt-20" onclick="generateTimetable()">
                                 <i class="fas fa-table"></i> Générer l'emploi du temps
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sub-tab-content" data-subtab="themes">
-                    <div class="form-section">
-                        <h2><i class="fas fa-sitemap"></i> THÈMES ET PROGRAMMES PAR MATIÈRE</h2>
-                        <div class="form-group">
-                            <label><i class="fas fa-book-open"></i> Sélectionnez la matière</label>
-                            <select id="subjectSelector" onchange="loadSubjectThemes(this.value)">
-                                <option value="">-- Sélectionner une matière --</option>
-                            </select>
-                        </div>
-                        <div id="themesContainer">
-                            <!-- Les thèmes seront chargés dynamiquement -->
                         </div>
                     </div>
                 </div>
@@ -2512,28 +2496,7 @@
         // Mettre à jour le sélecteur de matières dans l'onglet 2
         function updateSubjectsSelector() {
             const selector = document.getElementById('subjectSelector');
-            if (!selector) return;
-            
-            selector.innerHTML = '<option value="">-- Sélectionner une matière --</option>';
-            
-            teacherData.subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.name;
-                option.textContent = subject.name;
-                selector.appendChild(option);
-            });
-            
-            // Mettre à jour aussi les filtres de leçons
-            const lessonFilterSubject = document.getElementById('lessonFilterSubject');
-            if (lessonFilterSubject) {
-                lessonFilterSubject.innerHTML = '<option value="">Toutes les matières</option>';
-                teacherData.subjects.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject.name;
-                    option.textContent = subject.name;
-                    lessonFilterSubject.appendChild(option);
-                });
-            }
+            // Supprimé car l'onglet Thèmes a été supprimé
         }
 
         function updateEvaluationFilters() {
@@ -2618,76 +2581,11 @@
 
         // Fonction pour charger automatiquement les données dans l'onglet 2
         function loadSubjectThemes(subject) {
-            const container = document.getElementById('themesContainer');
-            if (!container) return;
-            
-            if (!subject) {
-                container.innerHTML = '<p class="text-center">Veuillez sélectionner une matière</p>';
-                return;
-            }
-            
-            // Vérifier si cette matière existe dans les données
-            const subjectData = teacherData.subjects.find(s => s.name === subject);
-            
-            container.innerHTML = `
-                <div class="theme-container">
-                    <h4>Thèmes pour ${subject}</h4>
-                    <div class="current-class-display">
-                        <h4><i class="fas fa-info-circle"></i> Informations sur la matière</h4>
-                        ${subjectData ? `
-                            <p><strong>Type:</strong> ${subjectData.type === 'main' ? 'Matière principale' : subjectData.type === 'secondary' ? 'Matière secondaire' : 'Matière supplémentaire'}</p>
-                            ${subjectData.hours ? `<p><strong>Heures/semaine:</strong> ${subjectData.hours} heures</p>` : ''}
-                        ` : ''}
-                    </div>
-                    <div class="form-group">
-                        <label>Ajouter un nouveau thème</label>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <input type="text" id="newThemeName" placeholder="Nom du thème">
-                            </div>
-                            <div class="form-col">
-                                <button type="button" class="btn btn-secondary" onclick="addTheme('${subject}')">
-                                    <i class="fas fa-plus"></i> Ajouter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="themesList"></div>
-                </div>
-            `;
+            // Cette fonction a été supprimée avec l'onglet Thèmes
         }
 
         function addTheme(subject) {
-            const themeNameInput = document.getElementById('newThemeName');
-            if (!themeNameInput || !themeNameInput.value) {
-                showNotification('Veuillez entrer un nom de thème', 'warning');
-                return;
-            }
-            
-            const themesList = document.getElementById('themesList');
-            if (themesList) {
-                const themeId = `theme_${Date.now()}`;
-                const themeHTML = `
-                    <div class="dynamic-item" id="${themeId}">
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label>Thème: ${themeNameInput.value}</label>
-                                    <textarea rows="2" placeholder="Description du thème"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="section-actions">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${themeId}')">
-                                <i class="fas fa-trash"></i> Supprimer
-                            </button>
-                        </div>
-                    </div>
-                `;
-                themesList.insertAdjacentHTML('beforeend', themeHTML);
-                themeNameInput.value = '';
-                syncAllData();
-            }
+            // Cette fonction a été supprimée avec l'onglet Thèmes
         }
 
         // Lors de l'ajout d'une leçon, pré-remplir avec les informations synchronisées
@@ -3916,7 +3814,6 @@
                     
                     updateSchoolName();
                     calculateRetirementDate();
-                    updateSubjectsSelector();
                     updateSyncedInfoDisplay();
                     
                     // Restaurer les évaluations
@@ -3966,7 +3863,6 @@
         function updateTabUI(tabId) {
             switch(tabId) {
                 case 'tab2':
-                    updateSubjectsSelector();
                     updateSyncedInfoDisplay();
                     break;
                 case 'tab3':
