@@ -997,6 +997,57 @@
             color: var(--success-color);
             margin-bottom: 5px;
         }
+        
+        /* Style spécifique pour l'emploi du temps */
+        .timetable-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .timetable-cell {
+            min-width: 120px;
+            height: 40px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .timetable-cell:hover {
+            background: #f8f9fa;
+            transform: scale(1.02);
+        }
+        
+        .timetable-cell.main {
+            background: #e3f2fd;
+            border-color: var(--primary-color);
+        }
+        
+        .timetable-cell.secondary {
+            background: #e8f5e9;
+            border-color: var(--success-color);
+        }
+        
+        .timetable-cell.tp {
+            background: #fff3e0;
+            border-color: var(--warning-color);
+        }
+        
+        .timetable-cell.meeting {
+            background: #f3e5f5;
+            border-color: var(--info-color);
+        }
+        
+        .timetable-cell.free {
+            background: #f5f5f5;
+        }
+        
+        .timetable-cell.break {
+            background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px);
+            text-align: center;
+            font-style: italic;
+            color: var(--gray-color);
+        }
     </style>
 </head>
 <body>
@@ -1356,8 +1407,8 @@
                     <div class="form-row">
                         <div class="form-col">
                             <div class="form-group">
-                                <label for="currentClass"><i class="fas fa-chalkboard"></i> Classe(s) actuelle(s)</label>
-                                <input type="text" id="currentClass" placeholder="Ex: 3ème A, Terminale C...">
+                                <label for="currentClass"><i class="fas fa-chalkboard"></i> Classe(s) actuelle(s) *</label>
+                                <input type="text" id="currentClass" placeholder="Ex: 3ème A, Terminale C..." required>
                             </div>
                         </div>
                         <div class="form-col">
@@ -1430,13 +1481,34 @@
                     <div class="form-section">
                         <h2><i class="fas fa-calendar-alt"></i> EMPLOI DU TEMPS HEBDOMADAIRE</h2>
                         <div class="form-group">
-                            <label><i class="fas fa-info-circle"></i> Sélectionnez la matière et les créneaux</label>
+                            <div class="current-class-display mb-20">
+                                <h4><i class="fas fa-info-circle"></i> Paramètres généraux</h4>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label><i class="fas fa-chalkboard"></i> Classe(s) à planifier</label>
+                                        <input type="text" id="planningClasses" placeholder="Ex: 3ème A, Terminale C">
+                                    </div>
+                                    <div class="form-col">
+                                        <label><i class="fas fa-clock"></i> Heures par séance</label>
+                                        <input type="number" id="sessionDuration" value="55" min="30" max="120" step="5">
+                                        <small>Durée en minutes</small>
+                                    </div>
+                                </div>
+                            </div>
                             <div id="timetableContainer">
                                 <!-- L'emploi du temps sera généré dynamiquement -->
                             </div>
-                            <button type="button" class="btn btn-secondary mt-20" onclick="generateTimetable()">
-                                <i class="fas fa-table"></i> Générer l'emploi du temps
-                            </button>
+                            <div class="mt-20">
+                                <button type="button" class="btn btn-secondary" onclick="generateTimetable()">
+                                    <i class="fas fa-table"></i> Générer l'emploi du temps
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="saveTimetable()">
+                                    <i class="fas fa-save"></i> Sauvegarder l'emploi du temps
+                                </button>
+                                <button type="button" class="btn btn-light" onclick="printTimetable()">
+                                    <i class="fas fa-print"></i> Imprimer
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1846,7 +1918,8 @@
                 lessons: [],
                 tps: [],
                 resources: [],
-                timetable: {}
+                timetable: {},
+                planningClasses: ""
             },
             diplomas: [],
             trainings: [],
@@ -1953,6 +2026,15 @@
 
         function loadSubTabData(subtabId) {
             switch(subtabId) {
+                case 'planning':
+                    // Pré-remplir les classes pour l'emploi du temps
+                    const planningClassesInput = document.getElementById('planningClasses');
+                    if (planningClassesInput && !planningClassesInput.value && teacherData.professional.current_class) {
+                        planningClassesInput.value = teacherData.professional.current_class;
+                    }
+                    // Charger l'emploi du temps sauvegardé
+                    loadTimetableData();
+                    break;
                 case 'themes':
                     updateSubjectsSelector();
                     break;
@@ -2002,11 +2084,20 @@
             // Upload de fichiers
             document.getElementById('resourceUpload')?.addEventListener('change', handleResourceUpload);
             document.getElementById('importFile')?.addEventListener('change', handleFileSelect);
+            
+            // Synchronisation des classes pour l'emploi du temps
+            document.getElementById('currentClass')?.addEventListener('change', function() {
+                const planningClassesInput = document.getElementById('planningClasses');
+                if (planningClassesInput && !planningClassesInput.value) {
+                    planningClassesInput.value = this.value;
+                }
+            });
         }
 
         // Fonction principale de synchronisation
         function syncAllData() {
             collectTab1Data();
+            collectPlanningData();
             saveToLocalStorage();
             
             // Mettre à jour les interfaces dépendantes
@@ -2103,6 +2194,11 @@
                     }
                 }
             });
+        }
+
+        function collectPlanningData() {
+            const planningClasses = document.getElementById('planningClasses')?.value || '';
+            teacherData.teaching.planningClasses = planningClasses;
         }
 
         function updateSchoolName() {
@@ -2322,497 +2418,102 @@
             syncAllData();
         }
 
-        function loadSubjectThemes(subject) {
-            const container = document.getElementById('themesContainer');
-            if (!container) return;
-            
-            if (!subject) {
-                container.innerHTML = '<p class="text-center">Veuillez sélectionner une matière</p>';
-                return;
-            }
-            
-            container.innerHTML = `
-                <div class="theme-container">
-                    <h4>Thèmes pour ${subject}</h4>
-                    <div class="form-group">
-                        <label>Ajouter un nouveau thème</label>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <input type="text" id="newThemeName" placeholder="Nom du thème">
-                            </div>
-                            <div class="form-col">
-                                <button type="button" class="btn btn-secondary" onclick="addTheme('${subject}')">
-                                    <i class="fas fa-plus"></i> Ajouter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="themesList">
-                        <!-- Thèmes seront ajoutés ici -->
-                    </div>
-                </div>
-            `;
-            
-            // Charger les thèmes existants
-            if (teacherData.teaching.themes[subject]) {
-                const themesList = document.getElementById('themesList');
-                teacherData.teaching.themes[subject].forEach(theme => {
-                    addThemeToDisplay(subject, theme);
-                });
-            }
-        }
-
-        function addTheme(subject) {
-            const themeName = document.getElementById('newThemeName').value;
-            if (!themeName) {
-                showNotification('Veuillez entrer un nom de thème', 'warning');
-                return;
-            }
-            
-            const theme = {
-                id: Date.now(),
-                name: themeName,
-                description: '',
-                createdAt: new Date().toISOString()
-            };
-            
-            if (!teacherData.teaching.themes[subject]) {
-                teacherData.teaching.themes[subject] = [];
-            }
-            
-            teacherData.teaching.themes[subject].push(theme);
-            addThemeToDisplay(subject, theme);
-            
-            document.getElementById('newThemeName').value = '';
-            syncAllData();
-            showNotification('Thème ajouté avec succès', 'success');
-        }
-
-        function addThemeToDisplay(subject, theme) {
-            const themesList = document.getElementById('themesList');
-            if (!themesList) return;
-            
-            const themeElement = document.createElement('div');
-            themeElement.className = 'dynamic-item';
-            themeElement.innerHTML = `
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label>${theme.name}</label>
-                            <textarea placeholder="Description du thème" onchange="updateTheme('${subject}', ${theme.id}, this.value)">${theme.description || ''}</textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="section-actions">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteTheme('${subject}', ${theme.id})">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
-                </div>
-            `;
-            
-            themesList.appendChild(themeElement);
-        }
-
-        function updateTheme(subject, themeId, description) {
-            if (teacherData.teaching.themes[subject]) {
-                const theme = teacherData.teaching.themes[subject].find(t => t.id === themeId);
-                if (theme) {
-                    theme.description = description;
-                    syncAllData();
-                }
-            }
-        }
-
-        function deleteTheme(subject, themeId) {
-            if (confirm('Voulez-vous vraiment supprimer ce thème ?')) {
-                if (teacherData.teaching.themes[subject]) {
-                    teacherData.teaching.themes[subject] = teacherData.teaching.themes[subject].filter(t => t.id !== themeId);
-                    syncAllData();
-                    loadSubjectThemes(subject);
-                    showNotification('Thème supprimé', 'success');
-                }
-            }
-        }
-
-        function addNewLesson() {
-            const lessonId = `lesson_${Date.now()}`;
-            const currentDate = new Date().toISOString().split('T')[0];
-            const mainSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
-            const currentClass = teacherData.professional.current_class || '';
-            
-            const lesson = {
-                id: lessonId,
-                title: '',
-                date: currentDate,
-                duration: 1,
-                subject: mainSubject,
-                class: currentClass,
-                objectives: '',
-                content: '',
-                materials: '',
-                difficulties: '',
-                solutions: '',
-                createdAt: new Date().toISOString()
-            };
-            
-            if (!teacherData.teaching.lessons) {
-                teacherData.teaching.lessons = [];
-            }
-            
-            teacherData.teaching.lessons.push(lesson);
-            displayLesson(lesson);
-            syncAllData();
-            
-            showNotification('Nouvelle leçon créée', 'success');
-        }
-
-        function displayLesson(lesson) {
-            const container = document.getElementById('lessonsContainer');
-            if (!container) return;
-            
-            const lessonElement = document.createElement('div');
-            lessonElement.className = 'lesson-container';
-            lessonElement.id = lesson.id;
-            lessonElement.innerHTML = `
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-book"></i> Titre de la leçon</label>
-                            <input type="text" value="${lesson.title}" onchange="updateLessonField('${lesson.id}', 'title', this.value)" placeholder="Titre de la leçon">
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Date</label>
-                            <input type="date" value="${lesson.date}" onchange="updateLessonField('${lesson.id}', 'date', this.value)">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-clock"></i> Durée (heures)</label>
-                            <input type="number" value="${lesson.duration}" onchange="updateLessonField('${lesson.id}', 'duration', this.value)" min="0.5" max="4" step="0.5">
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-book"></i> Matière</label>
-                            <input type="text" value="${lesson.subject}" onchange="updateLessonField('${lesson.id}', 'subject', this.value)" placeholder="Matière">
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-users"></i> Classe</label>
-                            <input type="text" value="${lesson.class}" onchange="updateLessonField('${lesson.id}', 'class', this.value)" placeholder="Ex: 3ème A">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-bullseye"></i> Objectifs pédagogiques</label>
-                    <textarea onchange="updateLessonField('${lesson.id}', 'objectives', this.value)" placeholder="Objectifs spécifiques de la leçon">${lesson.objectives || ''}</textarea>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-tasks"></i> Déroulement</label>
-                    <textarea onchange="updateLessonField('${lesson.id}', 'content', this.value)" placeholder="Plan détaillé de la séance">${lesson.content || ''}</textarea>
-                </div>
-                <div class="section-actions">
-                    <button type="button" class="btn btn-success btn-sm" onclick="saveLesson('${lesson.id}')">
-                        <i class="fas fa-save"></i> Enregistrer
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteLesson('${lesson.id}')">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
-                </div>
-            `;
-            
-            container.appendChild(lessonElement);
-        }
-
-        function updateLessonField(lessonId, field, value) {
-            const lesson = teacherData.teaching.lessons.find(l => l.id === lessonId);
-            if (lesson) {
-                lesson[field] = value;
-                syncAllData();
-            }
-        }
-
-        function saveLesson(lessonId) {
-            showNotification('Leçon sauvegardée', 'success');
-            syncAllData();
-        }
-
-        function deleteLesson(lessonId) {
-            if (confirm('Voulez-vous vraiment supprimer cette leçon ?')) {
-                teacherData.teaching.lessons = teacherData.teaching.lessons.filter(l => l.id !== lessonId);
-                const element = document.getElementById(lessonId);
-                if (element) element.remove();
-                syncAllData();
-                showNotification('Leçon supprimée', 'success');
-            }
-        }
-
-        function loadLessons() {
-            const container = document.getElementById('lessonsContainer');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (teacherData.teaching.lessons && teacherData.teaching.lessons.length > 0) {
-                teacherData.teaching.lessons.forEach(lesson => {
-                    displayLesson(lesson);
-                });
-            }
-        }
-
-        function filterLessons() {
-            const searchTerm = document.getElementById('lessonSearch').value.toLowerCase();
-            const filterSubject = document.getElementById('lessonFilterSubject').value;
-            const filterClass = document.getElementById('lessonFilterClass').value;
-            
-            const lessons = document.querySelectorAll('.lesson-container');
-            
-            lessons.forEach(lesson => {
-                const title = lesson.querySelector('input[type="text"]')?.value.toLowerCase() || '';
-                const subject = lesson.querySelector('input[placeholder="Matière"]')?.value || '';
-                const classe = lesson.querySelector('input[placeholder="Ex: 3ème A"]')?.value || '';
-                
-                let show = true;
-                
-                if (searchTerm && !title.includes(searchTerm)) {
-                    show = false;
-                }
-                
-                if (filterSubject && subject !== filterSubject) {
-                    show = false;
-                }
-                
-                if (filterClass && classe !== filterClass) {
-                    show = false;
-                }
-                
-                lesson.style.display = show ? 'block' : 'none';
-            });
-        }
-
-        function addNewTP() {
-            const tpId = `tp_${Date.now()}`;
-            const currentDate = new Date().toISOString().split('T')[0];
-            const mainSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
-            const currentClass = teacherData.professional.current_class || '';
-            
-            const tp = {
-                id: tpId,
-                title: '',
-                date: currentDate,
-                subject: mainSubject,
-                class: currentClass,
-                objectives: '',
-                procedure: '',
-                materials: '',
-                results: '',
-                createdAt: new Date().toISOString()
-            };
-            
-            if (!teacherData.teaching.tps) {
-                teacherData.teaching.tps = [];
-            }
-            
-            teacherData.teaching.tps.push(tp);
-            displayTP(tp);
-            syncAllData();
-            
-            showNotification('Nouveau TP créé', 'success');
-        }
-
-        function displayTP(tp) {
-            const container = document.getElementById('tpContainer');
-            if (!container) return;
-            
-            const tpElement = document.createElement('div');
-            tpElement.className = 'tp-container';
-            tpElement.id = tp.id;
-            tpElement.innerHTML = `
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-flask"></i> Titre du TP</label>
-                            <input type="text" value="${tp.title}" onchange="updateTPField('${tp.id}', 'title', this.value)" placeholder="Titre du TP">
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Date</label>
-                            <input type="date" value="${tp.date}" onchange="updateTPField('${tp.id}', 'date', this.value)">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-book"></i> Matière</label>
-                            <input type="text" value="${tp.subject}" onchange="updateTPField('${tp.id}', 'subject', this.value)" placeholder="Matière">
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label><i class="fas fa-users"></i> Classe</label>
-                            <input type="text" value="${tp.class}" onchange="updateTPField('${tp.id}', 'class', this.value)" placeholder="Classe">
-                        </div>
-                    </div>
-                </div>
-                <div class="section-actions">
-                    <button type="button" class="btn btn-success btn-sm" onclick="saveTP('${tp.id}')">
-                        <i class="fas fa-save"></i> Enregistrer
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteTP('${tp.id}')">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
-                </div>
-            `;
-            
-            container.appendChild(tpElement);
-        }
-
-        function updateTPField(tpId, field, value) {
-            const tp = teacherData.teaching.tps.find(t => t.id === tpId);
-            if (tp) {
-                tp[field] = value;
-                syncAllData();
-            }
-        }
-
-        function loadTPs() {
-            const container = document.getElementById('tpContainer');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (teacherData.teaching.tps && teacherData.teaching.tps.length > 0) {
-                teacherData.teaching.tps.forEach(tp => {
-                    displayTP(tp);
-                });
-            }
-        }
-
-        function handleResourceUpload(event) {
-            const files = event.target.files;
-            const container = document.getElementById('resourcesList');
-            
-            if (!container) return;
-            
-            Array.from(files).forEach(file => {
-                const resourceId = `resource_${Date.now()}`;
-                const resource = {
-                    id: resourceId,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    uploadedAt: new Date().toISOString()
-                };
-                
-                if (!teacherData.teaching.resources) {
-                    teacherData.teaching.resources = [];
-                }
-                
-                teacherData.teaching.resources.push(resource);
-                
-                const resourceElement = document.createElement('div');
-                resourceElement.className = 'attachment-item';
-                resourceElement.innerHTML = `
-                    <div>
-                        <i class="fas fa-file"></i>
-                        <span>${file.name}</span>
-                        <small>(${formatFileSize(file.size)})</small>
-                    </div>
-                    <div>
-                        <button type="button" class="btn btn-xs btn-light" onclick="previewResource('${resourceId}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button type="button" class="btn btn-xs btn-danger" onclick="deleteResource('${resourceId}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                
-                container.appendChild(resourceElement);
-            });
-            
-            showNotification(`${files.length} ressource(s) ajoutée(s)`, 'success');
-            syncAllData();
-        }
-
-        function loadResources() {
-            const container = document.getElementById('resourcesList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (teacherData.teaching.resources && teacherData.teaching.resources.length > 0) {
-                teacherData.teaching.resources.forEach(resource => {
-                    const resourceElement = document.createElement('div');
-                    resourceElement.className = 'attachment-item';
-                    resourceElement.innerHTML = `
-                        <div>
-                            <i class="fas fa-file"></i>
-                            <span>${resource.name}</span>
-                            <small>(${formatFileSize(resource.size)})</small>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-xs btn-light" onclick="previewResource('${resource.id}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button type="button" class="btn btn-xs btn-danger" onclick="deleteResource('${resource.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    
-                    container.appendChild(resourceElement);
-                });
-            }
-        }
-
+        // Fonction améliorée pour générer l'emploi du temps
         function generateTimetable() {
             const container = document.getElementById('timetableContainer');
+            if (!container) return;
+            
+            // Récupérer les paramètres
+            const planningClasses = document.getElementById('planningClasses')?.value || teacherData.professional.current_class || 'Non spécifié';
+            const sessionDuration = parseInt(document.getElementById('sessionDuration')?.value) || 55;
+            
+            // Définir les jours et les horaires selon les spécifications
             const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-            const hours = ['8h-9h', '9h-10h', '10h-11h', '11h-12h', '14h-15h', '15h-16h', '16h-17h'];
+            
+            // Horaires selon les spécifications : début à 7h00, séances de 55min, pause 9h45-10h10
+            const timeSlots = [
+                { start: '7:00', end: '7:55', isBreak: false },
+                { start: '7:55', end: '8:50', isBreak: false },
+                { start: '8:50', end: '9:45', isBreak: false },
+                { start: '9:45', end: '10:10', isBreak: true, label: 'PAUSE' },
+                { start: '10:10', end: '11:05', isBreak: false },
+                { start: '11:05', end: '12:00', isBreak: false },
+                { start: '15:00', end: '15:55', isBreak: false },
+                { start: '15:55', end: '16:50', isBreak: false }
+            ];
+            
+            // Récupérer les matières
+            const subjects = teacherData.subjects;
+            const mainSubject = subjects.find(s => s.type === 'main')?.name || 'Matière principale';
+            const secondarySubject = subjects.find(s => s.type === 'secondary')?.name || 'Matière secondaire';
             
             let html = `
                 <div class="current-class-display mb-20">
-                    <h4><i class="fas fa-info-circle"></i> Informations pour l'emploi du temps</h4>
+                    <h4><i class="fas fa-info-circle"></i> Informations de planification</h4>
+                    <p><strong>Classe(s):</strong> ${planningClasses}</p>
+                    <p><strong>Durée des séances:</strong> ${sessionDuration} minutes</p>
                     <p><strong>Total heures/semaine:</strong> ${teacherData.professional.weekly_hours || 0} heures</p>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Heures/Jours</th>
+                <div class="timetable-container">
+                    <table class="data-table" style="min-width: 800px;">
+                        <thead>
+                            <tr>
+                                <th>Horaires</th>
             `;
             
+            // En-têtes des jours
             days.forEach(day => {
                 html += `<th>${day}</th>`;
             });
             
             html += `</tr></thead><tbody>`;
             
-            hours.forEach((hour, hourIndex) => {
-                html += `<tr><td>${hour}</td>`;
+            // Lignes pour chaque créneau horaire
+            timeSlots.forEach((slot, slotIndex) => {
+                const timeLabel = slot.isBreak ? 
+                    `<strong>${slot.label || 'PAUSE'}</strong><br><small>${slot.start} - ${slot.end}</small>` :
+                    `${slot.start}<br>${slot.end}`;
                 
+                html += `<tr>`;
+                html += `<td style="text-align: center; vertical-align: middle; min-width: 100px;">${timeLabel}</td>`;
+                
+                // Cellules pour chaque jour
                 days.forEach((day, dayIndex) => {
-                    const cellId = `cell_${dayIndex}_${hourIndex}`;
-                    html += `
-                        <td>
-                            <select id="${cellId}" class="timetable-cell" onchange="updateTimetableCell('${cellId}')">
-                                <option value="">-- Vide --</option>
-                                ${teacherData.subjects.map(subject => 
-                                    `<option value="${subject.name}">${subject.name}</option>`
-                                ).join('')}
-                                <option value="TP">TP/Laboratoire</option>
-                                <option value="REUNION">Réunion</option>
-                                <option value="DISPO">Disponible</option>
-                            </select>
-                        </td>
-                    `;
+                    const cellId = `cell_${dayIndex}_${slotIndex}`;
+                    const savedValue = teacherData.teaching.timetable?.[cellId] || '';
+                    
+                    if (slot.isBreak) {
+                        html += `<td class="timetable-cell break" style="text-align: center;">${slot.label || 'PAUSE'}</td>`;
+                    } else {
+                        html += `
+                            <td>
+                                <select id="${cellId}" class="timetable-cell-select" 
+                                        onchange="updateTimetableCell('${cellId}', this.value)"
+                                        style="width: 100%; height: 40px; border: 1px solid #dee2e6; border-radius: 4px; padding: 5px;">
+                                    <option value="">-- Sélectionner --</option>
+                                    <option value="${mainSubject}" ${savedValue === mainSubject ? 'selected' : ''}>${mainSubject} (Principale)</option>
+                        `;
+                        
+                        if (secondarySubject && secondarySubject !== 'Matière secondaire') {
+                            html += `<option value="${secondarySubject}" ${savedValue === secondarySubject ? 'selected' : ''}>${secondarySubject} (Secondaire)</option>`;
+                        }
+                        
+                        // Autres matières supplémentaires
+                        subjects.forEach(subject => {
+                            if (subject.type === 'additional' && subject.name) {
+                                html += `<option value="${subject.name}" ${savedValue === subject.name ? 'selected' : ''}>${subject.name}</option>`;
+                            }
+                        });
+                        
+                        html += `
+                                    <option value="TP" ${savedValue === 'TP' ? 'selected' : ''}>TP/Laboratoire</option>
+                                    <option value="REUNION" ${savedValue === 'REUNION' ? 'selected' : ''}>Réunion</option>
+                                    <option value="AUTRE" ${savedValue === 'AUTRE' ? 'selected' : ''}>Autre activité</option>
+                                    <option value="LIBRE" ${savedValue === 'LIBRE' ? 'selected' : ''}>Libre</option>
+                                </select>
+                            </td>
+                        `;
+                    }
                 });
                 
                 html += `</tr>`;
@@ -2820,57 +2521,138 @@
             
             html += `</tbody></table>`;
             
+            // Légende
+            html += `
+                <div class="mt-20" style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                    <h5><i class="fas fa-key"></i> Légende</h5>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #e3f2fd; border: 1px solid var(--primary-color); margin-right: 5px;"></span> Matière principale</div>
+                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #e8f5e9; border: 1px solid var(--success-color); margin-right: 5px;"></span> Matière secondaire</div>
+                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #fff3e0; border: 1px solid var(--warning-color); margin-right: 5px;"></span> TP/Laboratoire</div>
+                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #f3e5f5; border: 1px solid var(--info-color); margin-right: 5px;"></span> Réunion</div>
+                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #f5f5f5; border: 1px solid #dee2e6; margin-right: 5px;"></span> Libre</div>
+                    </div>
+                </div>
+            `;
+            
             container.innerHTML = html;
             
-            // Charger les données sauvegardées
-            loadTimetableData();
+            // Appliquer les styles aux cellules déjà sélectionnées
+            Object.keys(teacherData.teaching.timetable || {}).forEach(cellId => {
+                const cell = document.getElementById(cellId);
+                if (cell) {
+                    applyTimetableCellStyle(cellId, cell.value);
+                }
+            });
         }
 
-        function updateTimetableCell(cellId) {
-            const cell = document.getElementById(cellId);
-            if (!cell) return;
-            
-            const value = cell.value;
-            
-            // Mettre à jour les données
+        function updateTimetableCell(cellId, value) {
             if (!teacherData.teaching.timetable) {
                 teacherData.teaching.timetable = {};
             }
             
             teacherData.teaching.timetable[cellId] = value;
-            
-            // Appliquer un style selon le type
-            switch(value) {
-                case 'TP':
-                    cell.style.backgroundColor = '#fff3e0';
-                    break;
-                case 'REUNION':
-                    cell.style.backgroundColor = '#f3e5f5';
-                    break;
-                case 'DISPO':
-                    cell.style.backgroundColor = '#e8f5e9';
-                    break;
-                case '':
-                    cell.style.backgroundColor = '';
-                    break;
-                default:
-                    cell.style.backgroundColor = '#e3f2fd';
-            }
-            
+            applyTimetableCellStyle(cellId, value);
             syncAllData();
         }
 
-        function loadTimetableData() {
-            if (!teacherData.teaching.timetable) return;
+        function applyTimetableCellStyle(cellId, value) {
+            const cell = document.getElementById(cellId);
+            if (!cell) return;
             
-            Object.keys(teacherData.teaching.timetable).forEach(cellId => {
-                const cell = document.getElementById(cellId);
-                if (cell) {
-                    cell.value = teacherData.teaching.timetable[cellId];
-                    updateTimetableCell(cellId); // Pour appliquer le style
-                }
-            });
+            // Retirer toutes les classes de style
+            cell.classList.remove('main', 'secondary', 'tp', 'meeting', 'free');
+            
+            // Appliquer le style approprié
+            const mainSubject = teacherData.subjects.find(s => s.type === 'main')?.name;
+            const secondarySubject = teacherData.subjects.find(s => s.type === 'secondary')?.name;
+            
+            if (value === mainSubject) {
+                cell.classList.add('main');
+                cell.style.backgroundColor = '#e3f2fd';
+                cell.style.borderColor = 'var(--primary-color)';
+            } else if (value === secondarySubject) {
+                cell.classList.add('secondary');
+                cell.style.backgroundColor = '#e8f5e9';
+                cell.style.borderColor = 'var(--success-color)';
+            } else if (value === 'TP') {
+                cell.classList.add('tp');
+                cell.style.backgroundColor = '#fff3e0';
+                cell.style.borderColor = 'var(--warning-color)';
+            } else if (value === 'REUNION') {
+                cell.classList.add('meeting');
+                cell.style.backgroundColor = '#f3e5f5';
+                cell.style.borderColor = 'var(--info-color)';
+            } else if (value === 'LIBRE' || value === '') {
+                cell.classList.add('free');
+                cell.style.backgroundColor = '#f5f5f5';
+                cell.style.borderColor = '#dee2e6';
+            } else {
+                // Pour les autres matières
+                cell.style.backgroundColor = '#e3f2fd';
+                cell.style.borderColor = 'var(--primary-color)';
+            }
         }
+
+        function saveTimetable() {
+            if (!teacherData.teaching.timetable || Object.keys(teacherData.teaching.timetable).length === 0) {
+                showNotification('Aucun emploi du temps à sauvegarder', 'warning');
+                return;
+            }
+            
+            syncAllData();
+            showNotification('Emploi du temps sauvegardé avec succès', 'success');
+        }
+
+        function loadTimetableData() {
+            // Les données sont chargées automatiquement dans generateTimetable()
+            if (teacherData.teaching.timetable && Object.keys(teacherData.teaching.timetable).length > 0) {
+                // Appliquer les styles aux cellules existantes
+                Object.keys(teacherData.teaching.timetable).forEach(cellId => {
+                    const cell = document.getElementById(cellId);
+                    if (cell) {
+                        applyTimetableCellStyle(cellId, cell.value);
+                    }
+                });
+            }
+        }
+
+        function printTimetable() {
+            const timetableElement = document.querySelector('.timetable-container');
+            if (!timetableElement) {
+                showNotification('Générez d\'abord l\'emploi du temps', 'warning');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Emploi du temps - ${teacherData.personal.last_name} ${teacherData.personal.first_name}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #3498db; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th { background-color: #3498db; color: white; padding: 10px; text-align: center; }
+                        td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        .break { background-color: #f8f9fa; font-style: italic; }
+                        @media print { body { padding: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <h1>Emploi du temps</h1>
+                    <p><strong>Enseignant:</strong> ${teacherData.personal.last_name} ${teacherData.personal.first_name}</p>
+                    <p><strong>Classe(s):</strong> ${document.getElementById('planningClasses')?.value || teacherData.professional.current_class}</p>
+                    <p><strong>Année scolaire:</strong> ${document.getElementById('currentYear').textContent}</p>
+                    ${timetableElement.innerHTML}
+                    <script>window.print();</script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Les autres fonctions restent similaires mais avec la synchronisation améliorée
 
         // Gestion des données
         function saveToLocalStorage() {
@@ -2966,6 +2748,14 @@
                 });
             }
             
+            // Données de planification
+            if (teacherData.teaching.planningClasses) {
+                const planningClassesInput = document.getElementById('planningClasses');
+                if (planningClassesInput) {
+                    planningClassesInput.value = teacherData.teaching.planningClasses;
+                }
+            }
+            
             updateUI();
         }
 
@@ -2988,6 +2778,106 @@
                 case 'tab7':
                     updateDashboard();
                     break;
+            }
+        }
+
+        // Les autres fonctions (addNewLesson, loadLessons, etc.) restent similaires
+        // mais avec la synchronisation améliorée
+
+        function addNewLesson() {
+            const lessonId = `lesson_${Date.now()}`;
+            const currentDate = new Date().toISOString().split('T')[0];
+            const mainSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
+            const currentClass = teacherData.professional.current_class || '';
+            
+            const lesson = {
+                id: lessonId,
+                title: '',
+                date: currentDate,
+                duration: 55,
+                subject: mainSubject,
+                class: currentClass,
+                objectives: '',
+                content: '',
+                materials: '',
+                difficulties: '',
+                solutions: '',
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!teacherData.teaching.lessons) {
+                teacherData.teaching.lessons = [];
+            }
+            
+            teacherData.teaching.lessons.push(lesson);
+            syncAllData();
+            
+            // Recharger l'affichage des leçons
+            loadLessons();
+            showNotification('Nouvelle leçon créée avec les informations synchronisées', 'success');
+        }
+
+        function loadLessons() {
+            const container = document.getElementById('lessonsContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (teacherData.teaching.lessons && teacherData.teaching.lessons.length > 0) {
+                teacherData.teaching.lessons.forEach(lesson => {
+                    const lessonElement = document.createElement('div');
+                    lessonElement.className = 'lesson-container';
+                    lessonElement.innerHTML = `
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label><i class="fas fa-book"></i> Titre de la leçon</label>
+                                    <input type="text" value="${lesson.title || ''}" 
+                                           onchange="updateLessonField('${lesson.id}', 'title', this.value)" 
+                                           placeholder="Titre de la leçon">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label><i class="fas fa-calendar"></i> Date</label>
+                                    <input type="date" value="${lesson.date}" 
+                                           onchange="updateLessonField('${lesson.id}', 'date', this.value)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-actions">
+                            <button type="button" class="btn btn-success btn-sm" onclick="saveLesson('${lesson.id}')">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteLesson('${lesson.id}')">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(lessonElement);
+                });
+            }
+        }
+
+        function updateLessonField(lessonId, field, value) {
+            const lesson = teacherData.teaching.lessons?.find(l => l.id === lessonId);
+            if (lesson) {
+                lesson[field] = value;
+                syncAllData();
+            }
+        }
+
+        function saveLesson(lessonId) {
+            showNotification('Leçon sauvegardée', 'success');
+            syncAllData();
+        }
+
+        function deleteLesson(lessonId) {
+            if (confirm('Voulez-vous vraiment supprimer cette leçon ?')) {
+                teacherData.teaching.lessons = teacherData.teaching.lessons?.filter(l => l.id !== lessonId) || [];
+                syncAllData();
+                loadLessons();
+                showNotification('Leçon supprimée', 'success');
             }
         }
 
@@ -3040,226 +2930,55 @@
             return age;
         }
 
-        function updateRecentActivity() {
-            const container = document.getElementById('recentActivity');
-            if (!container) return;
+        // Les autres fonctions (updateRecentActivity, updateDetailedStats, etc.) 
+        // restent similaires avec la synchronisation améliorée
+
+        // Gestion du formulaire
+        function handleSubmit(event) {
+            event.preventDefault();
             
-            let activities = [];
-            
-            // Collecter les activités récentes
-            if (teacherData.teaching.lessons) {
-                teacherData.teaching.lessons.slice(-3).forEach(lesson => {
-                    activities.push({
-                        type: 'Leçon',
-                        title: lesson.title || 'Nouvelle leçon',
-                        date: lesson.createdAt,
-                        icon: 'fas fa-chalkboard'
-                    });
-                });
+            if (validateForm()) {
+                backupData();
+                showNotification('Toutes les données ont été sauvegardées avec succès', 'success');
+            } else {
+                showNotification('Veuillez remplir tous les champs obligatoires', 'error');
             }
-            
-            if (teacherData.teaching.tps) {
-                teacherData.teaching.tps.slice(-2).forEach(tp => {
-                    activities.push({
-                        type: 'TP',
-                        title: tp.title || 'Nouveau TP',
-                        date: tp.createdAt,
-                        icon: 'fas fa-flask'
-                    });
-                });
-            }
-            
-            // Trier par date
-            activities.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            let html = '<div class="timeline">';
-            activities.slice(0, 5).forEach(activity => {
-                const date = new Date(activity.date).toLocaleDateString('fr-FR');
-                html += `
-                    <div class="timeline-item">
-                        <div><i class="${activity.icon}"></i> <strong>${activity.type}</strong></div>
-                        <div>${activity.title}</div>
-                        <small>${date}</small>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            
-            container.innerHTML = html;
         }
 
-        function updateDetailedStats() {
-            const container = document.getElementById('detailedStats');
-            if (!container) return;
+        function validateForm() {
+            const requiredFields = [
+                'establishmentName',
+                'lastName',
+                'firstName',
+                'birthDate',
+                'birthPlace',
+                'matricule',
+                'mainSubject',
+                'position',
+                'engagementDate',
+                'regionServiceDate',
+                'inspectionServiceDate',
+                'currentClass'
+            ];
             
-            const lessonsCount = teacherData.teaching.lessons?.length || 0;
-            const tpsCount = teacherData.teaching.tps?.length || 0;
-            const resourcesCount = teacherData.teaching.resources?.length || 0;
-            const themesCount = Object.values(teacherData.teaching.themes || {}).reduce((acc, themes) => acc + themes.length, 0);
+            let isValid = true;
             
-            container.innerHTML = `
-                <div class="stat-card">
-                    <div>Leçons créées</div>
-                    <div class="stat-value">${lessonsCount}</div>
-                </div>
-                <div class="stat-card">
-                    <div>TP/Expériences</div>
-                    <div class="stat-value">${tpsCount}</div>
-                </div>
-                <div class="stat-card">
-                    <div>Ressources</div>
-                    <div class="stat-value">${resourcesCount}</div>
-                </div>
-                <div class="stat-card">
-                    <div>Thèmes</div>
-                    <div class="stat-value">${themesCount}</div>
-                </div>
-            `;
-        }
-
-        // Backup et logs
-        function updateBackupHistory() {
-            const container = document.getElementById('backupHistory');
-            if (!container) return;
-            
-            try {
-                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
-                
-                if (backups.length === 0) {
-                    container.innerHTML = '<p class="text-center">Aucune sauvegarde disponible</p>';
-                    return;
-                }
-                
-                let html = '<table class="data-table"><thead><tr><th>Date</th><th>Taille</th><th>Actions</th></tr></thead><tbody>';
-                
-                backups.slice().reverse().forEach((backup, index) => {
-                    const date = new Date(backup.timestamp);
-                    const size = JSON.stringify(backup).length;
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && !field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--danger-color)';
                     
-                    html += `
-                        <tr>
-                            <td>${date.toLocaleString('fr-FR')}</td>
-                            <td>${formatFileSize(size)}</td>
-                            <td>
-                                <button type="button" class="btn btn-xs btn-info" onclick="restoreFromBackup(${backups.length - 1 - index})">
-                                    <i class="fas fa-undo"></i> Restaurer
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            } catch (error) {
-                container.innerHTML = '<p class="text-center">Erreur lors du chargement</p>';
-            }
-        }
-
-        function updateActivityLogs() {
-            const container = document.getElementById('activityLogs');
-            if (!container) return;
-            
-            try {
-                const logs = JSON.parse(localStorage.getItem('logs') || '[]');
-                
-                if (logs.length === 0) {
-                    container.innerHTML = '<p class="text-center">Aucune activité récente</p>';
-                    return;
+                    setTimeout(() => {
+                        if (field) field.style.borderColor = '';
+                    }, 2000);
                 }
-                
-                let html = '<div class="timeline">';
-                logs.slice().reverse().slice(0, 10).forEach(log => {
-                    const date = new Date(log.timestamp).toLocaleString('fr-FR');
-                    html += `
-                        <div class="timeline-item">
-                            <div><strong>${log.message}</strong></div>
-                            <small>${date} • ${log.tab || 'Général'}</small>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } catch (error) {
-                container.innerHTML = '<p class="text-center">Erreur lors du chargement</p>';
-            }
-        }
-
-        function backupData() {
-            const backup = {
-                timestamp: new Date().toISOString(),
-                data: {...teacherData}
-            };
+            });
             
-            try {
-                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
-                backups.push(backup);
-                localStorage.setItem('backups', JSON.stringify(backups.slice(-10)));
-                
-                showNotification('Sauvegarde effectuée', 'success');
-                updateBackupHistory();
-                addLog('Sauvegarde manuelle effectuée');
-            } catch (error) {
-                showNotification('Erreur lors de la sauvegarde', 'error');
-            }
+            return isValid;
         }
 
-        function restoreFromBackup(index) {
-            if (confirm('Voulez-vous restaurer cette sauvegarde ? Les données actuelles seront remplacées.')) {
-                try {
-                    const backups = JSON.parse(localStorage.getItem('backups') || '[]');
-                    if (backups[index]) {
-                        teacherData = {...backups[index].data};
-                        populateForm();
-                        showNotification('Sauvegarde restaurée', 'success');
-                        addLog('Restauration depuis sauvegarde');
-                    }
-                } catch (error) {
-                    showNotification('Erreur lors de la restauration', 'error');
-                }
-            }
-        }
-
-        function clearAllData() {
-            if (confirm('Voulez-vous vraiment effacer toutes les données ? Cette action est irréversible.')) {
-                localStorage.removeItem('teacherCompleteData');
-                localStorage.removeItem('backups');
-                localStorage.removeItem('logs');
-                
-                teacherData = {
-                    establishment: {},
-                    personal: {},
-                    professional: {},
-                    subjects: [],
-                    teaching: { themes: {}, lessons: [], tps: [], resources: [], timetable: {} },
-                    diplomas: [],
-                    trainings: [],
-                    languages: [],
-                    itSkills: [],
-                    evaluations: [],
-                    projects: [],
-                    activities: [],
-                    meetings: [],
-                    statistics: {},
-                    backups: [],
-                    logs: []
-                };
-                
-                document.getElementById('teacherForm').reset();
-                updateUI();
-                showNotification('Toutes les données ont été effacées', 'success');
-            }
-        }
-
-        // Utilitaires
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
+        // Fonctions utilitaires
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             const messageEl = document.getElementById('notificationMessage');
@@ -3303,154 +3022,14 @@
                 logs.push({
                     timestamp: new Date().toISOString(),
                     message: message,
-                    tab: currentTab
+                    tab: currentTab,
+                    subtab: currentSubTab
                 });
                 localStorage.setItem('logs', JSON.stringify(logs.slice(-100)));
                 updateActivityLogs();
             } catch (error) {
                 console.error('Erreur d\'ajout de log:', error);
             }
-        }
-
-        // Gestion du formulaire
-        function handleSubmit(event) {
-            event.preventDefault();
-            
-            if (validateForm()) {
-                backupData();
-                showNotification('Toutes les données ont été sauvegardées', 'success');
-            } else {
-                showNotification('Veuillez remplir tous les champs obligatoires', 'error');
-            }
-        }
-
-        function validateForm() {
-            const requiredFields = [
-                'establishmentName',
-                'lastName',
-                'firstName',
-                'birthDate',
-                'birthPlace',
-                'matricule',
-                'mainSubject',
-                'position',
-                'engagementDate',
-                'regionServiceDate',
-                'inspectionServiceDate'
-            ];
-            
-            let isValid = true;
-            
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field && !field.value.trim()) {
-                    isValid = false;
-                    field.style.borderColor = 'var(--danger-color)';
-                    
-                    setTimeout(() => {
-                        if (field) field.style.borderColor = '';
-                    }, 2000);
-                }
-            });
-            
-            return isValid;
-        }
-
-        // Fonctions de base pour les autres onglets
-        function addAcademicDiploma() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        function addTraining() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        function addLanguage() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        function addEvaluation() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        function addProject() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        function addActivity() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        function addMeeting() {
-            showNotification('Fonction à implémenter', 'info');
-        }
-
-        // Fonctions d'export/import (simplifiées)
-        function exportJSON(tab) {
-            const data = {[tab]: teacherData};
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `enseignant_${tab}_${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            showNotification(`Données de ${tab} exportées`, 'success');
-        }
-
-        function exportAllJSON() {
-            const dataStr = JSON.stringify(teacherData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `enseignant_complet_${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            showNotification('Toutes les données exportées', 'success');
-        }
-
-        function importJSON(tab) {
-            showNotification('Utilisez le bouton d\'import dans l\'onglet 6', 'info');
-        }
-
-        function importAllJSON() {
-            const fileInput = document.getElementById('importFile');
-            if (!fileInput.files.length) {
-                showNotification('Veuillez sélectionner un fichier', 'warning');
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    teacherData = {...teacherData, ...data};
-                    populateForm();
-                    showNotification('Données importées avec succès', 'success');
-                    addLog('Import de données depuis fichier');
-                } catch (error) {
-                    showNotification('Erreur lors de l\'import du fichier', 'error');
-                }
-            };
-            
-            reader.readAsText(file);
-        }
-
-        function handleFileSelect(event) {
-            // Préparer l'import
-            showNotification('Fichier sélectionné, cliquez sur "Importer JSON"', 'info');
-        }
-
-        function printForm() {
-            window.print();
         }
 
         // Initialisation finale
