@@ -1672,7 +1672,7 @@ teacher_example = {
         let showCompleteOnly = false;
         let pyodideLoaded = false;
 
-        // Types de fichiers supportés (basés sur l'application source)
+        // Types de fichiers supportés
         const FILE_TYPES = {
             'tab1': {
                 name: 'Informations Générales',
@@ -2442,9 +2442,6 @@ print(valider_donnees(teachers_data))`
             document.getElementById('pythonEstablishmentsCount').textContent = establishmentSet.size;
         }
 
-        // [Le reste du code JavaScript reste inchangé - les fonctions d'importation, 
-        // d'analyse, d'export Excel, etc. sont les mêmes que dans la version précédente]
-
         // Initialiser les onglets
         function initTabs() {
             const tabs = document.querySelectorAll('.tab');
@@ -2539,32 +2536,2098 @@ print(valider_donnees(teachers_data))`
             updateSubTabUI(subtabId);
         }
 
-        // [Les fonctions d'importation des fichiers, de traitement des données,
-        // d'analyse, d'export, etc. restent identiques à la version précédente]
+        function updateTabUI(tabId) {
+            switch(tabId) {
+                case 'tab-dashboard':
+                    updateDashboard();
+                    break;
+                case 'tab-teachers':
+                    updateTeachersList();
+                    break;
+                case 'tab-python':
+                    updatePythonStats();
+                    break;
+                case 'tab-export':
+                    updateExportPreview();
+                    break;
+            }
+        }
 
-        // Pour des raisons de longueur, je ne répète pas tout le code JavaScript ici.
-        // Les fonctions restantes (handleSingleFileImport, updateUIAfterImport, etc.)
-        // sont exactement les mêmes que dans la version précédente fournie.
+        function updateSubTabUI(subtabId) {
+            // Mettre à jour le contenu spécifique du sous-onglet
+            switch(subtabId) {
+                case 'pedagogy-overview':
+                    updatePedagogyOverview();
+                    break;
+                case 'pedagogy-subjects':
+                    updateSubjectsAnalysis();
+                    break;
+                case 'pedagogy-lessons':
+                    updateLessonsAnalysis();
+                    break;
+                case 'pedagogy-tp':
+                    updateTPAnalysis();
+                    break;
+            }
+        }
 
-        // Note: Le code complet inclut toutes les fonctions nécessaires pour :
-        // 1. Importer les fichiers JSON
-        // 2. Traiter les données des enseignants
-        // 3. Mettre à jour l'interface
-        // 4. Analyser les données avec Python
-        // 5. Exporter en Excel
-        // 6. Générer des rapports
+        // Gestion des imports de fichiers
+        async function handleSingleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoader(true);
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // Traiter le fichier unique
+                processImportedFile(file.name, data, 'single');
+                
+                showNotification(`Fichier ${file.name} importé avec succès`, 'success');
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'importation:', error);
+                showNotification(`Erreur lors de l'importation: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+                event.target.value = ''; // Réinitialiser l'input
+            }
+        }
 
-        // Les seules modifications importantes sont :
-        // 1. L'ajout de l'onglet Python avec Pyodide
-        // 2. Les fonctions d'analyse Python spécifiques
-        // 3. L'intégration des données chargées dans l'environnement Python
+        async function handleMultiFileImport(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            
+            showLoader(true);
+            
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    
+                    // Traiter chaque fichier
+                    processImportedFile(file.name, data, 'multi');
+                }
+                
+                showNotification(`${files.length} fichiers importés avec succès`, 'success');
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'importation multiple:', error);
+                showNotification(`Erreur lors de l'importation multiple: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+                event.target.value = ''; // Réinitialiser l'input
+            }
+        }
 
-        // Les autres fonctions restent inchangées par rapport à la version précédente.
+        async function handleCompleteFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoader(true);
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // Traiter le fichier complet
+                processCompleteFile(file.name, data);
+                
+                showNotification(`Fichier complet ${file.name} importé avec succès`, 'success');
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'importation complète:', error);
+                showNotification(`Erreur lors de l'importation complète: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+                event.target.value = ''; // Réinitialiser l'input
+            }
+        }
+
+        // Traiter un fichier importé
+        function processImportedFile(filename, data, importType) {
+            // Déterminer le type de fichier basé sur le nom
+            let fileType = 'unknown';
+            if (filename.includes('tab1')) fileType = 'tab1';
+            else if (filename.includes('tab2')) fileType = 'tab2';
+            else if (filename.includes('tab3')) fileType = 'tab3';
+            else if (filename.includes('tab4')) fileType = 'tab4';
+            else if (filename.includes('tab5')) fileType = 'tab5';
+            else if (filename.includes('complete')) fileType = 'complete';
+            
+            // Créer ou mettre à jour un enseignant
+            const teacherId = generateTeacherId(data);
+            let teacherIndex = teachersData.findIndex(t => t.id === teacherId);
+            
+            if (teacherIndex === -1) {
+                // Créer un nouvel enseignant
+                const newTeacher = createTeacherFromData(data, fileType);
+                newTeacher.id = teacherId;
+                teachersData.push(newTeacher);
+                teacherIndex = teachersData.length - 1;
+            } else {
+                // Mettre à jour l'enseignant existant
+                updateTeacherData(teachersData[teacherIndex], data, fileType);
+            }
+            
+            // Ajouter le fichier à la liste des fichiers de l'enseignant
+            if (!teachersData[teacherIndex].files) {
+                teachersData[teacherIndex].files = [];
+            }
+            
+            teachersData[teacherIndex].files.push({
+                name: filename,
+                type: fileType,
+                importDate: new Date().toISOString(),
+                importType: importType
+            });
+            
+            // Marquer comme complet si toutes les données sont présentes
+            checkTeacherCompleteness(teachersData[teacherIndex]);
+            
+            // Mettre à jour l'interface
+            updateUIAfterImport();
+        }
+
+        // Traiter un fichier complet
+        function processCompleteFile(filename, data) {
+            if (Array.isArray(data)) {
+                // Si c'est un tableau d'enseignants
+                data.forEach(teacherData => {
+                    processImportedFile(filename, teacherData, 'complete');
+                });
+            } else if (typeof data === 'object') {
+                // Si c'est un objet unique
+                processImportedFile(filename, data, 'complete');
+            }
+        }
+
+        // Créer un ID d'enseignant unique
+        function generateTeacherId(data) {
+            // Utiliser le matricule si disponible
+            if (data.matricule) {
+                return `teacher_${data.matricule}`;
+            }
+            
+            // Sinon, utiliser le nom et prénom
+            if (data.lastName && data.firstName) {
+                return `teacher_${data.lastName}_${data.firstName}`;
+            }
+            
+            // Sinon, générer un ID basé sur le timestamp
+            return `teacher_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        }
+
+        // Créer un enseignant à partir des données
+        function createTeacherFromData(data, fileType) {
+            const teacher = {
+                id: generateTeacherId(data),
+                lastName: data.lastName || data.last_name || '',
+                firstName: data.firstName || data.first_name || '',
+                fullName: data.fullName || `${data.firstName || data.first_name || ''} ${data.lastName || data.last_name || ''}`.trim(),
+                matricule: data.matricule || '',
+                establishment: data.establishment || data.establishment_name || '',
+                age: calculateAge(data.birthDate || data.birth_date),
+                serviceYears: calculateServiceYears(data.engagementDate || data.engagement_date),
+                yearsToRetirement: calculateYearsToRetirement(data.retirementDate || data.retirement_date),
+                complete: false,
+                files: [],
+                data: {}
+            };
+            
+            // Organiser les données par type
+            organizeTeacherData(teacher, data, fileType);
+            
+            return teacher;
+        }
+
+        // Mettre à jour les données d'un enseignant existant
+        function updateTeacherData(teacher, data, fileType) {
+            // Mettre à jour les informations de base
+            teacher.lastName = teacher.lastName || data.lastName || data.last_name || '';
+            teacher.firstName = teacher.firstName || data.firstName || data.first_name || '';
+            teacher.fullName = teacher.fullName || data.fullName || `${teacher.firstName} ${teacher.lastName}`.trim();
+            teacher.matricule = teacher.matricule || data.matricule || '';
+            teacher.establishment = teacher.establishment || data.establishment || data.establishment_name || '';
+            
+            // Calculer les âges et années
+            if (data.birthDate || data.birth_date) {
+                teacher.age = calculateAge(data.birthDate || data.birth_date);
+            }
+            
+            if (data.engagementDate || data.engagement_date) {
+                teacher.serviceYears = calculateServiceYears(data.engagementDate || data.engagement_date);
+            }
+            
+            if (data.retirementDate || data.retirement_date) {
+                teacher.yearsToRetirement = calculateYearsToRetirement(data.retirementDate || data.retirement_date);
+            }
+            
+            // Organiser les données
+            organizeTeacherData(teacher, data, fileType);
+        }
+
+        // Organiser les données de l'enseignant par catégorie
+        function organizeTeacherData(teacher, data, fileType) {
+            if (!teacher.data) teacher.data = {};
+            
+            switch(fileType) {
+                case 'tab1':
+                    teacher.data.establishment = data.establishment || {};
+                    teacher.data.personal = data.personal || {};
+                    teacher.data.professional = data.professional || {};
+                    break;
+                case 'tab2':
+                    teacher.data.subjects = data.subjects || [];
+                    teacher.data.lessons = data.lessons || [];
+                    teacher.data.timetable = data.timetable || {};
+                    break;
+                case 'tab3':
+                    teacher.data.evaluations = data.evaluations || [];
+                    teacher.data.statistics = data.statistics || {};
+                    break;
+                case 'tab4':
+                    teacher.data.projects = data.projects || [];
+                    teacher.data.activities = data.activities || [];
+                    break;
+                case 'tab5':
+                    teacher.data.archives = data.archives || [];
+                    teacher.data.logs = data.logs || [];
+                    break;
+                case 'complete':
+                    // Si c'est un fichier complet, copier toutes les données
+                    teacher.data = { ...teacher.data, ...data };
+                    break;
+                default:
+                    // Pour les fichiers inconnus, essayer de déterminer le type
+                    if (data.subjects) teacher.data.subjects = data.subjects;
+                    if (data.evaluations) teacher.data.evaluations = data.evaluations;
+                    if (data.projects) teacher.data.projects = data.projects;
+                    break;
+            }
+        }
+
+        // Vérifier si un enseignant est complet
+        function checkTeacherCompleteness(teacher) {
+            const requiredData = [
+                teacher.lastName && teacher.firstName,
+                teacher.matricule,
+                teacher.establishment,
+                teacher.data.personal,
+                teacher.data.professional,
+                teacher.data.subjects && teacher.data.subjects.length > 0
+            ];
+            
+            teacher.complete = requiredData.every(Boolean);
+            return teacher.complete;
+        }
+
+        // Calculer l'âge à partir de la date de naissance
+        function calculateAge(birthDate) {
+            if (!birthDate) return null;
+            
+            try {
+                const birth = new Date(birthDate);
+                const today = new Date();
+                let age = today.getFullYear() - birth.getFullYear();
+                const monthDiff = today.getMonth() - birth.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                    age--;
+                }
+                
+                return age;
+            } catch (error) {
+                console.error('Erreur lors du calcul de l\'âge:', error);
+                return null;
+            }
+        }
+
+        // Calculer les années de service
+        function calculateServiceYears(engagementDate) {
+            if (!engagementDate) return null;
+            
+            try {
+                const engagement = new Date(engagementDate);
+                const today = new Date();
+                let years = today.getFullYear() - engagement.getFullYear();
+                const monthDiff = today.getMonth() - engagement.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < engagement.getDate())) {
+                    years--;
+                }
+                
+                return years;
+            } catch (error) {
+                console.error('Erreur lors du calcul des années de service:', error);
+                return null;
+            }
+        }
+
+        // Calculer les années avant la retraite
+        function calculateYearsToRetirement(retirementDate) {
+            if (!retirementDate) return null;
+            
+            try {
+                const retirement = new Date(retirementDate);
+                const today = new Date();
+                let years = retirement.getFullYear() - today.getFullYear();
+                const monthDiff = retirement.getMonth() - today.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && retirement.getDate() < today.getDate())) {
+                    years--;
+                }
+                
+                return Math.max(0, years);
+            } catch (error) {
+                console.error('Erreur lors du calcul des années avant retraite:', error);
+                return null;
+            }
+        }
+
+        // Mettre à jour l'interface après importation
+        function updateUIAfterImport() {
+            // Mettre à jour la liste des fichiers importés
+            updateImportedFilesList();
+            
+            // Mettre à jour les statistiques d'aperçu
+            updateOverviewStats();
+            
+            // Mettre à jour la liste des enseignants pour prévisualisation
+            updateDataPreviewSelect();
+            
+            // Mettre à jour les statistiques Python
+            updatePythonStats();
+            
+            // Afficher les sections si des données sont présentes
+            if (teachersData.length > 0) {
+                document.getElementById('importedFilesSection').style.display = 'block';
+                document.getElementById('overviewSection').style.display = 'block';
+                document.getElementById('dataPreviewSection').style.display = 'block';
+            }
+            
+            // Sauvegarder les données dans le localStorage
+            saveSessionData();
+        }
+
+        // Mettre à jour la liste des fichiers importés
+        function updateImportedFilesList() {
+            const container = document.getElementById('importedFilesList');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucun fichier importé</p>';
+                return;
+            }
+            
+            let html = '<div class="files-by-type">';
+            
+            // Grouper les fichiers par type
+            const filesByType = {};
+            teachersData.forEach(teacher => {
+                if (teacher.files) {
+                    teacher.files.forEach(file => {
+                        if (!filesByType[file.type]) {
+                            filesByType[file.type] = [];
+                        }
+                        filesByType[file.type].push({
+                            name: file.name,
+                            teacher: teacher.fullName,
+                            date: file.importDate
+                        });
+                    });
+                }
+            });
+            
+            // Afficher les fichiers par type
+            Object.keys(filesByType).forEach(type => {
+                const fileTypeInfo = FILE_TYPES[type] || { name: type, icon: 'fa-file', description: '' };
+                html += `
+                    <div class="file-type-group">
+                        <h4><i class="fas ${fileTypeInfo.icon}"></i> ${fileTypeInfo.name} (${filesByType[type].length})</h4>
+                        <p>${fileTypeInfo.description}</p>
+                        <div class="file-list">
+                `;
+                
+                filesByType[type].forEach(file => {
+                    const date = new Date(file.date).toLocaleString();
+                    html += `
+                        <div class="file-item">
+                            <span><i class="fas fa-file"></i> ${file.name}</span>
+                            <span class="badge badge-primary">${file.teacher}</span>
+                            <span style="color: var(--gray-color); font-size: 0.9em;">${date}</span>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Mettre à jour les statistiques d'aperçu
+        function updateOverviewStats() {
+            const container = document.getElementById('overviewStats');
+            if (!container) return;
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            const totalFiles = teachersData.reduce((sum, teacher) => sum + (teacher.files ? teacher.files.length : 0), 0);
+            
+            // Compter les établissements uniques
+            const establishments = [...new Set(teachersData.map(t => t.establishment).filter(Boolean))];
+            
+            // Calculer l'âge moyen
+            const ages = teachersData.map(t => t.age).filter(age => age !== null);
+            const averageAge = ages.length > 0 ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : 0;
+            
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div><i class="fas fa-users"></i> Enseignants</div>
+                    <div class="stat-value">${totalTeachers}</div>
+                    <div>Total importés</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-check-circle"></i> Fiches complètes</div>
+                    <div class="stat-value">${completeTeachers}</div>
+                    <div>${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-file"></i> Fichiers</div>
+                    <div class="stat-value">${totalFiles}</div>
+                    <div>Importés</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-school"></i> Établissements</div>
+                    <div class="stat-value">${establishments.length}</div>
+                    <div>Différents</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-birthday-cake"></i> Âge moyen</div>
+                    <div class="stat-value">${averageAge}</div>
+                    <div>Ans</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-chart-bar"></i> Matières</div>
+                    <div class="stat-value">${countUniqueSubjects()}</div>
+                    <div>Différentes</div>
+                </div>
+            `;
+        }
+
+        // Compter les matières uniques
+        function countUniqueSubjects() {
+            const subjects = new Set();
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) {
+                            subjects.add(subject.name);
+                        }
+                    });
+                }
+            });
+            return subjects.size;
+        }
+
+        // Mettre à jour la liste de prévisualisation
+        function updateDataPreviewSelect() {
+            const select = document.getElementById('dataPreviewSelect');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Sélectionner un enseignant pour prévisualiser...</option>';
+            
+            teachersData.forEach((teacher, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${teacher.fullName} (${teacher.matricule || 'Pas de matricule'}) - ${teacher.establishment || 'Établissement inconnu'}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Prévisualiser les données d'un enseignant
+        function previewTeacherData(teacherIndex) {
+            const container = document.getElementById('dataPreviewContent');
+            if (!container) return;
+            
+            if (teacherIndex === '' || teacherIndex === null || teacherIndex === undefined) {
+                container.innerHTML = '<p class="text-center">Sélectionnez un enseignant pour voir ses données.</p>';
+                return;
+            }
+            
+            const index = parseInt(teacherIndex);
+            if (isNaN(index) || index < 0 || index >= teachersData.length) {
+                container.innerHTML = '<p class="text-center">Enseignant non trouvé.</p>';
+                return;
+            }
+            
+            const teacher = teachersData[index];
+            let html = `
+                <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                        <i class="fas fa-user-tie"></i> ${teacher.fullName}
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <strong><i class="fas fa-id-card"></i> Informations personnelles</strong>
+                            <div style="margin-top: 10px;">
+                                <div>Matricule: <strong>${teacher.matricule || 'Non spécifié'}</strong></div>
+                                <div>Établissement: <strong>${teacher.establishment || 'Non spécifié'}</strong></div>
+                                <div>Âge: <strong>${teacher.age || 'Non calculé'} ans</strong></div>
+                                <div>Service: <strong>${teacher.serviceYears || 'Non calculé'} ans</strong></div>
+                                <div>Retraite dans: <strong>${teacher.yearsToRetirement || 'Non calculé'} ans</strong></div>
+                                <div>Fiche: <span class="badge ${teacher.complete ? 'badge-success' : 'badge-warning'}">${teacher.complete ? 'Complète' : 'Incomplète'}</span></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <strong><i class="fas fa-file"></i> Fichiers importés</strong>
+                            <div style="margin-top: 10px;">
+            `;
+            
+            if (teacher.files && teacher.files.length > 0) {
+                teacher.files.forEach(file => {
+                    const date = new Date(file.importDate).toLocaleString();
+                    html += `<div><i class="fas fa-file"></i> ${file.name} <small>(${date})</small></div>`;
+                });
+            } else {
+                html += '<div>Aucun fichier</div>';
+            }
+            
+            html += `
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <strong><i class="fas fa-database"></i> Données structurées</strong>
+                        <div style="margin-top: 10px;">
+            `;
+            
+            // Afficher les données structurées
+            if (teacher.data) {
+                Object.keys(teacher.data).forEach(key => {
+                    const dataSection = teacher.data[key];
+                    if (dataSection && Object.keys(dataSection).length > 0) {
+                        html += `<div style="margin-bottom: 10px;"><strong>${key}:</strong> ${JSON.stringify(dataSection, null, 2)}</div>`;
+                    }
+                });
+            } else {
+                html += '<div>Aucune donnée structurée</div>';
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="btn btn-primary btn-sm" onclick="viewTeacherDetail(${index})">
+                            <i class="fas fa-eye"></i> Voir les détails complets
+                        </button>
+                        <button class="btn btn-warning btn-sm" onclick="editTeacherData(${index})">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // Mettre à jour le tableau de bord
+        function updateDashboard() {
+            if (teachersData.length === 0) {
+                document.getElementById('globalStats').innerHTML = '<p class="text-center">Aucune donnée disponible. Importez des données d\'abord.</p>';
+                return;
+            }
+            
+            updateGlobalStats();
+            updateDashboardCharts();
+            updateRecentActivities();
+        }
+
+        // Mettre à jour les statistiques globales
+        function updateGlobalStats() {
+            const container = document.getElementById('globalStats');
+            if (!container) return;
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            const averageAge = calculateAverage(teachersData.map(t => t.age).filter(age => age !== null));
+            const averageService = calculateAverage(teachersData.map(t => t.serviceYears).filter(years => years !== null));
+            
+            // Compter par matière
+            const subjectCount = countUniqueSubjects();
+            
+            // Compter par établissement
+            const establishmentCount = [...new Set(teachersData.map(t => t.establishment).filter(Boolean))].length;
+            
+            // Compter les retraites à venir (moins de 5 ans)
+            const upcomingRetirements = teachersData.filter(t => {
+                return t.yearsToRetirement !== null && t.yearsToRetirement <= 5;
+            }).length;
+            
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div><i class="fas fa-users"></i> Total enseignants</div>
+                    <div class="stat-value">${totalTeachers}</div>
+                    <div>Importés</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-check-circle"></i> Fiches complètes</div>
+                    <div class="stat-value">${completeTeachers}</div>
+                    <div>${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-birthday-cake"></i> Âge moyen</div>
+                    <div class="stat-value">${averageAge.toFixed(1)}</div>
+                    <div>Ans</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-clock"></i> Service moyen</div>
+                    <div class="stat-value">${averageService.toFixed(1)}</div>
+                    <div>Ans</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-book"></i> Matières</div>
+                    <div class="stat-value">${subjectCount}</div>
+                    <div>Différentes</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-school"></i> Établissements</div>
+                    <div class="stat-value">${establishmentCount}</div>
+                    <div>Différents</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-umbrella-beach"></i> Retraites proches</div>
+                    <div class="stat-value">${upcomingRetirements}</div>
+                    <div>Dans ≤ 5 ans</div>
+                </div>
+                <div class="stat-card">
+                    <div><i class="fas fa-chart-line"></i> Taux complétion</div>
+                    <div class="stat-value">${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}%</div>
+                    <div>Moyenne</div>
+                </div>
+            `;
+        }
+
+        // Calculer la moyenne
+        function calculateAverage(values) {
+            const validValues = values.filter(v => v !== null && v !== undefined);
+            if (validValues.length === 0) return 0;
+            return validValues.reduce((a, b) => a + b, 0) / validValues.length;
+        }
+
+        // Mettre à jour les graphiques du tableau de bord
+        function updateDashboardCharts() {
+            // Graphique des matières
+            updateSubjectChart();
+            
+            // Graphique des retraites
+            updateRetirementChart();
+            
+            // Graphique des heures
+            updateHoursChart();
+            
+            // Graphique des âges
+            updateAgeChart();
+        }
+
+        // Graphique des matières
+        function updateSubjectChart() {
+            const ctx = document.getElementById('subjectChart');
+            if (!ctx) return;
+            
+            // Compter les matières
+            const subjectCounts = {};
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.name) {
+                            subjectCounts[subject.name] = (subjectCounts[subject.name] || 0) + 1;
+                        }
+                    });
+                }
+            });
+            
+            // Trier et prendre les 10 premières
+            const sortedSubjects = Object.entries(subjectCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            const labels = sortedSubjects.map(s => s[0]);
+            const data = sortedSubjects.map(s => s[1]);
+            
+            // Détruire le graphique existant
+            if (charts.subjectChart) {
+                charts.subjectChart.destroy();
+            }
+            
+            // Créer un nouveau graphique
+            charts.subjectChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
+                            '#1abc9c', '#d35400', '#c0392b', '#16a085', '#8e44ad'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique des retraites
+        function updateRetirementChart() {
+            const ctx = document.getElementById('retirementChart');
+            if (!ctx) return;
+            
+            // Compter les retraites par année
+            const retirementCounts = {};
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.professional && teacher.data.professional.retirement_date) {
+                    try {
+                        const date = new Date(teacher.data.professional.retirement_date);
+                        const year = date.getFullYear();
+                        retirementCounts[year] = (retirementCounts[year] || 0) + 1;
+                    } catch (error) {
+                        console.error('Erreur lors du traitement de la date de retraite:', error);
+                    }
+                }
+            });
+            
+            // Trier par année
+            const sortedYears = Object.keys(retirementCounts).sort();
+            const labels = sortedYears;
+            const data = sortedYears.map(year => retirementCounts[year]);
+            
+            // Détruire le graphique existant
+            if (charts.retirementChart) {
+                charts.retirementChart.destroy();
+            }
+            
+            // Créer un nouveau graphique
+            charts.retirementChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre de retraites',
+                        data: data,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre de retraites'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Année'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique des heures
+        function updateHoursChart() {
+            const ctx = document.getElementById('hoursChart');
+            if (!ctx) return;
+            
+            // Calculer les heures totales par enseignant
+            const teacherHours = teachersData.map(teacher => {
+                let totalHours = 0;
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        if (subject && subject.hours) {
+                            totalHours += parseFloat(subject.hours) || 0;
+                        }
+                    });
+                }
+                return totalHours;
+            }).filter(hours => hours > 0);
+            
+            // Créer des tranches d'heures
+            const bins = [0, 10, 15, 20, 25, 30];
+            const labels = bins.slice(1).map((bin, i) => `${bins[i]}-${bin}h`);
+            const data = new Array(bins.length - 1).fill(0);
+            
+            teacherHours.forEach(hours => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    if (hours >= bins[i] && hours < bins[i + 1]) {
+                        data[i]++;
+                        break;
+                    }
+                }
+            });
+            
+            // Détruire le graphique existant
+            if (charts.hoursChart) {
+                charts.hoursChart.destroy();
+            }
+            
+            // Créer un nouveau graphique
+            charts.hoursChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre d\'enseignants',
+                        data: data,
+                        backgroundColor: '#2ecc71'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre d\'enseignants'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Heures d\'enseignement par semaine'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique des âges
+        function updateAgeChart() {
+            const ctx = document.getElementById('ageChart');
+            if (!ctx) return;
+            
+            // Créer des tranches d'âge
+            const ageBins = [20, 30, 40, 50, 60, 70];
+            const labels = ageBins.slice(1).map((bin, i) => `${ageBins[i]}-${bin} ans`);
+            const data = new Array(ageBins.length - 1).fill(0);
+            
+            teachersData.forEach(teacher => {
+                if (teacher.age !== null) {
+                    for (let i = 0; i < ageBins.length - 1; i++) {
+                        if (teacher.age >= ageBins[i] && teacher.age < ageBins[i + 1]) {
+                            data[i]++;
+                            break;
+                        }
+                    }
+                }
+            });
+            
+            // Détruire le graphique existant
+            if (charts.ageChart) {
+                charts.ageChart.destroy();
+            }
+            
+            // Créer un nouveau graphique
+            charts.ageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre d\'enseignants',
+                        data: data,
+                        backgroundColor: '#9b59b6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre d\'enseignants'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tranche d\'âge'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Mettre à jour les activités récentes
+        function updateRecentActivities() {
+            const container = document.getElementById('recentActivities');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune activité récente</p>';
+                return;
+            }
+            
+            // Récupérer les fichiers récemment importés
+            const allFiles = [];
+            teachersData.forEach(teacher => {
+                if (teacher.files) {
+                    teacher.files.forEach(file => {
+                        allFiles.push({
+                            teacher: teacher.fullName,
+                            filename: file.name,
+                            date: new Date(file.importDate),
+                            type: file.type
+                        });
+                    });
+                }
+            });
+            
+            // Trier par date (plus récent d'abord)
+            allFiles.sort((a, b) => b.date - a.date);
+            
+            // Prendre les 10 plus récents
+            const recentFiles = allFiles.slice(0, 10);
+            
+            let html = '<div style="background: white; padding: 20px; border-radius: 8px;">';
+            
+            if (recentFiles.length === 0) {
+                html += '<p class="text-center">Aucune activité récente</p>';
+            } else {
+                html += '<table class="data-table">';
+                html += '<thead><tr><th>Date</th><th>Enseignant</th><th>Fichier</th><th>Type</th></tr></thead><tbody>';
+                
+                recentFiles.forEach(file => {
+                    const fileTypeInfo = FILE_TYPES[file.type] || { name: file.type, icon: 'fa-file' };
+                    html += `
+                        <tr>
+                            <td>${file.date.toLocaleString()}</td>
+                            <td>${file.teacher}</td>
+                            <td><i class="fas ${fileTypeInfo.icon}"></i> ${file.filename}</td>
+                            <td><span class="badge badge-primary">${fileTypeInfo.name}</span></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Filtrer le tableau de bord
+        function filterDashboard() {
+            const searchTerm = document.getElementById('dashboardSearch').value.toLowerCase();
+            const subjectFilter = document.getElementById('dashboardFilterSubject').value;
+            const categoryFilter = document.getElementById('dashboardFilterCategory').value;
+            const establishmentFilter = document.getElementById('dashboardFilterEstablishment').value;
+            
+            // Mettre à jour les graphiques avec les données filtrées
+            updateDashboardCharts();
+        }
+
+        // Mettre à jour la liste des enseignants
+        function updateTeachersList() {
+            const container = document.getElementById('teachersCards');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1; padding: 40px; color: var(--gray-color);">Aucun enseignant importé. Utilisez l\'onglet "Importation" pour importer des données.</p>';
+                return;
+            }
+            
+            // Filtrer les enseignants
+            filteredTeachers = [...teachersData];
+            
+            if (showCompleteOnly) {
+                filteredTeachers = filteredTeachers.filter(teacher => teacher.complete);
+            }
+            
+            // Trier les enseignants
+            filteredTeachers.sort((a, b) => {
+                let aValue, bValue;
+                
+                switch(currentSort.field) {
+                    case 'name':
+                        aValue = a.lastName + a.firstName;
+                        bValue = b.lastName + b.firstName;
+                        break;
+                    case 'retirement':
+                        aValue = a.yearsToRetirement !== null ? a.yearsToRetirement : Infinity;
+                        bValue = b.yearsToRetirement !== null ? b.yearsToRetirement : Infinity;
+                        break;
+                    default:
+                        aValue = a[currentSort.field] || '';
+                        bValue = b[currentSort.field] || '';
+                }
+                
+                if (currentSort.direction === 'asc') {
+                    return aValue > bValue ? 1 : -1;
+                } else {
+                    return aValue < bValue ? 1 : -1;
+                }
+            });
+            
+            // Afficher les enseignants
+            let html = '';
+            filteredTeachers.forEach((teacher, index) => {
+                html += `
+                    <div class="teacher-card" onclick="viewTeacherDetail(${teachersData.indexOf(teacher)})">
+                        <div class="teacher-header">
+                            <div class="teacher-name">${teacher.fullName}</div>
+                            <div class="teacher-matricule">${teacher.matricule || 'Pas de matricule'}</div>
+                        </div>
+                        
+                        <div class="teacher-info">
+                            <div class="teacher-info-item">
+                                <i class="fas fa-school"></i>
+                                <span>${teacher.establishment || 'Non spécifié'}</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>${teacher.age || '?'} ans</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${teacher.serviceYears || '?'} ans de service</span>
+                            </div>
+                            <div class="teacher-info-item">
+                                <i class="fas fa-umbrella-beach"></i>
+                                <span>Retraite: ${teacher.yearsToRetirement !== null ? `dans ${teacher.yearsToRetirement} ans` : 'Non définie'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                ${teacher.data && teacher.data.subjects && teacher.data.subjects.length > 0 ? 
+                                    `<span class="badge badge-info">${teacher.data.subjects.length} matière(s)</span>` : 
+                                    '<span class="badge badge-warning">Aucune matière</span>'
+                                }
+                                <span class="badge ${teacher.complete ? 'badge-success' : 'badge-warning'}">
+                                    ${teacher.complete ? 'Complet' : 'Incomplet'}
+                                </span>
+                            </div>
+                            <div>
+                                <button class="btn btn-xs btn-primary" onclick="event.stopPropagation(); editTeacherData(${teachersData.indexOf(teacher)})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Trier les enseignants
+        function sortTeachers(field) {
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            
+            updateTeachersList();
+            
+            // Mettre à jour le texte du bouton
+            const button = document.querySelector(`button[onclick="sortTeachers('${field}')"]`);
+            if (button) {
+                const icon = currentSort.direction === 'asc' ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up';
+                button.innerHTML = `<i class="fas ${icon}"></i> Trier par ${field === 'name' ? 'nom' : 'retraite'}`;
+            }
+        }
+
+        // Filtrer seulement les fiches complètes
+        function filterCompleteOnly() {
+            showCompleteOnly = !showCompleteOnly;
+            updateTeachersList();
+            
+            // Mettre à jour le bouton
+            const button = document.querySelector('button[onclick="filterCompleteOnly()"]');
+            if (button) {
+                if (showCompleteOnly) {
+                    button.innerHTML = '<i class="fas fa-check-circle"></i> Toutes les fiches';
+                    button.classList.remove('btn-light');
+                    button.classList.add('btn-success');
+                } else {
+                    button.innerHTML = '<i class="fas fa-check-circle"></i> Fiches complètes';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-light');
+                }
+            }
+        }
+
+        // Filtrer les enseignants par recherche
+        function filterTeachers() {
+            const searchTerm = document.getElementById('teacherSearch').value.toLowerCase();
+            
+            // Filtrer les enseignants
+            filteredTeachers = teachersData.filter(teacher => {
+                return (
+                    teacher.fullName.toLowerCase().includes(searchTerm) ||
+                    teacher.matricule.toLowerCase().includes(searchTerm) ||
+                    teacher.establishment.toLowerCase().includes(searchTerm) ||
+                    (teacher.data && teacher.data.subjects && 
+                     teacher.data.subjects.some(s => s.name.toLowerCase().includes(searchTerm)))
+                );
+            });
+            
+            // Mettre à jour l'affichage
+            updateTeachersList();
+        }
+
+        // Voir les détails d'un enseignant
+        function viewTeacherDetail(index) {
+            const teacher = teachersData[index];
+            if (!teacher) return;
+            
+            document.getElementById('teacherModalTitle').textContent = `Détails: ${teacher.fullName}`;
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4><i class="fas fa-user-tie"></i> Informations personnelles</h4>
+                        <table class="data-table">
+                            <tr><td>Nom complet</td><td><strong>${teacher.fullName}</strong></td></tr>
+                            <tr><td>Matricule</td><td>${teacher.matricule || 'Non spécifié'}</td></tr>
+                            <tr><td>Établissement</td><td>${teacher.establishment || 'Non spécifié'}</td></tr>
+                            <tr><td>Âge</td><td>${teacher.age || 'Non calculé'} ans</td></tr>
+                            <tr><td>Années de service</td><td>${teacher.serviceYears || 'Non calculé'} ans</td></tr>
+                            <tr><td>Années avant retraite</td><td>${teacher.yearsToRetirement !== null ? `${teacher.yearsToRetirement} ans` : 'Non définie'}</td></tr>
+                            <tr><td>Statut fiche</td><td><span class="badge ${teacher.complete ? 'badge-success' : 'badge-warning'}">${teacher.complete ? 'Complète' : 'Incomplète'}</span></td></tr>
+                        </table>
+                    </div>
+                    
+                    <div>
+                        <h4><i class="fas fa-file"></i> Fichiers importés</h4>
+            `;
+            
+            if (teacher.files && teacher.files.length > 0) {
+                html += '<table class="data-table"><thead><tr><th>Fichier</th><th>Type</th><th>Date</th></tr></thead><tbody>';
+                teacher.files.forEach(file => {
+                    const fileTypeInfo = FILE_TYPES[file.type] || { name: file.type, icon: 'fa-file' };
+                    const date = new Date(file.importDate).toLocaleString();
+                    html += `
+                        <tr>
+                            <td><i class="fas ${fileTypeInfo.icon}"></i> ${file.name}</td>
+                            <td><span class="badge badge-primary">${fileTypeInfo.name}</span></td>
+                            <td>${date}</td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+            } else {
+                html += '<p>Aucun fichier importé</p>';
+            }
+            
+            html += `
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4><i class="fas fa-database"></i> Données structurées</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+            `;
+            
+            // Afficher les données structurées
+            if (teacher.data) {
+                Object.keys(teacher.data).forEach(key => {
+                    const dataSection = teacher.data[key];
+                    if (dataSection && Object.keys(dataSection).length > 0) {
+                        html += `
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
+                                <h5 style="margin-bottom: 10px;">${key}</h5>
+                                <pre style="white-space: pre-wrap; font-size: 0.85rem; max-height: 200px; overflow-y: auto;">${JSON.stringify(dataSection, null, 2)}</pre>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                html += '<p>Aucune donnée structurée disponible</p>';
+            }
+            
+            html += `
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-primary" onclick="editTeacherData(${index})">
+                        <i class="fas fa-edit"></i> Modifier les données
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteTeacher(${index})">
+                        <i class="fas fa-trash"></i> Supprimer cet enseignant
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('teacherModalContent').innerHTML = html;
+            document.getElementById('teacherDetailModal').classList.add('active');
+        }
+
+        // Fermer les détails de l'enseignant
+        function closeTeacherDetail() {
+            document.getElementById('teacherDetailModal').classList.remove('active');
+        }
+
+        // Modifier les données d'un enseignant
+        function editTeacherData(index) {
+            const teacher = teachersData[index];
+            if (!teacher) return;
+            
+            // Pour l'instant, on va simplement permettre de supprimer et re-importer
+            // Dans une version future, on pourrait implémenter un formulaire d'édition
+            if (confirm(`Voulez-vous supprimer les données de ${teacher.fullName} et ré-importer de nouvelles données ?`)) {
+                deleteTeacher(index);
+                showNotification('Enseignant supprimé. Vous pouvez maintenant importer de nouvelles données.', 'info');
+            }
+        }
+
+        // Supprimer un enseignant
+        function deleteTeacher(index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ? Cette action est irréversible.')) {
+                teachersData.splice(index, 1);
+                updateUIAfterImport();
+                updateTeachersList();
+                closeTeacherDetail();
+                showNotification('Enseignant supprimé avec succès', 'success');
+            }
+        }
+
+        // Mettre à jour l'aperçu de l'export
+        function updateExportPreview() {
+            const container = document.getElementById('exportPreview');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée à exporter. Importez des données d\'abord.</p>';
+                return;
+            }
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            const totalFiles = teachersData.reduce((sum, teacher) => sum + (teacher.files ? teacher.files.length : 0), 0);
+            
+            container.innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Résumé des données disponibles</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div class="stat-card">
+                            <div>Enseignants</div>
+                            <div class="stat-value">${totalTeachers}</div>
+                            <div>Total</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Fiches complètes</div>
+                            <div class="stat-value">${completeTeachers}</div>
+                            <div>${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Fichiers</div>
+                            <div class="stat-value">${totalFiles}</div>
+                            <div>Importés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>Matières</div>
+                            <div class="stat-value">${countUniqueSubjects()}</div>
+                            <div>Différentes</div>
+                        </div>
+                    </div>
+                    
+                    <h5 style="margin-bottom: 10px;">Détails par catégorie:</h5>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Catégorie</th>
+                                <th>Enregistrements</th>
+                                <th>Disponible pour export</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Enseignants (liste)</td>
+                                <td>${totalTeachers}</td>
+                                <td><span class="badge badge-success">Oui</span></td>
+                            </tr>
+                            <tr>
+                                <td>Données pédagogiques</td>
+                                <td>${countDataRecords('subjects') + countDataRecords('lessons')}</td>
+                                <td><span class="badge ${countDataRecords('subjects') > 0 ? 'badge-success' : 'badge-warning'}">${countDataRecords('subjects') > 0 ? 'Oui' : 'Non'}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Évaluations</td>
+                                <td>${countDataRecords('evaluations')}</td>
+                                <td><span class="badge ${countDataRecords('evaluations') > 0 ? 'badge-success' : 'badge-warning'}">${countDataRecords('evaluations') > 0 ? 'Oui' : 'Non'}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Projets et activités</td>
+                                <td>${countDataRecords('projects') + countDataRecords('activities')}</td>
+                                <td><span class="badge ${countDataRecords('projects') > 0 ? 'badge-success' : 'badge-warning'}">${countDataRecords('projects') > 0 ? 'Oui' : 'Non'}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Planification retraite</td>
+                                <td>${countTeachersWithRetirementDate()}</td>
+                                <td><span class="badge ${countTeachersWithRetirementDate() > 0 ? 'badge-success' : 'badge-warning'}">${countTeachersWithRetirementDate() > 0 ? 'Oui' : 'Non'}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px; border-left: 4px solid var(--success-color);">
+                        <h5><i class="fas fa-lightbulb"></i> Recommandation</h5>
+                        <p>Utilisez "Export complet" pour obtenir toutes les données dans un seul fichier Excel avec plusieurs onglets.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Compter les enregistrements d'une catégorie de données
+        function countDataRecords(dataType) {
+            return teachersData.reduce((sum, teacher) => {
+                if (teacher.data && teacher.data[dataType]) {
+                    return sum + (Array.isArray(teacher.data[dataType]) ? teacher.data[dataType].length : 1);
+                }
+                return sum;
+            }, 0);
+        }
+
+        // Compter les enseignants avec date de retraite
+        function countTeachersWithRetirementDate() {
+            return teachersData.filter(teacher => {
+                return teacher.data && teacher.data.professional && teacher.data.professional.retirement_date;
+            }).length;
+        }
+
+        // Exporter toutes les données vers Excel
+        function exportAllToExcel() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            try {
+                // Créer un classeur avec plusieurs onglets
+                const wb = XLSX.utils.book_new();
+                
+                // 1. Onglet "Enseignants"
+                const teachersSheet = prepareTeachersSheet();
+                XLSX.utils.book_append_sheet(wb, teachersSheet, "Enseignants");
+                
+                // 2. Onglet "Pédagogie"
+                const pedagogySheet = preparePedagogySheet();
+                XLSX.utils.book_append_sheet(wb, pedagogySheet, "Pédagogie");
+                
+                // 3. Onglet "Évaluations"
+                const evaluationsSheet = prepareEvaluationsSheet();
+                XLSX.utils.book_append_sheet(wb, evaluationsSheet, "Évaluations");
+                
+                // 4. Onglet "Projets"
+                const projectsSheet = prepareProjectsSheet();
+                XLSX.utils.book_append_sheet(wb, projectsSheet, "Projets");
+                
+                // 5. Onglet "Retraite"
+                const retirementSheet = prepareRetirementSheet();
+                XLSX.utils.book_append_sheet(wb, retirementSheet, "Retraite");
+                
+                // 6. Onglet "Statistiques"
+                const statsSheet = prepareStatsSheet();
+                XLSX.utils.book_append_sheet(wb, statsSheet, "Statistiques");
+                
+                // Générer le fichier Excel
+                const fileName = `export_enseignants_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                showNotification('Export complet réalisé avec succès', 'success');
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'export:', error);
+                showNotification('Erreur lors de l\'export: ' + error.message, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Préparer l'onglet "Enseignants"
+        function prepareTeachersSheet() {
+            const headers = [
+                "Nom", "Prénom", "Nom complet", "Matricule", "Établissement",
+                "Âge", "Années de service", "Années avant retraite", "Fiche complète",
+                "Date de naissance", "Date d'engagement", "Date de retraite",
+                "Catégorie", "Grade", "Heures hebdomadaires"
+            ];
+            
+            const data = teachersData.map(teacher => [
+                teacher.lastName || '',
+                teacher.firstName || '',
+                teacher.fullName || '',
+                teacher.matricule || '',
+                teacher.establishment || '',
+                teacher.age || '',
+                teacher.serviceYears || '',
+                teacher.yearsToRetirement || '',
+                teacher.complete ? "Oui" : "Non",
+                teacher.data && teacher.data.personal ? teacher.data.personal.birth_date || '' : '',
+                teacher.data && teacher.data.professional ? teacher.data.professional.engagement_date || '' : '',
+                teacher.data && teacher.data.professional ? teacher.data.professional.retirement_date || '' : '',
+                teacher.data && teacher.data.professional ? teacher.data.professional.professional_category || '' : '',
+                teacher.data && teacher.data.professional ? teacher.data.professional.grade || '' : '',
+                teacher.data && teacher.data.professional ? teacher.data.professional.weekly_hours || '' : ''
+            ]);
+            
+            return XLSX.utils.aoa_to_sheet([headers, ...data]);
+        }
+
+        // Préparer l'onglet "Pédagogie"
+        function preparePedagogySheet() {
+            const headers = [
+                "Enseignant", "Matricule", "Établissement",
+                "Matière", "Type", "Heures", "Niveau"
+            ];
+            
+            const data = [];
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.subjects) {
+                    teacher.data.subjects.forEach(subject => {
+                        data.push([
+                            teacher.fullName || '',
+                            teacher.matricule || '',
+                            teacher.establishment || '',
+                            subject.name || '',
+                            subject.type || '',
+                            subject.hours || '',
+                            subject.level || ''
+                        ]);
+                    });
+                }
+            });
+            
+            return XLSX.utils.aoa_to_sheet([headers, ...data]);
+        }
+
+        // Préparer l'onglet "Évaluations"
+        function prepareEvaluationsSheet() {
+            const headers = [
+                "Enseignant", "Matricule", "Établissement",
+                "Date", "Type", "Matière", "Moyenne", "Meilleure note",
+                "Nombre d'élèves", "Commentaire"
+            ];
+            
+            const data = [];
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.evaluations) {
+                    teacher.data.evaluations.forEach(evaluation => {
+                        data.push([
+                            teacher.fullName || '',
+                            teacher.matricule || '',
+                            teacher.establishment || '',
+                            evaluation.date || '',
+                            evaluation.type || '',
+                            evaluation.subject || '',
+                            evaluation.average || '',
+                            evaluation.best || '',
+                            evaluation.student_count || '',
+                            evaluation.comment || ''
+                        ]);
+                    });
+                }
+            });
+            
+            return XLSX.utils.aoa_to_sheet([headers, ...data]);
+        }
+
+        // Préparer l'onglet "Projets"
+        function prepareProjectsSheet() {
+            const headers = [
+                "Enseignant", "Matricule", "Établissement",
+                "Projet", "Type", "Date début", "Date fin",
+                "Description", "Statut", "Participants"
+            ];
+            
+            const data = [];
+            teachersData.forEach(teacher => {
+                if (teacher.data && teacher.data.projects) {
+                    teacher.data.projects.forEach(project => {
+                        data.push([
+                            teacher.fullName || '',
+                            teacher.matricule || '',
+                            teacher.establishment || '',
+                            project.name || '',
+                            project.type || '',
+                            project.start_date || '',
+                            project.end_date || '',
+                            project.description || '',
+                            project.status || '',
+                            project.participants ? project.participants.join(', ') : ''
+                        ]);
+                    });
+                }
+            });
+            
+            return XLSX.utils.aoa_to_sheet([headers, ...data]);
+        }
+
+        // Préparer l'onglet "Retraite"
+        function prepareRetirementSheet() {
+            const headers = [
+                "Enseignant", "Matricule", "Établissement",
+                "Âge", "Années de service", "Date de retraite",
+                "Années restantes", "Catégorie", "Remarques"
+            ];
+            
+            const data = teachersData
+                .filter(teacher => teacher.data && teacher.data.professional && teacher.data.professional.retirement_date)
+                .map(teacher => [
+                    teacher.fullName || '',
+                    teacher.matricule || '',
+                    teacher.establishment || '',
+                    teacher.age || '',
+                    teacher.serviceYears || '',
+                    teacher.data.professional.retirement_date || '',
+                    teacher.yearsToRetirement || '',
+                    teacher.data.professional.professional_category || '',
+                    teacher.data.professional.retirement_notes || ''
+                ]);
+            
+            return XLSX.utils.aoa_to_sheet([headers, ...data]);
+        }
+
+        // Préparer l'onglet "Statistiques"
+        function prepareStatsSheet() {
+            const headers = ["Statistique", "Valeur", "Détail"];
+            
+            const totalTeachers = teachersData.length;
+            const completeTeachers = teachersData.filter(t => t.complete).length;
+            const averageAge = calculateAverage(teachersData.map(t => t.age).filter(age => age !== null));
+            const averageService = calculateAverage(teachersData.map(t => t.serviceYears).filter(years => years !== null));
+            const subjectCount = countUniqueSubjects();
+            const establishmentCount = [...new Set(teachersData.map(t => t.establishment).filter(Boolean))].length;
+            const upcomingRetirements = teachersData.filter(t => t.yearsToRetirement !== null && t.yearsToRetirement <= 5).length;
+            
+            const data = [
+                ["Enseignants total", totalTeachers, "Nombre total d'enseignants importés"],
+                ["Fiches complètes", completeTeachers, `${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}% du total`],
+                ["Âge moyen", averageAge.toFixed(1), "Âge moyen des enseignants"],
+                ["Service moyen", averageService.toFixed(1), "Années de service moyennes"],
+                ["Matières différentes", subjectCount, "Nombre de matières enseignées"],
+                ["Établissements", establishmentCount, "Nombre d'établissements différents"],
+                ["Retraites proches", upcomingRetirements, "Retraites dans moins de 5 ans"],
+                ["Taux de complétion", `${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}%`, "Pourcentage de fiches complètes"],
+                ["Date d'export", new Date().toLocaleDateString(), "Date de génération du rapport"],
+                ["Nombre de fichiers", teachersData.reduce((sum, t) => sum + (t.files ? t.files.length : 0), 0), "Total des fichiers importés"]
+            ];
+            
+            return XLSX.utils.aoa_to_sheet([headers, ...data]);
+        }
+
+        // Exporter seulement la liste des enseignants
+        function exportTeachersToExcel() {
+            if (teachersData.length === 0) {
+                showNotification('Aucun enseignant à exporter', 'warning');
+                return;
+            }
+            
+            const sheet = prepareTeachersSheet();
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, sheet, "Enseignants");
+            
+            const fileName = `liste_enseignants_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Liste des enseignants exportée avec succès', 'success');
+        }
+
+        // Exporter les données pédagogiques
+        function exportPedagogyToExcel() {
+            if (countDataRecords('subjects') === 0) {
+                showNotification('Aucune donnée pédagogique à exporter', 'warning');
+                return;
+            }
+            
+            const sheet = preparePedagogySheet();
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, sheet, "Pédagogie");
+            
+            const fileName = `donnees_pedagogiques_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Données pédagogiques exportées avec succès', 'success');
+        }
+
+        // Exporter les données d'évaluation
+        function exportEvaluationsToExcel() {
+            if (countDataRecords('evaluations') === 0) {
+                showNotification('Aucune donnée d\'évaluation à exporter', 'warning');
+                return;
+            }
+            
+            const sheet = prepareEvaluationsSheet();
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, sheet, "Évaluations");
+            
+            const fileName = `evaluations_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Données d\'évaluation exportées avec succès', 'success');
+        }
+
+        // Exporter la planification des retraites
+        function exportRetirementToExcel() {
+            if (countTeachersWithRetirementDate() === 0) {
+                showNotification('Aucune donnée de retraite à exporter', 'warning');
+                return;
+            }
+            
+            const sheet = prepareRetirementSheet();
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, sheet, "Retraite");
+            
+            const fileName = `planification_retraite_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Planification retraite exportée avec succès', 'success');
+        }
+
+        // Exporter les projets et activités
+        function exportProjectsToExcel() {
+            if (countDataRecords('projects') === 0) {
+                showNotification('Aucun projet ou activité à exporter', 'warning');
+                return;
+            }
+            
+            const sheet = prepareProjectsSheet();
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, sheet, "Projets");
+            
+            const fileName = `projets_activites_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            showNotification('Projets et activités exportés avec succès', 'success');
+        }
+
+        // Effacer toutes les données
+        function clearAllData() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à effacer', 'info');
+                return;
+            }
+            
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible.')) {
+                teachersData = [];
+                filteredTeachers = [];
+                
+                // Réinitialiser l'interface
+                document.getElementById('importedFilesSection').style.display = 'none';
+                document.getElementById('overviewSection').style.display = 'none';
+                document.getElementById('dataPreviewSection').style.display = 'none';
+                
+                updateTeachersList();
+                updateDashboard();
+                updateExportPreview();
+                updatePythonStats();
+                
+                // Effacer le localStorage
+                localStorage.removeItem('teachersAnalyticsData');
+                
+                showNotification('Toutes les données ont été effacées', 'success');
+            }
+        }
+
+        // Générer un rapport
+        function generateReport() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée pour générer un rapport', 'warning');
+                return;
+            }
+            
+            showLoader(true);
+            
+            try {
+                // Créer un rapport simple en HTML
+                const reportWindow = window.open('', '_blank');
+                const reportDate = new Date().toLocaleString();
+                
+                let reportHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Rapport d'analyse enseignants - ${reportDate}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            h1 { color: #2c3e50; }
+                            h2 { color: #3498db; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+                            .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+                            .stat-card { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; border: 1px solid #dee2e6; }
+                            .stat-value { font-size: 2rem; font-weight: bold; color: #3498db; margin: 10px 0; }
+                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            th { background: #3498db; color: white; padding: 10px; text-align: left; }
+                            td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+                            tr:hover { background: #f5f5f5; }
+                            .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; }
+                            .badge-success { background: #d4edda; color: #155724; }
+                            .badge-warning { background: #fff3cd; color: #856404; }
+                            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>📊 Rapport d'analyse des enseignants</h1>
+                        <p>Date de génération: ${reportDate}</p>
+                        
+                        <h2>📈 Statistiques globales</h2>
+                        <div class="stat-grid">
+                `;
+                
+                const totalTeachers = teachersData.length;
+                const completeTeachers = teachersData.filter(t => t.complete).length;
+                const averageAge = calculateAverage(teachersData.map(t => t.age).filter(age => age !== null));
+                const averageService = calculateAverage(teachersData.map(t => t.serviceYears).filter(years => years !== null));
+                const subjectCount = countUniqueSubjects();
+                const establishmentCount = [...new Set(teachersData.map(t => t.establishment).filter(Boolean))].length;
+                const upcomingRetirements = teachersData.filter(t => t.yearsToRetirement !== null && t.yearsToRetirement <= 5).length;
+                
+                reportHTML += `
+                            <div class="stat-card">
+                                <div>Enseignants total</div>
+                                <div class="stat-value">${totalTeachers}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Fiches complètes</div>
+                                <div class="stat-value">${completeTeachers}</div>
+                                <div>${totalTeachers > 0 ? ((completeTeachers / totalTeachers) * 100).toFixed(1) : 0}%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Âge moyen</div>
+                                <div class="stat-value">${averageAge.toFixed(1)}</div>
+                                <div>ans</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Service moyen</div>
+                                <div class="stat-value">${averageService.toFixed(1)}</div>
+                                <div>ans</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Matières</div>
+                                <div class="stat-value">${subjectCount}</div>
+                                <div>différentes</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Établissements</div>
+                                <div class="stat-value">${establishmentCount}</div>
+                                <div>différents</div>
+                            </div>
+                        </div>
+                        
+                        <h2>👥 Liste des enseignants</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Matricule</th>
+                                    <th>Établissement</th>
+                                    <th>Âge</th>
+                                    <th>Service</th>
+                                    <th>Retraite</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                teachersData.forEach(teacher => {
+                    reportHTML += `
+                        <tr>
+                            <td>${teacher.fullName}</td>
+                            <td>${teacher.matricule || ''}</td>
+                            <td>${teacher.establishment || ''}</td>
+                            <td>${teacher.age || ''}</td>
+                            <td>${teacher.serviceYears || ''}</td>
+                            <td>${teacher.yearsToRetirement !== null ? `${teacher.yearsToRetirement} ans` : ''}</td>
+                            <td><span class="badge ${teacher.complete ? 'badge-success' : 'badge-warning'}">${teacher.complete ? 'Complet' : 'Incomplet'}</span></td>
+                        </tr>
+                    `;
+                });
+                
+                reportHTML += `
+                            </tbody>
+                        </table>
+                        
+                        <h2>📊 Analyse par établissement</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Établissement</th>
+                                    <th>Nombre d'enseignants</th>
+                                    <th>Pourcentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                // Compter par établissement
+                const establishmentCounts = {};
+                teachersData.forEach(teacher => {
+                    const etab = teacher.establishment || 'Non spécifié';
+                    establishmentCounts[etab] = (establishmentCounts[etab] || 0) + 1;
+                });
+                
+                Object.entries(establishmentCounts).forEach(([etab, count]) => {
+                    const percentage = totalTeachers > 0 ? ((count / totalTeachers) * 100).toFixed(1) : 0;
+                    reportHTML += `
+                        <tr>
+                            <td>${etab}</td>
+                            <td>${count}</td>
+                            <td>${percentage}%</td>
+                        </tr>
+                    `;
+                });
+                
+                reportHTML += `
+                            </tbody>
+                        </table>
+                        
+                        <div class="footer">
+                            <p>Rapport généré automatiquement par la Plateforme d'Analyse - Inspecteurs Éducation</p>
+                            <p>Nombre total de fichiers importés: ${teachersData.reduce((sum, t) => sum + (t.files ? t.files.length : 0), 0)}</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                reportWindow.document.write(reportHTML);
+                reportWindow.document.close();
+                
+                showNotification('Rapport généré avec succès', 'success');
+                
+            } catch (error) {
+                console.error('Erreur lors de la génération du rapport:', error);
+                showNotification('Erreur lors de la génération du rapport: ' + error.message, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Sauvegarder la session
+        function saveSession() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à sauvegarder', 'warning');
+                return;
+            }
+            
+            const sessionData = {
+                teachers: teachersData,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            try {
+                localStorage.setItem('teachersAnalyticsData', JSON.stringify(sessionData));
+                showNotification('Session sauvegardée avec succès', 'success');
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                showNotification('Erreur lors de la sauvegarde: ' + error.message, 'error');
+            }
+        }
+
+        // Charger les données de session
+        function loadSessionData() {
+            try {
+                const savedData = localStorage.getItem('teachersAnalyticsData');
+                if (savedData) {
+                    const sessionData = JSON.parse(savedData);
+                    if (sessionData.teachers && Array.isArray(sessionData.teachers)) {
+                        teachersData = sessionData.teachers;
+                        updateUIAfterImport();
+                        showNotification('Session précédente chargée avec succès', 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de la session:', error);
+                // Ne pas afficher d'erreur pour ne pas perturber l'utilisateur
+            }
+        }
+
+        // Exporter les données de session
+        function backupData() {
+            if (teachersData.length === 0) {
+                showNotification('Aucune donnée à sauvegarder', 'warning');
+                return;
+            }
+            
+            const backupData = {
+                teachers: teachersData,
+                timestamp: new Date().toISOString(),
+                version: '1.0',
+                exportType: 'backup'
+            };
+            
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_enseignants_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Sauvegarde des données exportée avec succès', 'success');
+        }
+
+        // Gestionnaire de notifications
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const messageElement = document.getElementById('notificationMessage');
+            
+            // Mettre à jour le message et le type
+            messageElement.textContent = message;
+            notification.className = 'notification';
+            
+            // Définir l'icône et la couleur selon le type
+            switch(type) {
+                case 'error':
+                    notification.classList.add('error');
+                    icon.className = 'fas fa-exclamation-circle';
+                    break;
+                case 'warning':
+                    notification.classList.add('warning');
+                    icon.className = 'fas fa-exclamation-triangle';
+                    break;
+                case 'info':
+                    notification.classList.add('info');
+                    icon.className = 'fas fa-info-circle';
+                    break;
+                default:
+                    notification.classList.add('success');
+                    icon.className = 'fas fa-check-circle';
+            }
+            
+            // Afficher la notification
+            notification.classList.add('show');
+            
+            // Masquer automatiquement après 5 secondes
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Gestionnaire de loader
+        function showLoader(show) {
+            const loader = document.getElementById('loader');
+            if (show) {
+                loader.classList.add('active');
+            } else {
+                loader.classList.remove('active');
+            }
+        }
+
+        // Note: Les fonctions pour les sous-onglets pédagogie, évaluations, projets, etc.
+        // sont simplifiées pour cet exemple. Dans une version complète, elles seraient
+        // implémentées de manière similaire aux autres sections.
+
+        function updatePedagogyOverview() {
+            const container = document.getElementById('pedagogyStats');
+            if (!container) return;
+            
+            if (teachersData.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée pédagogique disponible</p>';
+                return;
+            }
+            
+            const totalSubjects = countDataRecords('subjects');
+            const totalLessons = countDataRecords('lessons');
+            const teachersWithSubjects = teachersData.filter(t => t.data && t.data.subjects && t.data.subjects.length > 0).length;
+            
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Matières enseignées</div>
+                        <div class="stat-value">${totalSubjects}</div>
+                        <div>Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Leçons enregistrées</div>
+                        <div class="stat-value">${totalLessons}</div>
+                        <div>Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Enseignants avec matières</div>
+                        <div class="stat-value">${teachersWithSubjects}</div>
+                        <div>${teachersData.length > 0 ? ((teachersWithSubjects / teachersData.length) * 100).toFixed(1) : 0}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateSubjectsAnalysis() {
+            const container = document.getElementById('subjectsAnalysis');
+            if (!container) return;
+            
+            // Similaire aux autres fonctions d'analyse
+            container.innerHTML = '<p class="text-center">Fonctionnalité d\'analyse des matières en développement...</p>';
+        }
+
+        function updateLessonsAnalysis() {
+            const container = document.getElementById('lessonsAnalysis');
+            if (!container) return;
+            
+            container.innerHTML = '<p class="text-center">Fonctionnalité d\'analyse des leçons en développement...</p>';
+        }
+
+        function updateTPAnalysis() {
+            const container = document.getElementById('tpAnalysis');
+            if (!container) return;
+            
+            container.innerHTML = '<p class="text-center">Fonctionnalité d\'analyse des TP en développement...</p>';
+        }
 
     </script>
-
-    <!-- Note: Pour des raisons de longueur, le reste du code JavaScript 
-         (gestion des fichiers, mise à jour de l'interface, export Excel, etc.)
-         est identique à la version précédente et doit être inclus ici. -->
 </body>
 </html>
