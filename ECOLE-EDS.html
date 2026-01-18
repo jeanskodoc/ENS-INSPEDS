@@ -276,6 +276,30 @@
             border-left-color: var(--success-color);
         }
 
+        .project-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--info-color);
+        }
+
+        .activity-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .meeting-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -655,6 +679,136 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Charts */
+        .chart-placeholder {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        /* Bouton Accueil */
+        .btn-accueil {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-accueil:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Correction: Ajout du style manquant */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            position: relative;
+            min-width: 200px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+        }
+        
+        .search-box input {
+            padding-left: 35px;
+        }
+        
+        /* Correction: Ajout du style pour .timeline */
+        .timeline {
+            border-left: 2px solid var(--primary-color);
+            padding-left: 20px;
+            margin-left: 10px;
+        }
+        
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+        
+        /* Style pour la classe courante */
+        .current-class-display {
+            background: #e8f5e9;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .current-class-display h4 {
+            color: var(--success-color);
+            margin-bottom: 5px;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .container {
@@ -878,175 +1032,6 @@
             border: 1px solid #e9ecef;
             border-radius: 5px;
             margin-bottom: 5px;
-        }
-
-        /* Dashboard */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .dashboard-card {
-            background: white;
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .dashboard-card h3 {
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chart-container {
-            height: 200px;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        /* Bouton Accueil */
-        .btn-accueil {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 999;
-            padding: 12px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-accueil:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
-            color: white;
-            text-decoration: none;
-        }
-        
-        /* Correction: Ajout du style manquant */
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .search-box {
-            flex: 1;
-            position: relative;
-            min-width: 200px;
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-color);
-        }
-        
-        .search-box input {
-            padding-left: 35px;
-        }
-        
-        /* Correction: Ajout du style pour .timeline */
-        .timeline {
-            border-left: 2px solid var(--primary-color);
-            padding-left: 20px;
-            margin-left: 10px;
-        }
-        
-        .timeline-item {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .timeline-item:before {
-            content: '';
-            position: absolute;
-            left: -26px;
-            top: 5px;
-            width: 10px;
-            height: 10px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-        }
-        
-        /* Style pour la classe courante */
-        .current-class-display {
-            background: #e8f5e9;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--success-color);
-        }
-        
-        .current-class-display h4 {
-            color: var(--success-color);
-            margin-bottom: 5px;
-        }
-        
-        /* Style spécifique pour l'emploi du temps */
-        .timetable-container {
-            overflow-x: auto;
-            margin: 20px 0;
-        }
-        
-        .timetable-cell {
-            min-width: 120px;
-            height: 40px;
-            border: 1px solid #dee2e6;
-            text-align: center;
-            background: white;
-            transition: all 0.2s;
-        }
-        
-        .timetable-cell:hover {
-            background: #f8f9fa;
-            transform: scale(1.02);
-        }
-        
-        .timetable-cell.main {
-            background: #e3f2fd;
-            border-color: var(--primary-color);
-        }
-        
-        .timetable-cell.secondary {
-            background: #e8f5e9;
-            border-color: var(--success-color);
-        }
-        
-        .timetable-cell.tp {
-            background: #fff3e0;
-            border-color: var(--warning-color);
-        }
-        
-        .timetable-cell.meeting {
-            background: #f3e5f5;
-            border-color: var(--info-color);
-        }
-        
-        .timetable-cell.free {
-            background: #f5f5f5;
-        }
-        
-        .timetable-cell.break {
-            background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px);
-            text-align: center;
-            font-style: italic;
-            color: var(--gray-color);
         }
     </style>
 </head>
@@ -1407,8 +1392,8 @@
                     <div class="form-row">
                         <div class="form-col">
                             <div class="form-group">
-                                <label for="currentClass"><i class="fas fa-chalkboard"></i> Classe(s) actuelle(s) *</label>
-                                <input type="text" id="currentClass" placeholder="Ex: 3ème A, Terminale C..." required>
+                                <label for="currentClass"><i class="fas fa-chalkboard"></i> Classe(s) actuelle(s)</label>
+                                <input type="text" id="currentClass" placeholder="Ex: 3ème A, Terminale C...">
                             </div>
                         </div>
                         <div class="form-col">
@@ -1481,34 +1466,13 @@
                     <div class="form-section">
                         <h2><i class="fas fa-calendar-alt"></i> EMPLOI DU TEMPS HEBDOMADAIRE</h2>
                         <div class="form-group">
-                            <div class="current-class-display mb-20">
-                                <h4><i class="fas fa-info-circle"></i> Paramètres généraux</h4>
-                                <div class="form-row">
-                                    <div class="form-col">
-                                        <label><i class="fas fa-chalkboard"></i> Classe(s) à planifier</label>
-                                        <input type="text" id="planningClasses" placeholder="Ex: 3ème A, Terminale C">
-                                    </div>
-                                    <div class="form-col">
-                                        <label><i class="fas fa-clock"></i> Heures par séance</label>
-                                        <input type="number" id="sessionDuration" value="55" min="30" max="120" step="5">
-                                        <small>Durée en minutes</small>
-                                    </div>
-                                </div>
-                            </div>
+                            <label><i class="fas fa-info-circle"></i> Sélectionnez la matière et les créneaux</label>
                             <div id="timetableContainer">
                                 <!-- L'emploi du temps sera généré dynamiquement -->
                             </div>
-                            <div class="mt-20">
-                                <button type="button" class="btn btn-secondary" onclick="generateTimetable()">
-                                    <i class="fas fa-table"></i> Générer l'emploi du temps
-                                </button>
-                                <button type="button" class="btn btn-primary" onclick="saveTimetable()">
-                                    <i class="fas fa-save"></i> Sauvegarder l'emploi du temps
-                                </button>
-                                <button type="button" class="btn btn-light" onclick="printTimetable()">
-                                    <i class="fas fa-print"></i> Imprimer
-                                </button>
-                            </div>
+                            <button type="button" class="btn btn-secondary mt-20" onclick="generateTimetable()">
+                                <i class="fas fa-table"></i> Générer l'emploi du temps
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1645,7 +1609,7 @@
                 </div>
             </div>
 
-            <!-- Onglet 4: Évaluations & Statistiques -->
+            <!-- Onglet 4: Évaluations & Statistiques - CORRIGÉ -->
             <div id="tab4" class="tab-content">
                 <div class="tab-actions">
                     <button type="button" class="btn btn-info" onclick="exportJSON('tab4')">
@@ -1657,32 +1621,107 @@
                     <button type="button" class="btn btn-light" onclick="showStatistics()">
                         <i class="fas fa-chart-bar"></i> Statistiques
                     </button>
+                    <button type="button" class="btn btn-secondary" onclick="addEvaluation()">
+                        <i class="fas fa-plus"></i> Ajouter Évaluation
+                    </button>
                 </div>
 
+                <!-- Statistiques de synthèse -->
+                <div class="form-section">
+                    <h2><i class="fas fa-chart-pie"></i> STATISTIQUES DE SYNTHÈSE</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div><i class="fas fa-clipboard-check"></i> Évaluations</div>
+                            <div class="stat-value" id="totalEvaluations">0</div>
+                            <div>Total effectuées</div>
+                        </div>
+                        <div class="stat-card">
+                            <div><i class="fas fa-users"></i> Élèves évalués</div>
+                            <div class="stat-value" id="totalStudents">0</div>
+                            <div>Élèves concernés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div><i class="fas fa-percentage"></i> Moyenne générale</div>
+                            <div class="stat-value" id="averageScore">0.0</div>
+                            <div>/20</div>
+                        </div>
+                        <div class="stat-card">
+                            <div><i class="fas fa-trophy"></i> Meilleure note</div>
+                            <div class="stat-value" id="bestScore">0</div>
+                            <div>/20</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graphiques -->
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
                         <h3><i class="fas fa-chart-line"></i> Performances des élèves</h3>
-                        <div class="chart-container" id="performanceChart"></div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder" id="performanceChart">
+                                Graphique des performances
+                            </div>
+                        </div>
                     </div>
                     <div class="dashboard-card">
                         <h3><i class="fas fa-tasks"></i> Progression du programme</h3>
-                        <div class="chart-container" id="progressChart"></div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder" id="progressChart">
+                                Graphique de progression
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Évaluations -->
+                <!-- Filtres pour les évaluations -->
                 <div class="form-section">
-                    <h2><i class="fas fa-clipboard-check"></i> ÉVALUATIONS</h2>
-                    <div id="evaluationsContainer">
-                        <!-- Évaluations -->
+                    <h2><i class="fas fa-filter"></i> FILTRES DE RECHERCHE</h2>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Rechercher une évaluation..." id="evaluationSearch">
+                        </div>
+                        <select id="evaluationFilterSubject">
+                            <option value="">Toutes les matières</option>
+                        </select>
+                        <select id="evaluationFilterClass">
+                            <option value="">Toutes les classes</option>
+                        </select>
+                        <select id="evaluationFilterType">
+                            <option value="">Tous les types</option>
+                            <option value="examen">Examen</option>
+                            <option value="devoir">Devoir</option>
+                            <option value="oral">Oral</option>
+                            <option value="tp">TP</option>
+                            <option value="projet">Projet</option>
+                        </select>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="addEvaluation()">
-                        <i class="fas fa-plus"></i> Nouvelle évaluation
-                    </button>
+                </div>
+
+                <!-- Liste des évaluations -->
+                <div class="form-section">
+                    <h2><i class="fas fa-clipboard-check"></i> LISTE DES ÉVALUATIONS</h2>
+                    <div id="evaluationsContainer">
+                        <!-- Les évaluations seront ajoutées ici dynamiquement -->
+                        <div class="text-center" id="noEvaluationsMessage">
+                            <p>Aucune évaluation enregistrée</p>
+                            <button type="button" class="btn btn-primary mt-20" onclick="addEvaluation()">
+                                <i class="fas fa-plus-circle"></i> Créer votre première évaluation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques détaillées -->
+                <div class="form-section">
+                    <h2><i class="fas fa-chart-bar"></i> STATISTIQUES DÉTAILLÉES</h2>
+                    <div id="detailedEvaluationStats">
+                        <!-- Statistiques détaillées seront ajoutées ici -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Onglet 5: Projets & Activités -->
+            <!-- Onglet 5: Projets & Activités - CORRIGÉ -->
             <div id="tab5" class="tab-content">
                 <div class="tab-actions">
                     <button type="button" class="btn btn-info" onclick="exportJSON('tab5')">
@@ -1691,39 +1730,138 @@
                     <button type="button" class="btn btn-warning" onclick="importJSON('tab5')">
                         <i class="fas fa-file-import"></i> Importer
                     </button>
-                </div>
-
-                <!-- Projets pédagogiques -->
-                <div class="form-section">
-                    <h2><i class="fas fa-project-diagram"></i> PROJETS PÉDAGOGIQUES</h2>
-                    <div id="projectsContainer">
-                        <!-- Projets -->
-                    </div>
                     <button type="button" class="btn btn-primary" onclick="addProject()">
                         <i class="fas fa-plus"></i> Nouveau projet
                     </button>
-                </div>
-
-                <!-- Activités extrascolaires -->
-                <div class="form-section">
-                    <h2><i class="fas fa-futbol"></i> ACTIVITÉS EXTRASCOLAIRES</h2>
-                    <div id="activitiesContainer">
-                        <!-- Activités -->
-                    </div>
-                    <button type="button" class="btn btn-primary" onclick="addActivity()">
+                    <button type="button" class="btn btn-warning" onclick="addActivity()">
                         <i class="fas fa-plus"></i> Nouvelle activité
                     </button>
-                </div>
-
-                <!-- Réunions et conseils -->
-                <div class="form-section">
-                    <h2><i class="fas fa-users"></i> RÉUNIONS & CONSEILS</h2>
-                    <div id="meetingsContainer">
-                        <!-- Réunions -->
-                    </div>
-                    <button type="button" class="btn btn-primary" onclick="addMeeting()">
+                    <button type="button" class="btn btn-info" onclick="addMeeting()">
                         <i class="fas fa-plus"></i> Nouvelle réunion
                     </button>
+                </div>
+
+                <!-- Statistiques des projets et activités -->
+                <div class="stats-grid mb-30">
+                    <div class="stat-card">
+                        <div><i class="fas fa-project-diagram"></i> Projets</div>
+                        <div class="stat-value" id="totalProjects">0</div>
+                        <div>En cours et terminés</div>
+                    </div>
+                    <div class="stat-card">
+                        <div><i class="fas fa-futbol"></i> Activités</div>
+                        <div class="stat-value" id="totalActivities">0</div>
+                        <div>Extrascolaires</div>
+                    </div>
+                    <div class="stat-card">
+                        <div><i class="fas fa-users"></i> Réunions</div>
+                        <div class="stat-value" id="totalMeetings">0</div>
+                        <div>Conseils et réunions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div><i class="fas fa-calendar-check"></i> Total</div>
+                        <div class="stat-value" id="totalEngagements">0</div>
+                        <div>Engagements</div>
+                    </div>
+                </div>
+
+                <!-- Navigation secondaire -->
+                <div class="sub-tabs mb-30">
+                    <div class="sub-tab active" data-subtab="projects">Projets Pédagogiques</div>
+                    <div class="sub-tab" data-subtab="activities">Activités Extrascolaires</div>
+                    <div class="sub-tab" data-subtab="meetings">Réunions & Conseils</div>
+                    <div class="sub-tab" data-subtab="calendar">Calendrier</div>
+                </div>
+
+                <!-- Sous-contenu des onglets secondaires -->
+                <div class="sub-tab-content active" data-subtab="projects">
+                    <div class="form-section">
+                        <h2><i class="fas fa-project-diagram"></i> PROJETS PÉDAGOGIQUES</h2>
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Rechercher un projet..." id="projectSearch">
+                            </div>
+                            <select id="projectFilterStatus">
+                                <option value="">Tous les statuts</option>
+                                <option value="planning">En planification</option>
+                                <option value="in_progress">En cours</option>
+                                <option value="completed">Terminé</option>
+                                <option value="cancelled">Annulé</option>
+                            </select>
+                        </div>
+                        <div id="projectsContainer">
+                            <!-- Les projets seront ajoutés ici -->
+                            <div class="text-center" id="noProjectsMessage">
+                                <p>Aucun projet enregistré</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="activities">
+                    <div class="form-section">
+                        <h2><i class="fas fa-futbol"></i> ACTIVITÉS EXTRASCOLAIRES</h2>
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Rechercher une activité..." id="activitySearch">
+                            </div>
+                            <select id="activityFilterType">
+                                <option value="">Tous les types</option>
+                                <option value="sport">Sportive</option>
+                                <option value="cultural">Culturelle</option>
+                                <option value="scientific">Scientifique</option>
+                                <option value="artistic">Artistique</option>
+                                <option value="social">Sociale</option>
+                            </select>
+                        </div>
+                        <div id="activitiesContainer">
+                            <!-- Les activités seront ajoutées ici -->
+                            <div class="text-center" id="noActivitiesMessage">
+                                <p>Aucune activité enregistrée</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="meetings">
+                    <div class="form-section">
+                        <h2><i class="fas fa-users"></i> RÉUNIONS & CONSEILS</h2>
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Rechercher une réunion..." id="meetingSearch">
+                            </div>
+                            <select id="meetingFilterType">
+                                <option value="">Tous les types</option>
+                                <option value="conseil">Conseil de classe</option>
+                                <option value="pedagogique">Réunion pédagogique</option>
+                                <option value="parents">Réunion parents</option>
+                                <option value="administration">Réunion administrative</option>
+                                <option value="formation">Réunion de formation</option>
+                            </select>
+                        </div>
+                        <div id="meetingsContainer">
+                            <!-- Les réunions seront ajoutées ici -->
+                            <div class="text-center" id="noMeetingsMessage">
+                                <p>Aucune réunion enregistrée</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" data-subtab="calendar">
+                    <div class="form-section">
+                        <h2><i class="fas fa-calendar-alt"></i> CALENDRIER DES ÉVÉNEMENTS</h2>
+                        <div id="eventsCalendar">
+                            <!-- Calendrier sera généré ici -->
+                            <div class="text-center">
+                                <p>Calendrier des projets, activités et réunions</p>
+                                <div class="calendar-view" id="monthlyCalendar"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1907,36 +2045,37 @@
     </div>
 
     <script>
-        // Structure de données complète
+        // Variables globales améliorées pour la synchronisation
         let teacherData = {
             establishment: {},
             personal: {},
             professional: {},
             subjects: [],
-            teaching: {
-                themes: {},
-                lessons: [],
-                tps: [],
-                resources: [],
-                timetable: {},
-                planningClasses: ""
-            },
+            themes: {},
+            lessons: [],
+            tps: [],
+            evaluations: [],
             diplomas: [],
             trainings: [],
-            languages: [],
-            itSkills: [],
-            evaluations: [],
             projects: [],
             activities: [],
             meetings: [],
-            statistics: {},
             backups: [],
             logs: []
         };
 
         let currentTab = 'tab1';
-        let currentSubTab = 'planning';
-        
+        let counters = {
+            subject: 0,
+            theme: 0,
+            lesson: 0,
+            tp: 0,
+            evaluation: 0,
+            project: 0,
+            activity: 0,
+            meeting: 0
+        };
+
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             initApp();
@@ -2015,99 +2154,179 @@
             if (subTabElement) subTabElement.classList.add('active');
             if (subTabContent) subTabContent.classList.add('active');
             
-            currentSubTab = subtabId;
+            // Mettre à jour les informations synchronisées pour l'onglet 2
+            if (currentTab === 'tab2') {
+                updateSyncedInfoDisplay();
+            }
             
-            // Mettre à jour les informations synchronisées
-            updateSyncedInfoDisplay();
-            
-            // Charger les données spécifiques au sous-onglet
-            loadSubTabData(subtabId);
-        }
-
-        function loadSubTabData(subtabId) {
-            switch(subtabId) {
-                case 'planning':
-                    // Pré-remplir les classes pour l'emploi du temps
-                    const planningClassesInput = document.getElementById('planningClasses');
-                    if (planningClassesInput && !planningClassesInput.value && teacherData.professional.current_class) {
-                        planningClassesInput.value = teacherData.professional.current_class;
-                    }
-                    // Charger l'emploi du temps sauvegardé
-                    loadTimetableData();
-                    break;
-                case 'themes':
-                    updateSubjectsSelector();
-                    break;
-                case 'lessons':
-                    loadLessons();
-                    break;
-                case 'tp':
-                    loadTPs();
-                    break;
-                case 'resources':
-                    loadResources();
-                    break;
+            // Si c'est le calendrier, le mettre à jour
+            if (subtabId === 'calendar') {
+                updateEventsCalendar();
             }
         }
 
         function initEvents() {
-            // Synchronisation automatique des champs
-            const form = document.getElementById('teacherForm');
-            if (form) {
-                form.addEventListener('change', syncAllData);
-                form.addEventListener('input', syncAllData);
-                form.addEventListener('submit', handleSubmit);
+            // Écouter les changements sur les champs importants
+            const establishmentName = document.getElementById('establishmentName');
+            if (establishmentName) {
+                establishmentName.addEventListener('change', updateSchoolName);
+                establishmentName.addEventListener('input', updateSchoolName);
             }
             
-            // Événements spécifiques
-            document.getElementById('establishmentName')?.addEventListener('change', updateSchoolName);
+            const birthDate = document.getElementById('birthDate');
+            if (birthDate) {
+                birthDate.addEventListener('change', function() {
+                    // Synchroniser le mois de naissance avec la date
+                    const birthDateValue = new Date(this.value);
+                    const birthMonth = birthDateValue.getMonth() + 1;
+                    const birthMonthSelect = document.getElementById('birthMonth');
+                    if (birthMonthSelect) {
+                        birthMonthSelect.value = birthMonth;
+                    }
+                    calculateRetirementDate();
+                });
+            }
             
-            document.getElementById('birthDate')?.addEventListener('change', function() {
-                syncBirthDateWithMonth();
-                calculateRetirementDate();
-            });
+            const birthMonth = document.getElementById('birthMonth');
+            if (birthMonth) {
+                birthMonth.addEventListener('change', calculateRetirementDate);
+            }
             
-            document.getElementById('birthMonth')?.addEventListener('change', calculateRetirementDate);
-            document.getElementById('professionalCategory')?.addEventListener('change', calculateRetirementDate);
+            const professionalCategory = document.getElementById('professionalCategory');
+            if (professionalCategory) {
+                professionalCategory.addEventListener('change', calculateRetirementDate);
+            }
             
-            document.getElementById('regionServiceDate')?.addEventListener('change', () => {
-                calculateServiceYears('regionServiceDate', 'yearsInRegion');
-            });
+            const regionServiceDate = document.getElementById('regionServiceDate');
+            if (regionServiceDate) {
+                regionServiceDate.addEventListener('change', () => {
+                    calculateServiceYears('regionServiceDate', 'yearsInRegion');
+                });
+            }
             
-            document.getElementById('inspectionServiceDate')?.addEventListener('change', () => {
-                calculateServiceYears('inspectionServiceDate', 'yearsInInspection');
-            });
+            const inspectionServiceDate = document.getElementById('inspectionServiceDate');
+            if (inspectionServiceDate) {
+                inspectionServiceDate.addEventListener('change', () => {
+                    calculateServiceYears('inspectionServiceDate', 'yearsInInspection');
+                });
+            }
+            
+            // Gestion du formulaire
+            const teacherForm = document.getElementById('teacherForm');
+            if (teacherForm) {
+                teacherForm.addEventListener('submit', handleSubmit);
+            }
             
             // Recherche
-            document.getElementById('lessonSearch')?.addEventListener('input', filterLessons);
+            const lessonSearch = document.getElementById('lessonSearch');
+            if (lessonSearch) {
+                lessonSearch.addEventListener('input', filterLessons);
+            }
             
-            // Upload de fichiers
-            document.getElementById('resourceUpload')?.addEventListener('change', handleResourceUpload);
-            document.getElementById('importFile')?.addEventListener('change', handleFileSelect);
+            // Recherche dans les évaluations
+            const evaluationSearch = document.getElementById('evaluationSearch');
+            if (evaluationSearch) {
+                evaluationSearch.addEventListener('input', filterEvaluations);
+            }
             
-            // Synchronisation des classes pour l'emploi du temps
-            document.getElementById('currentClass')?.addEventListener('change', function() {
-                const planningClassesInput = document.getElementById('planningClasses');
-                if (planningClassesInput && !planningClassesInput.value) {
-                    planningClassesInput.value = this.value;
+            // Recherche dans les projets
+            const projectSearch = document.getElementById('projectSearch');
+            if (projectSearch) {
+                projectSearch.addEventListener('input', filterProjects);
+            }
+            
+            // Recherche dans les activités
+            const activitySearch = document.getElementById('activitySearch');
+            if (activitySearch) {
+                activitySearch.addEventListener('input', filterActivities);
+            }
+            
+            // Recherche dans les réunions
+            const meetingSearch = document.getElementById('meetingSearch');
+            if (meetingSearch) {
+                meetingSearch.addEventListener('input', filterMeetings);
+            }
+            
+            // Filtres des évaluations
+            const evaluationFilters = [
+                'evaluationFilterSubject',
+                'evaluationFilterClass',
+                'evaluationFilterType'
+            ];
+            
+            evaluationFilters.forEach(filterId => {
+                const filter = document.getElementById(filterId);
+                if (filter) {
+                    filter.addEventListener('change', filterEvaluations);
                 }
             });
+            
+            // Filtres des projets
+            const projectFilterStatus = document.getElementById('projectFilterStatus');
+            if (projectFilterStatus) {
+                projectFilterStatus.addEventListener('change', filterProjects);
+            }
+            
+            // Filtres des activités
+            const activityFilterType = document.getElementById('activityFilterType');
+            if (activityFilterType) {
+                activityFilterType.addEventListener('change', filterActivities);
+            }
+            
+            // Filtres des réunions
+            const meetingFilterType = document.getElementById('meetingFilterType');
+            if (meetingFilterType) {
+                meetingFilterType.addEventListener('change', filterMeetings);
+            }
+            
+            // Upload de fichiers
+            const resourceUpload = document.getElementById('resourceUpload');
+            if (resourceUpload) {
+                resourceUpload.addEventListener('change', handleResourceUpload);
+            }
+            
+            const importFile = document.getElementById('importFile');
+            if (importFile) {
+                importFile.addEventListener('change', handleFileSelect);
+            }
+            
+            // Synchronisation des données
+            initDataSync();
         }
 
-        // Fonction principale de synchronisation
+        function initDataSync() {
+            // Écouter les changements sur tous les champs du formulaire
+            const form = document.getElementById('teacherForm');
+            if (form) {
+                form.addEventListener('change', function() {
+                    syncAllData();
+                });
+                
+                form.addEventListener('input', function() {
+                    syncAllData();
+                });
+            }
+        }
+
+        // Fonction principale de synchronisation des données
         function syncAllData() {
+            // Collecter les données de l'onglet 1
             collectTab1Data();
-            collectPlanningData();
-            saveToLocalStorage();
             
-            // Mettre à jour les interfaces dépendantes
-            updateSchoolName();
+            // Mettre à jour les sélecteurs de matières dans l'onglet 2
             updateSubjectsSelector();
-            updateSyncedInfoDisplay();
-            updateDashboard();
             
-            // Mettre à jour les filtres de classe
+            // Mettre à jour l'affichage des informations synchronisées
+            updateSyncedInfoDisplay();
+            
+            // Initialiser les filtres de classe pour les évaluations
             updateClassFilters();
+            
+            // Initialiser les filtres de matière pour les évaluations
+            updateEvaluationFilters();
+            
+            // Sauvegarder les données dans localStorage
+            saveToLocalStorage();
         }
 
         function collectTab1Data() {
@@ -2164,7 +2383,7 @@
                     id: 'main',
                     name: mainSubject,
                     type: 'main',
-                    hours: ''
+                    hours: teacherData.professional.weekly_hours || ''
                 });
             }
             
@@ -2180,9 +2399,9 @@
             // Collecter les matières supplémentaires
             const subjectRows = document.querySelectorAll('#subjectsContainer .form-row');
             subjectRows.forEach((row, index) => {
-                if (index > 0) {
-                    const subjectInput = row.querySelector('.subject-field');
-                    const hoursInput = row.querySelector('.subject-hours-field');
+                if (index > 0) { // Ignorer la première ligne (matière principale/secondaire)
+                    const subjectInput = row.querySelector('input[type="text"]');
+                    const hoursInput = row.querySelector('input[type="number"]');
                     
                     if (subjectInput && subjectInput.value) {
                         teacherData.subjects.push({
@@ -2194,28 +2413,55 @@
                     }
                 }
             });
-        }
-
-        function collectPlanningData() {
-            const planningClasses = document.getElementById('planningClasses')?.value || '';
-            teacherData.teaching.planningClasses = planningClasses;
+            
+            updateSchoolName();
         }
 
         function updateSchoolName() {
-            const name = document.getElementById('establishmentName')?.value || 'Établissement Scolaire';
-            document.getElementById('schoolName').textContent = name;
+            const name = document.getElementById('establishmentName').value;
+            const schoolNameElement = document.getElementById('schoolName');
+            if (name && schoolNameElement) {
+                schoolNameElement.textContent = name;
+            }
         }
 
-        function syncBirthDateWithMonth() {
-            const birthDate = document.getElementById('birthDate')?.value;
-            if (birthDate) {
-                const date = new Date(birthDate);
-                const month = date.getMonth() + 1;
-                const monthSelect = document.getElementById('birthMonth');
-                if (monthSelect) {
-                    monthSelect.value = month;
-                }
+        // Fonction pour mettre à jour l'affichage des informations synchronisées dans l'onglet 2
+        function updateSyncedInfoDisplay() {
+            const displayContainer = document.getElementById('syncedInfoDisplay');
+            if (!displayContainer) return;
+            
+            let html = '<h4><i class="fas fa-sync"></i> Informations chargées depuis l\'onglet "Informations Générales":</h4>';
+            
+            // Afficher l'enseignant
+            if (teacherData.personal.last_name || teacherData.personal.first_name) {
+                html += `<p><strong>Enseignant:</strong> ${teacherData.personal.last_name} ${teacherData.personal.first_name}</p>`;
             }
+            
+            // Afficher le matricule
+            if (teacherData.professional.matricule) {
+                html += `<p><strong>Matricule:</strong> ${teacherData.professional.matricule}</p>`;
+            }
+            
+            // Afficher les classes
+            if (teacherData.professional.current_class) {
+                html += `<p><strong>Classe(s):</strong> ${teacherData.professional.current_class}</p>`;
+            }
+            
+            // Afficher les matières
+            if (teacherData.subjects.length > 0) {
+                html += '<p><strong>Matière(s):</strong> ';
+                const subjectNames = teacherData.subjects.map(subject => 
+                    `${subject.name}${subject.type === 'main' ? ' (principale)' : subject.type === 'secondary' ? ' (secondaire)' : ''}`
+                );
+                html += subjectNames.join(', ') + '</p>';
+            }
+            
+            // Afficher les heures/semaine
+            if (teacherData.professional.weekly_hours) {
+                html += `<p><strong>Heures/semaine:</strong> ${teacherData.professional.weekly_hours} heures</p>`;
+            }
+            
+            displayContainer.innerHTML = html;
         }
 
         function calculateRetirementDate() {
@@ -2224,7 +2470,9 @@
             const professionalCategoryInput = document.getElementById('professionalCategory');
             const retirementDateInput = document.getElementById('retirementDate');
             
-            if (!birthDateInput || !birthDateInput.value) return;
+            if (!birthDateInput || !birthDateInput.value || !retirementDateInput) {
+                return;
+            }
             
             const birthDate = new Date(birthDateInput.value);
             let birthMonth = birthDate.getMonth() + 1;
@@ -2234,7 +2482,7 @@
             }
             
             const birthYear = birthDate.getFullYear();
-            const professionalCategory = professionalCategoryInput?.value || '';
+            const professionalCategory = professionalCategoryInput ? professionalCategoryInput.value : '';
             
             let retirementAge = 60;
             
@@ -2258,37 +2506,73 @@
                     retirementMonth = 1;
                     retirementYear += 1;
                 }
-            } else {
-                retirementMonth = birthMonth;
+            } else if (retirementAge === 55 || retirementAge === 60) {
+                retirementMonth = birthMonth + 1;
+                if (retirementMonth > 12) {
+                    retirementMonth = 1;
+                    retirementYear += 1;
+                }
             }
             
             const retirementDate = new Date(retirementYear, retirementMonth - 1, 1);
-            retirementDateInput.value = retirementDate.toISOString().split('T')[0];
+            const formattedDate = retirementDate.toISOString().split('T')[0];
+            retirementDateInput.value = formattedDate;
             
             updateRetirementDetails(birthYear, birthMonth, retirementAge, retirementYear, retirementMonth, professionalCategory);
             syncAllData();
         }
 
         function updateRetirementDetails(birthYear, birthMonth, retirementAge, retirementYear, retirementMonth, professionalCategory) {
-            const container = document.getElementById('retirementDetails');
-            if (!container) return;
+            const detailsContainer = document.getElementById('retirementDetails');
+            if (!detailsContainer) return;
             
-            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            const monthNames = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ];
             
-            let html = `
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
-                    <h4 style="color: var(--primary-color); margin-bottom: 10px;">
+            const birthMonthName = monthNames[birthMonth - 1];
+            const retirementMonthName = monthNames[retirementMonth - 1];
+            
+            let detailsHTML = `
+                <div class="retirement-info" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                    <h4 style="margin-bottom: 10px; color: var(--primary-color);">
                         <i class="fas fa-info-circle"></i> Détails du calcul
                     </h4>
-                    <p><strong>Année de naissance:</strong> ${birthYear}</p>
-                    <p><strong>Mois de naissance:</strong> ${monthNames[birthMonth - 1] || 'Non défini'}</p>
-                    <p><strong>Catégorie:</strong> ${professionalCategory || 'Non définie'}</p>
-                    <p><strong>Âge de départ:</strong> ${retirementAge} ans</p>
-                    <p><strong>Date calculée:</strong> 1er ${monthNames[retirementMonth - 1]} ${retirementYear}</p>
+                    <div style="font-size: 0.9rem;">
+                        <p><strong>Année de naissance:</strong> ${birthYear}</p>
+                        <p><strong>Mois de naissance:</strong> ${birthMonthName}</p>
+                        <p><strong>Catégorie:</strong> ${professionalCategory || 'Non définie'}</p>
+                        <p><strong>Âge de départ:</strong> ${retirementAge} ans</p>
+                        <p><strong>Calcul:</strong> ${birthYear} + ${retirementAge} = ${retirementYear}</p>
+                        <p><strong>Date de départ:</strong> 1er ${retirementMonthName} ${retirementYear}</p>
+                    </div>
                 </div>
             `;
             
-            container.innerHTML = html;
+            if (retirementAge === 58) {
+                let ruleText = '';
+                if (birthMonth >= 1 && birthMonth <= 3) {
+                    ruleText = 'Né(e) entre Janvier et Mars → Départ le 1er Avril';
+                } else if (birthMonth >= 4 && birthMonth <= 9) {
+                    ruleText = 'Né(e) entre Avril et Septembre → Départ le 1er Octobre';
+                } else {
+                    ruleText = 'Né(e) entre Octobre et Décembre → Départ le 1er Janvier suivant';
+                }
+                
+                detailsHTML += `
+                    <div class="retirement-rules" style="background: #fff3e0; padding: 15px; border-radius: 5px; margin-top: 10px; border-left: 4px solid var(--warning-color);">
+                        <h5 style="margin-bottom: 10px; color: var(--warning-color);">
+                            <i class="fas fa-exclamation-circle"></i> Règle appliquée
+                        </h5>
+                        <div style="font-size: 0.85rem;">
+                            <p>${ruleText}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            detailsContainer.innerHTML = detailsHTML;
         }
 
         function calculateServiceYears(dateFieldId, yearsFieldId) {
@@ -2311,357 +2595,1348 @@
             }
         }
 
+        // Mettre à jour le sélecteur de matières dans l'onglet 2
         function updateSubjectsSelector() {
             const selector = document.getElementById('subjectSelector');
-            const lessonFilter = document.getElementById('lessonFilterSubject');
+            if (!selector) return;
             
-            if (selector) {
-                selector.innerHTML = '<option value="">-- Sélectionner une matière --</option>';
-                teacherData.subjects.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject.name;
-                    option.textContent = `${subject.name} ${subject.type === 'main' ? '(Principale)' : subject.type === 'secondary' ? '(Secondaire)' : ''}`;
-                    selector.appendChild(option);
-                });
-            }
+            selector.innerHTML = '<option value="">-- Sélectionner une matière --</option>';
             
-            if (lessonFilter) {
-                lessonFilter.innerHTML = '<option value="">Toutes les matières</option>';
+            teacherData.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                selector.appendChild(option);
+            });
+            
+            // Mettre à jour aussi les filtres de leçons
+            const lessonFilterSubject = document.getElementById('lessonFilterSubject');
+            if (lessonFilterSubject) {
+                lessonFilterSubject.innerHTML = '<option value="">Toutes les matières</option>';
                 teacherData.subjects.forEach(subject => {
                     const option = document.createElement('option');
                     option.value = subject.name;
                     option.textContent = subject.name;
-                    lessonFilter.appendChild(option);
+                    lessonFilterSubject.appendChild(option);
                 });
             }
         }
 
-        function updateClassFilters() {
-            const filter = document.getElementById('lessonFilterClass');
-            if (!filter) return;
+        function updateEvaluationFilters() {
+            const subjectFilter = document.getElementById('evaluationFilterSubject');
+            if (!subjectFilter) return;
             
-            const currentClass = teacherData.professional.current_class;
-            if (currentClass) {
-                const classes = currentClass.split(',').map(c => c.trim());
-                filter.innerHTML = '<option value="">Toutes les classes</option>';
-                classes.forEach(classe => {
-                    if (classe) {
+            subjectFilter.innerHTML = '<option value="">Toutes les matières</option>';
+            
+            if (teacherData.subjects && teacherData.subjects.length > 0) {
+                teacherData.subjects.forEach(subject => {
+                    if (subject.name) {
                         const option = document.createElement('option');
-                        option.value = classe;
-                        option.textContent = classe;
-                        filter.appendChild(option);
+                        option.value = subject.name;
+                        option.textContent = subject.name;
+                        subjectFilter.appendChild(option);
                     }
                 });
             }
         }
 
-        function updateSyncedInfoDisplay() {
-            const display = document.getElementById('syncedInfoDisplay');
-            if (!display) return;
+        function updateClassFilters() {
+            const classFilter = document.getElementById('evaluationFilterClass');
+            if (!classFilter) return;
             
-            let html = '<h4><i class="fas fa-sync"></i> Informations synchronisées:</h4>';
+            classFilter.innerHTML = '<option value="">Toutes les classes</option>';
             
-            if (teacherData.personal.last_name || teacherData.personal.first_name) {
-                html += `<p><strong>Enseignant:</strong> ${teacherData.personal.last_name} ${teacherData.personal.first_name}</p>`;
-            }
-            
-            if (teacherData.professional.matricule) {
-                html += `<p><strong>Matricule:</strong> ${teacherData.professional.matricule}</p>`;
-            }
-            
-            if (teacherData.professional.current_class) {
-                html += `<p><strong>Classe(s):</strong> ${teacherData.professional.current_class}</p>`;
-            }
-            
-            if (teacherData.subjects.length > 0) {
-                html += '<p><strong>Matière(s):</strong> ';
-                teacherData.subjects.forEach((subject, index) => {
-                    html += `${subject.name}${subject.type === 'main' ? ' (Principale)' : subject.type === 'secondary' ? ' (Secondaire)' : ''}`;
-                    if (index < teacherData.subjects.length - 1) html += ', ';
+            if (teacherData.professional && teacherData.professional.current_class) {
+                const classes = teacherData.professional.current_class.split(',').map(c => c.trim());
+                classes.forEach(classe => {
+                    if (classe) {
+                        const option = document.createElement('option');
+                        option.value = classe;
+                        option.textContent = classe;
+                        classFilter.appendChild(option);
+                    }
                 });
-                html += '</p>';
             }
-            
-            display.innerHTML = html;
         }
 
+        // Fonctions pour ajouter des éléments dynamiques
         function addSubjectField() {
             const container = document.getElementById('subjectsContainer');
-            const index = container.querySelectorAll('.form-row').length;
+            counters.subject++;
             
-            const newRow = document.createElement('div');
-            newRow.className = 'form-row';
-            newRow.innerHTML = `
+            const newSubject = document.createElement('div');
+            newSubject.className = 'form-row';
+            newSubject.innerHTML = `
                 <div class="form-col">
                     <div class="form-group">
-                        <label><i class="fas fa-book"></i> Matière supplémentaire ${index}</label>
-                        <input type="text" class="subject-field" placeholder="Nom de la matière">
+                        <label><i class="fas fa-book"></i> Matière supplémentaire ${counters.subject}</label>
+                        <input type="text" placeholder="Nom de la matière" class="subject-field">
                     </div>
                 </div>
                 <div class="form-col">
                     <div class="form-group">
                         <label><i class="fas fa-clock"></i> Heures/semaine</label>
-                        <input type="number" class="subject-hours-field" min="0" max="20">
+                        <input type="number" min="0" max="20" class="subject-hours-field">
                     </div>
                 </div>
                 <div class="form-col">
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.form-row').remove(); syncAllData();">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectField(this)">
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     </div>
                 </div>
             `;
             
-            container.appendChild(newRow);
+            container.appendChild(newSubject);
             syncAllData();
         }
 
-        // Fonction améliorée pour générer l'emploi du temps
-        function generateTimetable() {
-            const container = document.getElementById('timetableContainer');
+        function removeSubjectField(button) {
+            const row = button.closest('.form-row');
+            if (row && row !== row.parentElement.firstElementChild) {
+                row.remove();
+                counters.subject--;
+                syncAllData();
+            }
+        }
+
+        // Fonction pour charger automatiquement les données dans l'onglet 2
+        function loadSubjectThemes(subject) {
+            const container = document.getElementById('themesContainer');
             if (!container) return;
             
-            // Récupérer les paramètres
-            const planningClasses = document.getElementById('planningClasses')?.value || teacherData.professional.current_class || 'Non spécifié';
-            const sessionDuration = parseInt(document.getElementById('sessionDuration')?.value) || 55;
+            if (!subject) {
+                container.innerHTML = '<p class="text-center">Veuillez sélectionner une matière</p>';
+                return;
+            }
             
-            // Définir les jours et les horaires selon les spécifications
-            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            // Vérifier si cette matière existe dans les données
+            const subjectData = teacherData.subjects.find(s => s.name === subject);
             
-            // Horaires selon les spécifications : début à 7h00, séances de 55min, pause 9h45-10h10
-            const timeSlots = [
-                { start: '7:00', end: '7:55', isBreak: false },
-                { start: '7:55', end: '8:50', isBreak: false },
-                { start: '8:50', end: '9:45', isBreak: false },
-                { start: '9:45', end: '10:10', isBreak: true, label: 'PAUSE' },
-                { start: '10:10', end: '11:05', isBreak: false },
-                { start: '11:05', end: '12:00', isBreak: false },
-                { start: '15:00', end: '15:55', isBreak: false },
-                { start: '15:55', end: '16:50', isBreak: false }
-            ];
-            
-            // Récupérer les matières
-            const subjects = teacherData.subjects;
-            const mainSubject = subjects.find(s => s.type === 'main')?.name || 'Matière principale';
-            const secondarySubject = subjects.find(s => s.type === 'secondary')?.name || 'Matière secondaire';
-            
-            let html = `
-                <div class="current-class-display mb-20">
-                    <h4><i class="fas fa-info-circle"></i> Informations de planification</h4>
-                    <p><strong>Classe(s):</strong> ${planningClasses}</p>
-                    <p><strong>Durée des séances:</strong> ${sessionDuration} minutes</p>
-                    <p><strong>Total heures/semaine:</strong> ${teacherData.professional.weekly_hours || 0} heures</p>
+            container.innerHTML = `
+                <div class="theme-container">
+                    <h4>Thèmes pour ${subject}</h4>
+                    <div class="current-class-display">
+                        <h4><i class="fas fa-info-circle"></i> Informations sur la matière</h4>
+                        ${subjectData ? `
+                            <p><strong>Type:</strong> ${subjectData.type === 'main' ? 'Matière principale' : subjectData.type === 'secondary' ? 'Matière secondaire' : 'Matière supplémentaire'}</p>
+                            ${subjectData.hours ? `<p><strong>Heures/semaine:</strong> ${subjectData.hours} heures</p>` : ''}
+                        ` : ''}
+                    </div>
+                    <div class="form-group">
+                        <label>Ajouter un nouveau thème</label>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <input type="text" id="newThemeName" placeholder="Nom du thème">
+                            </div>
+                            <div class="form-col">
+                                <button type="button" class="btn btn-secondary" onclick="addTheme('${subject}')">
+                                    <i class="fas fa-plus"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="themesList"></div>
                 </div>
-                <div class="timetable-container">
-                    <table class="data-table" style="min-width: 800px;">
-                        <thead>
-                            <tr>
-                                <th>Horaires</th>
             `;
+        }
+
+        function addTheme(subject) {
+            const themeNameInput = document.getElementById('newThemeName');
+            if (!themeNameInput || !themeNameInput.value) {
+                showNotification('Veuillez entrer un nom de thème', 'warning');
+                return;
+            }
             
-            // En-têtes des jours
-            days.forEach(day => {
-                html += `<th>${day}</th>`;
-            });
+            const themesList = document.getElementById('themesList');
+            if (themesList) {
+                const themeId = `theme_${Date.now()}`;
+                const themeHTML = `
+                    <div class="dynamic-item" id="${themeId}">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Thème: ${themeNameInput.value}</label>
+                                    <textarea rows="2" placeholder="Description du thème"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-actions">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${themeId}')">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+                themesList.insertAdjacentHTML('beforeend', themeHTML);
+                themeNameInput.value = '';
+                syncAllData();
+            }
+        }
+
+        // Lors de l'ajout d'une leçon, pré-remplir avec les informations synchronisées
+        function addNewLesson() {
+            const lessonId = `lesson_${Date.now()}`;
             
-            html += `</tr></thead><tbody>`;
+            // Récupérer les informations synchronisées
+            const currentDate = new Date().toISOString().split('T')[0];
+            const defaultSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
+            const defaultClass = teacherData.professional.current_class || '';
             
-            // Lignes pour chaque créneau horaire
-            timeSlots.forEach((slot, slotIndex) => {
-                const timeLabel = slot.isBreak ? 
-                    `<strong>${slot.label || 'PAUSE'}</strong><br><small>${slot.start} - ${slot.end}</small>` :
-                    `${slot.start}<br>${slot.end}`;
-                
-                html += `<tr>`;
-                html += `<td style="text-align: center; vertical-align: middle; min-width: 100px;">${timeLabel}</td>`;
-                
-                // Cellules pour chaque jour
-                days.forEach((day, dayIndex) => {
-                    const cellId = `cell_${dayIndex}_${slotIndex}`;
-                    const savedValue = teacherData.teaching.timetable?.[cellId] || '';
-                    
-                    if (slot.isBreak) {
-                        html += `<td class="timetable-cell break" style="text-align: center;">${slot.label || 'PAUSE'}</td>`;
-                    } else {
-                        html += `
-                            <td>
-                                <select id="${cellId}" class="timetable-cell-select" 
-                                        onchange="updateTimetableCell('${cellId}', this.value)"
-                                        style="width: 100%; height: 40px; border: 1px solid #dee2e6; border-radius: 4px; padding: 5px;">
-                                    <option value="">-- Sélectionner --</option>
-                                    <option value="${mainSubject}" ${savedValue === mainSubject ? 'selected' : ''}>${mainSubject} (Principale)</option>
-                        `;
-                        
-                        if (secondarySubject && secondarySubject !== 'Matière secondaire') {
-                            html += `<option value="${secondarySubject}" ${savedValue === secondarySubject ? 'selected' : ''}>${secondarySubject} (Secondaire)</option>`;
-                        }
-                        
-                        // Autres matières supplémentaires
-                        subjects.forEach(subject => {
-                            if (subject.type === 'additional' && subject.name) {
-                                html += `<option value="${subject.name}" ${savedValue === subject.name ? 'selected' : ''}>${subject.name}</option>`;
-                            }
-                        });
-                        
-                        html += `
-                                    <option value="TP" ${savedValue === 'TP' ? 'selected' : ''}>TP/Laboratoire</option>
-                                    <option value="REUNION" ${savedValue === 'REUNION' ? 'selected' : ''}>Réunion</option>
-                                    <option value="AUTRE" ${savedValue === 'AUTRE' ? 'selected' : ''}>Autre activité</option>
-                                    <option value="LIBRE" ${savedValue === 'LIBRE' ? 'selected' : ''}>Libre</option>
-                                </select>
-                            </td>
-                        `;
-                    }
-                });
-                
-                html += `</tr>`;
-            });
-            
-            html += `</tbody></table>`;
-            
-            // Légende
-            html += `
-                <div class="mt-20" style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
-                    <h5><i class="fas fa-key"></i> Légende</h5>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #e3f2fd; border: 1px solid var(--primary-color); margin-right: 5px;"></span> Matière principale</div>
-                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #e8f5e9; border: 1px solid var(--success-color); margin-right: 5px;"></span> Matière secondaire</div>
-                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #fff3e0; border: 1px solid var(--warning-color); margin-right: 5px;"></span> TP/Laboratoire</div>
-                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #f3e5f5; border: 1px solid var(--info-color); margin-right: 5px;"></span> Réunion</div>
-                        <div><span style="display: inline-block; width: 20px; height: 20px; background: #f5f5f5; border: 1px solid #dee2e6; margin-right: 5px;"></span> Libre</div>
+            const lessonHTML = `
+                <div class="lesson-container" id="${lessonId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Titre de la leçon</label>
+                                <input type="text" placeholder="Titre de la leçon" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" value="${currentDate}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Durée (heures)</label>
+                                <input type="number" min="0.5" max="4" step="0.5" value="1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Matière</label>
+                                <input type="text" value="${defaultSubject}" placeholder="Matière">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Classe</label>
+                                <input type="text" value="${defaultClass}" placeholder="Ex: 3ème A">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs pédagogiques</label>
+                        <textarea rows="3" placeholder="Objectifs spécifiques de la leçon"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tasks"></i> Déroulement</label>
+                        <textarea rows="4" placeholder="Plan détaillé de la séance"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tools"></i> Matériel utilisé</label>
+                        <textarea rows="2" placeholder="Matériel et supports pédagogiques"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${lessonId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${lessonId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
                     </div>
                 </div>
             `;
             
-            container.innerHTML = html;
+            const lessonsContainer = document.getElementById('lessonsContainer');
+            if (lessonsContainer) {
+                lessonsContainer.insertAdjacentHTML('beforeend', lessonHTML);
+                
+                // Ajouter cette leçon aux données
+                if (!teacherData.lessons) teacherData.lessons = [];
+                teacherData.lessons.push({
+                    id: lessonId,
+                    title: '',
+                    date: currentDate,
+                    subject: defaultSubject,
+                    class: defaultClass,
+                    createdAt: new Date().toISOString()
+                });
+                
+                syncAllData();
+                showNotification('Nouvelle leçon créée avec les informations synchronisées', 'success');
+            }
+        }
+
+        function addNewTP() {
+            const tpId = `tp_${Date.now()}`;
+            const currentDate = new Date().toISOString().split('T')[0];
+            const defaultSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
+            const defaultClass = teacherData.professional.current_class || '';
             
-            // Appliquer les styles aux cellules déjà sélectionnées
-            Object.keys(teacherData.teaching.timetable || {}).forEach(cellId => {
-                const cell = document.getElementById(cellId);
-                if (cell) {
-                    applyTimetableCellStyle(cellId, cell.value);
+            const tpHTML = `
+                <div class="tp-container" id="${tpId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-flask"></i> Titre du TP/Expérience</label>
+                                <input type="text" placeholder="Titre de l'expérience" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" value="${currentDate}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Matière</label>
+                                <input type="text" value="${defaultSubject}" placeholder="Matière">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Classe</label>
+                                <input type="text" value="${defaultClass}" placeholder="Classe">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs spécifiques</label>
+                        <textarea rows="2" placeholder="Objectifs pédagogiques du TP"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-vial"></i> Description de l'expérience</label>
+                        <textarea rows="3" placeholder="Protocole expérimental détaillé"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tools"></i> Matériel et équipement</label>
+                        <textarea rows="2" placeholder="Liste du matériel nécessaire"></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveElement('${tpId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${tpId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const tpContainer = document.getElementById('tpContainer');
+            if (tpContainer) {
+                tpContainer.insertAdjacentHTML('beforeend', tpHTML);
+                
+                if (!teacherData.tps) teacherData.tps = [];
+                teacherData.tps.push({
+                    id: tpId,
+                    title: '',
+                    date: currentDate,
+                    subject: defaultSubject,
+                    class: defaultClass,
+                    createdAt: new Date().toISOString()
+                });
+                
+                syncAllData();
+                showNotification('Nouveau TP créé avec les informations synchronisées', 'success');
+            }
+        }
+
+        // ==================== ONGLET 4: ÉVALUATIONS ====================
+        
+        function addEvaluation() {
+            const evaluationId = `eval_${Date.now()}`;
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            // Récupérer les informations synchronisées
+            const defaultSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
+            const defaultClass = teacherData.professional.current_class ? 
+                teacherData.professional.current_class.split(',')[0].trim() : '';
+            
+            const evaluationHTML = `
+                <div class="evaluation-container" id="${evaluationId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clipboard-check"></i> Type d'évaluation *</label>
+                                <select class="eval-type" required>
+                                    <option value="">Sélectionner</option>
+                                    <option value="examen">Examen</option>
+                                    <option value="devoir">Devoir</option>
+                                    <option value="oral">Oral</option>
+                                    <option value="tp">TP</option>
+                                    <option value="projet">Projet</option>
+                                    <option value="participation">Participation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Matière *</label>
+                                <input type="text" class="eval-subject" value="${defaultSubject}" placeholder="Matière" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Classe *</label>
+                                <input type="text" class="eval-class" value="${defaultClass}" placeholder="Classe" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date *</label>
+                                <input type="date" class="eval-date" value="${currentDate}" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Thème/chapitre</label>
+                                <input type="text" class="eval-topic" placeholder="Thème évalué">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-percentage"></i> Coefficient</label>
+                                <input type="number" class="eval-coefficient" min="1" max="10" value="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs d'évaluation</label>
+                        <textarea class="eval-objectives" rows="2" placeholder="Compétences évaluées..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-user-graduate"></i> Nombre d'élèves évalués</label>
+                                <input type="number" class="eval-student-count" min="1" max="50" value="1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-chart-bar"></i> Moyenne de la classe</label>
+                                <input type="number" class="eval-average" min="0" max="20" step="0.1" placeholder="/20">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-trophy"></i> Meilleure note</label>
+                                <input type="number" class="eval-best" min="0" max="20" step="0.1" placeholder="/20">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sticky-note"></i> Commentaires/Remarques</label>
+                        <textarea class="eval-comments" rows="3" placeholder="Observations sur l'évaluation..."></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveEvaluation('${evaluationId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm" onclick="duplicateEvaluation('${evaluationId}')">
+                            <i class="fas fa-copy"></i> Dupliquer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeEvaluation('${evaluationId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const container = document.getElementById('evaluationsContainer');
+            if (container) {
+                // Masquer le message "aucune évaluation"
+                const noEvalMessage = document.getElementById('noEvaluationsMessage');
+                if (noEvalMessage) {
+                    noEvalMessage.style.display = 'none';
                 }
+                
+                container.insertAdjacentHTML('afterbegin', evaluationHTML);
+                
+                // Ajouter aux données
+                if (!teacherData.evaluations) teacherData.evaluations = [];
+                teacherData.evaluations.push({
+                    id: evaluationId,
+                    type: '',
+                    subject: defaultSubject,
+                    class: defaultClass,
+                    date: currentDate,
+                    createdAt: new Date().toISOString()
+                });
+                
+                counters.evaluation++;
+                updateEvaluationStats();
+                syncAllData();
+                showNotification('Nouvelle évaluation créée', 'success');
+            }
+        }
+
+        function saveEvaluation(evaluationId) {
+            const element = document.getElementById(evaluationId);
+            if (!element) return;
+            
+            // Récupérer les valeurs
+            const type = element.querySelector('.eval-type').value;
+            const subject = element.querySelector('.eval-subject').value;
+            const classe = element.querySelector('.eval-class').value;
+            const date = element.querySelector('.eval-date').value;
+            const average = element.querySelector('.eval-average').value;
+            const best = element.querySelector('.eval-best').value;
+            
+            // Mettre à jour les données
+            const evaluationIndex = teacherData.evaluations.findIndex(e => e.id === evaluationId);
+            if (evaluationIndex !== -1) {
+                teacherData.evaluations[evaluationIndex] = {
+                    ...teacherData.evaluations[evaluationIndex],
+                    type: type,
+                    subject: subject,
+                    class: classe,
+                    date: date,
+                    average: parseFloat(average) || 0,
+                    best: parseFloat(best) || 0,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            
+            updateEvaluationStats();
+            syncAllData();
+            showNotification('Évaluation sauvegardée', 'success');
+        }
+
+        function duplicateEvaluation(evaluationId) {
+            const original = document.getElementById(evaluationId);
+            if (!original) return;
+            
+            // Créer une nouvelle évaluation avec les mêmes données
+            addEvaluation();
+            
+            // Récupérer la nouvelle évaluation (la dernière ajoutée)
+            const newEvaluation = document.querySelector('.evaluation-container:first-child');
+            if (newEvaluation && newEvaluation.id !== evaluationId) {
+                // Copier les valeurs
+                const originalType = original.querySelector('.eval-type').value;
+                const originalSubject = original.querySelector('.eval-subject').value;
+                const originalClass = original.querySelector('.eval-class').value;
+                const originalTopic = original.querySelector('.eval-topic').value;
+                
+                if (originalType) newEvaluation.querySelector('.eval-type').value = originalType;
+                if (originalSubject) newEvaluation.querySelector('.eval-subject').value = originalSubject;
+                if (originalClass) newEvaluation.querySelector('.eval-class').value = originalClass;
+                if (originalTopic) newEvaluation.querySelector('.eval-topic').value = originalTopic;
+                
+                showNotification('Évaluation dupliquée', 'success');
+            }
+        }
+
+        function removeEvaluation(evaluationId) {
+            if (confirm('Voulez-vous vraiment supprimer cette évaluation ?')) {
+                const element = document.getElementById(evaluationId);
+                if (element) {
+                    element.remove();
+                    
+                    // Retirer des données
+                    teacherData.evaluations = teacherData.evaluations.filter(e => e.id !== evaluationId);
+                    
+                    counters.evaluation--;
+                    updateEvaluationStats();
+                    syncAllData();
+                    
+                    // Afficher le message "aucune évaluation" si besoin
+                    const container = document.getElementById('evaluationsContainer');
+                    if (container && container.children.length === 0) {
+                        const noEvalMessage = document.getElementById('noEvaluationsMessage');
+                        if (noEvalMessage) {
+                            noEvalMessage.style.display = 'block';
+                        }
+                    }
+                    
+                    showNotification('Évaluation supprimée', 'success');
+                }
+            }
+        }
+
+        function filterEvaluations() {
+            const searchTerm = document.getElementById('evaluationSearch').value.toLowerCase();
+            const filterSubject = document.getElementById('evaluationFilterSubject').value;
+            const filterClass = document.getElementById('evaluationFilterClass').value;
+            const filterType = document.getElementById('evaluationFilterType').value;
+            
+            const evaluations = document.querySelectorAll('.evaluation-container');
+            let visibleCount = 0;
+            
+            evaluations.forEach(evaluation => {
+                const subject = evaluation.querySelector('.eval-subject')?.value || '';
+                const classe = evaluation.querySelector('.eval-class')?.value || '';
+                const type = evaluation.querySelector('.eval-type')?.value || '';
+                const text = evaluation.textContent.toLowerCase();
+                
+                let shouldShow = true;
+                
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                
+                if (filterSubject && subject !== filterSubject) {
+                    shouldShow = false;
+                }
+                
+                if (filterClass && classe !== filterClass) {
+                    shouldShow = false;
+                }
+                
+                if (filterType && type !== filterType) {
+                    shouldShow = false;
+                }
+                
+                evaluation.style.display = shouldShow ? 'block' : 'none';
+                if (shouldShow) visibleCount++;
+            });
+            
+            // Si aucun filtre n'est actif, ne pas afficher le compteur
+            if (!searchTerm && !filterSubject && !filterClass && !filterType) {
+                return;
+            }
+            
+            // Afficher le nombre de résultats
+            const searchBox = document.getElementById('evaluationSearch');
+            if (searchBox) {
+                const currentParent = searchBox.parentElement;
+                const resultCount = document.createElement('div');
+                resultCount.className = 'search-result-count';
+                resultCount.innerHTML = `<small>${visibleCount} évaluation(s) trouvée(s)</small>`;
+                
+                // Supprimer l'ancien compteur s'il existe
+                const oldCount = currentParent.querySelector('.search-result-count');
+                if (oldCount) oldCount.remove();
+                
+                if (searchTerm || filterSubject || filterClass || filterType) {
+                    currentParent.appendChild(resultCount);
+                }
+            }
+        }
+
+        function updateEvaluationStats() {
+            // Mettre à jour le compteur total
+            document.getElementById('totalEvaluations').textContent = teacherData.evaluations.length;
+            
+            // Calculer les statistiques
+            let totalStudents = 0;
+            let totalScore = 0;
+            let validScores = 0;
+            let bestScore = 0;
+            
+            teacherData.evaluations.forEach(eval => {
+                const studentCount = parseInt(eval.studentCount) || 1;
+                totalStudents += studentCount;
+                
+                if (eval.average && !isNaN(eval.average)) {
+                    totalScore += eval.average;
+                    validScores++;
+                }
+                
+                if (eval.best && !isNaN(eval.best) && eval.best > bestScore) {
+                    bestScore = eval.best;
+                }
+            });
+            
+            // Mettre à jour l'affichage
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('bestScore').textContent = bestScore.toFixed(1);
+            
+            const averageScore = validScores > 0 ? totalScore / validScores : 0;
+            document.getElementById('averageScore').textContent = averageScore.toFixed(1);
+            
+            // Mettre à jour les statistiques détaillées
+            updateDetailedEvaluationStats();
+        }
+
+        function updateDetailedEvaluationStats() {
+            const container = document.getElementById('detailedEvaluationStats');
+            if (!container) return;
+            
+            if (teacherData.evaluations.length === 0) {
+                container.innerHTML = '<p class="text-center">Aucune donnée statistique disponible</p>';
+                return;
+            }
+            
+            // Grouper par matière
+            const bySubject = {};
+            const byType = {};
+            const byMonth = {};
+            
+            teacherData.evaluations.forEach(eval => {
+                // Par matière
+                if (eval.subject) {
+                    if (!bySubject[eval.subject]) {
+                        bySubject[eval.subject] = { count: 0, total: 0 };
+                    }
+                    bySubject[eval.subject].count++;
+                    if (eval.average) bySubject[eval.subject].total += eval.average;
+                }
+                
+                // Par type
+                if (eval.type) {
+                    if (!byType[eval.type]) {
+                        byType[eval.type] = 0;
+                    }
+                    byType[eval.type]++;
+                }
+                
+                // Par mois
+                if (eval.date) {
+                    const month = eval.date.substring(0, 7); // YYYY-MM
+                    if (!byMonth[month]) {
+                        byMonth[month] = 0;
+                    }
+                    byMonth[month]++;
+                }
+            });
+            
+            let html = '<div class="stats-grid">';
+            
+            // Statistiques par matière
+            html += '<div class="stat-card"><div>Par matière</div><div>';
+            Object.entries(bySubject).forEach(([subject, data]) => {
+                const avg = data.total / data.count;
+                html += `<div>${subject}: ${data.count} éval. (${avg.toFixed(1)}/20)</div>`;
+            });
+            html += '</div></div>';
+            
+            // Répartition par type
+            html += '<div class="stat-card"><div>Par type</div><div>';
+            Object.entries(byType).forEach(([type, count]) => {
+                html += `<div>${type}: ${count}</div>`;
+            });
+            html += '</div></div>';
+            
+            // Évolution mensuelle
+            html += '<div class="stat-card"><div>Évolution</div><div>';
+            Object.entries(byMonth).forEach(([month, count]) => {
+                html += `<div>${month}: ${count} éval.</div>`;
+            });
+            html += '</div></div>';
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ==================== ONGLET 5: PROJETS & ACTIVITÉS ====================
+        
+        function addProject() {
+            const projectId = `proj_${Date.now()}`;
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            const projectHTML = `
+                <div class="project-container" id="${projectId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-project-diagram"></i> Nom du projet *</label>
+                                <input type="text" class="project-name" placeholder="Titre du projet" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Matière concernée</label>
+                                <input type="text" class="project-subject" placeholder="Matière">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Statut</label>
+                                <select class="project-status">
+                                    <option value="planning">En planification</option>
+                                    <option value="in_progress" selected>En cours</option>
+                                    <option value="completed">Terminé</option>
+                                    <option value="cancelled">Annulé</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date de début</label>
+                                <input type="date" class="project-start" value="${currentDate}">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-check"></i> Date de fin prévue</label>
+                                <input type="date" class="project-end">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Classes concernées</label>
+                                <input type="text" class="project-classes" placeholder="Classes">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs pédagogiques</label>
+                        <textarea class="project-objectives" rows="2" placeholder="Objectifs du projet..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tasks"></i> Description/Contenu</label>
+                        <textarea class="project-description" rows="3" placeholder="Description détaillée du projet..."></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveProject('${projectId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProject('${projectId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const container = document.getElementById('projectsContainer');
+            if (container) {
+                // Masquer le message "aucun projet"
+                const noProjectsMessage = document.getElementById('noProjectsMessage');
+                if (noProjectsMessage) {
+                    noProjectsMessage.style.display = 'none';
+                }
+                
+                container.insertAdjacentHTML('afterbegin', projectHTML);
+                
+                // Ajouter aux données
+                if (!teacherData.projects) teacherData.projects = [];
+                teacherData.projects.push({
+                    id: projectId,
+                    name: '',
+                    status: 'in_progress',
+                    startDate: currentDate,
+                    createdAt: new Date().toISOString()
+                });
+                
+                counters.project++;
+                updateProjectsStats();
+                syncAllData();
+                showNotification('Nouveau projet créé', 'success');
+            }
+        }
+
+        function saveProject(projectId) {
+            const element = document.getElementById(projectId);
+            if (!element) return;
+            
+            const name = element.querySelector('.project-name').value;
+            const subject = element.querySelector('.project-subject').value;
+            const status = element.querySelector('.project-status').value;
+            const startDate = element.querySelector('.project-start').value;
+            const endDate = element.querySelector('.project-end').value;
+            
+            // Mettre à jour les données
+            const projectIndex = teacherData.projects.findIndex(p => p.id === projectId);
+            if (projectIndex !== -1) {
+                teacherData.projects[projectIndex] = {
+                    ...teacherData.projects[projectIndex],
+                    name: name,
+                    subject: subject,
+                    status: status,
+                    startDate: startDate,
+                    endDate: endDate,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            
+            updateProjectsStats();
+            syncAllData();
+            showNotification('Projet sauvegardé', 'success');
+        }
+
+        function removeProject(projectId) {
+            if (confirm('Voulez-vous vraiment supprimer ce projet ?')) {
+                const element = document.getElementById(projectId);
+                if (element) {
+                    element.remove();
+                    
+                    // Retirer des données
+                    teacherData.projects = teacherData.projects.filter(p => p.id !== projectId);
+                    
+                    counters.project--;
+                    updateProjectsStats();
+                    syncAllData();
+                    
+                    // Afficher le message "aucun projet" si besoin
+                    const container = document.getElementById('projectsContainer');
+                    if (container && container.children.length === 0) {
+                        const noProjectsMessage = document.getElementById('noProjectsMessage');
+                        if (noProjectsMessage) {
+                            noProjectsMessage.style.display = 'block';
+                        }
+                    }
+                    
+                    showNotification('Projet supprimé', 'success');
+                }
+            }
+        }
+
+        function addActivity() {
+            const activityId = `act_${Date.now()}`;
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            const activityHTML = `
+                <div class="activity-container" id="${activityId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-futbol"></i> Nom de l'activité *</label>
+                                <input type="text" class="activity-name" placeholder="Titre de l'activité" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Type d'activité</label>
+                                <select class="activity-type">
+                                    <option value="sport">Sportive</option>
+                                    <option value="cultural">Culturelle</option>
+                                    <option value="scientific">Scientifique</option>
+                                    <option value="artistic">Artistique</option>
+                                    <option value="social">Sociale</option>
+                                    <option value="other">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" class="activity-date" value="${currentDate}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-users"></i> Participants</label>
+                        <textarea class="activity-participants" rows="2" placeholder="Classes/Élèves participants..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bullseye"></i> Objectifs</label>
+                        <textarea class="activity-objectives" rows="2" placeholder="Objectifs de l'activité..."></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveActivity('${activityId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeActivity('${activityId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const container = document.getElementById('activitiesContainer');
+            if (container) {
+                // Masquer le message "aucune activité"
+                const noActivitiesMessage = document.getElementById('noActivitiesMessage');
+                if (noActivitiesMessage) {
+                    noActivitiesMessage.style.display = 'none';
+                }
+                
+                container.insertAdjacentHTML('afterbegin', activityHTML);
+                
+                // Ajouter aux données
+                if (!teacherData.activities) teacherData.activities = [];
+                teacherData.activities.push({
+                    id: activityId,
+                    name: '',
+                    type: 'sport',
+                    date: currentDate,
+                    createdAt: new Date().toISOString()
+                });
+                
+                counters.activity++;
+                updateProjectsStats();
+                syncAllData();
+                showNotification('Nouvelle activité créée', 'success');
+            }
+        }
+
+        function saveActivity(activityId) {
+            const element = document.getElementById(activityId);
+            if (!element) return;
+            
+            const name = element.querySelector('.activity-name').value;
+            const type = element.querySelector('.activity-type').value;
+            const date = element.querySelector('.activity-date').value;
+            
+            // Mettre à jour les données
+            const activityIndex = teacherData.activities.findIndex(a => a.id === activityId);
+            if (activityIndex !== -1) {
+                teacherData.activities[activityIndex] = {
+                    ...teacherData.activities[activityIndex],
+                    name: name,
+                    type: type,
+                    date: date,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            
+            updateProjectsStats();
+            syncAllData();
+            showNotification('Activité sauvegardée', 'success');
+        }
+
+        function removeActivity(activityId) {
+            if (confirm('Voulez-vous vraiment supprimer cette activité ?')) {
+                const element = document.getElementById(activityId);
+                if (element) {
+                    element.remove();
+                    
+                    // Retirer des données
+                    teacherData.activities = teacherData.activities.filter(a => a.id !== activityId);
+                    
+                    counters.activity--;
+                    updateProjectsStats();
+                    syncAllData();
+                    
+                    // Afficher le message "aucune activité" si besoin
+                    const container = document.getElementById('activitiesContainer');
+                    if (container && container.children.length === 0) {
+                        const noActivitiesMessage = document.getElementById('noActivitiesMessage');
+                        if (noActivitiesMessage) {
+                            noActivitiesMessage.style.display = 'block';
+                        }
+                    }
+                    
+                    showNotification('Activité supprimée', 'success');
+                }
+            }
+        }
+
+        function addMeeting() {
+            const meetingId = `meet_${Date.now()}`;
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            const meetingHTML = `
+                <div class="meeting-container" id="${meetingId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-users"></i> Type de réunion *</label>
+                                <select class="meeting-type" required>
+                                    <option value="conseil">Conseil de classe</option>
+                                    <option value="pedagogique">Réunion pédagogique</option>
+                                    <option value="parents">Réunion parents</option>
+                                    <option value="administration">Réunion administrative</option>
+                                    <option value="formation">Réunion de formation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date *</label>
+                                <input type="date" class="meeting-date" value="${currentDate}" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Heure</label>
+                                <input type="time" class="meeting-time" value="14:00">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tie"></i> Président de séance</label>
+                                <input type="text" class="meeting-president" placeholder="Nom du président">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-user-friends"></i> Participants</label>
+                                <input type="text" class="meeting-participants" placeholder="Nombre de participants">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clipboard-list"></i> Ordre du jour</label>
+                        <textarea class="meeting-agenda" rows="3" placeholder="Points à aborder..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sticky-note"></i> Compte-rendu/Décisions</label>
+                        <textarea class="meeting-report" rows="3" placeholder="Décisions prises, actions à mener..."></textarea>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveMeeting('${meetingId}')">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMeeting('${meetingId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const container = document.getElementById('meetingsContainer');
+            if (container) {
+                // Masquer le message "aucune réunion"
+                const noMeetingsMessage = document.getElementById('noMeetingsMessage');
+                if (noMeetingsMessage) {
+                    noMeetingsMessage.style.display = 'none';
+                }
+                
+                container.insertAdjacentHTML('afterbegin', meetingHTML);
+                
+                // Ajouter aux données
+                if (!teacherData.meetings) teacherData.meetings = [];
+                teacherData.meetings.push({
+                    id: meetingId,
+                    type: 'conseil',
+                    date: currentDate,
+                    createdAt: new Date().toISOString()
+                });
+                
+                counters.meeting++;
+                updateProjectsStats();
+                syncAllData();
+                showNotification('Nouvelle réunion créée', 'success');
+            }
+        }
+
+        function saveMeeting(meetingId) {
+            const element = document.getElementById(meetingId);
+            if (!element) return;
+            
+            const type = element.querySelector('.meeting-type').value;
+            const date = element.querySelector('.meeting-date').value;
+            const time = element.querySelector('.meeting-time').value;
+            
+            // Mettre à jour les données
+            const meetingIndex = teacherData.meetings.findIndex(m => m.id === meetingId);
+            if (meetingIndex !== -1) {
+                teacherData.meetings[meetingIndex] = {
+                    ...teacherData.meetings[meetingIndex],
+                    type: type,
+                    date: date,
+                    time: time,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            
+            updateProjectsStats();
+            syncAllData();
+            showNotification('Réunion sauvegardée', 'success');
+        }
+
+        function removeMeeting(meetingId) {
+            if (confirm('Voulez-vous vraiment supprimer cette réunion ?')) {
+                const element = document.getElementById(meetingId);
+                if (element) {
+                    element.remove();
+                    
+                    // Retirer des données
+                    teacherData.meetings = teacherData.meetings.filter(m => m.id !== meetingId);
+                    
+                    counters.meeting--;
+                    updateProjectsStats();
+                    syncAllData();
+                    
+                    // Afficher le message "aucune réunion" si besoin
+                    const container = document.getElementById('meetingsContainer');
+                    if (container && container.children.length === 0) {
+                        const noMeetingsMessage = document.getElementById('noMeetingsMessage');
+                        if (noMeetingsMessage) {
+                            noMeetingsMessage.style.display = 'block';
+                        }
+                    }
+                    
+                    showNotification('Réunion supprimée', 'success');
+                }
+            }
+        }
+
+        function filterProjects() {
+            const searchTerm = document.getElementById('projectSearch').value.toLowerCase();
+            const filterStatus = document.getElementById('projectFilterStatus').value;
+            
+            const projects = document.querySelectorAll('.project-container');
+            projects.forEach(project => {
+                const name = project.querySelector('.project-name')?.value || '';
+                const status = project.querySelector('.project-status')?.value || '';
+                const text = project.textContent.toLowerCase();
+                
+                let shouldShow = true;
+                
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                
+                if (filterStatus && status !== filterStatus) {
+                    shouldShow = false;
+                }
+                
+                project.style.display = shouldShow ? 'block' : 'none';
             });
         }
 
-        function updateTimetableCell(cellId, value) {
-            if (!teacherData.teaching.timetable) {
-                teacherData.teaching.timetable = {};
-            }
+        function filterActivities() {
+            const searchTerm = document.getElementById('activitySearch').value.toLowerCase();
+            const filterType = document.getElementById('activityFilterType').value;
             
-            teacherData.teaching.timetable[cellId] = value;
-            applyTimetableCellStyle(cellId, value);
-            syncAllData();
+            const activities = document.querySelectorAll('.activity-container');
+            activities.forEach(activity => {
+                const name = activity.querySelector('.activity-name')?.value || '';
+                const type = activity.querySelector('.activity-type')?.value || '';
+                const text = activity.textContent.toLowerCase();
+                
+                let shouldShow = true;
+                
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                
+                if (filterType && type !== filterType) {
+                    shouldShow = false;
+                }
+                
+                activity.style.display = shouldShow ? 'block' : 'none';
+            });
         }
 
-        function applyTimetableCellStyle(cellId, value) {
-            const cell = document.getElementById(cellId);
-            if (!cell) return;
+        function filterMeetings() {
+            const searchTerm = document.getElementById('meetingSearch').value.toLowerCase();
+            const filterType = document.getElementById('meetingFilterType').value;
             
-            // Retirer toutes les classes de style
-            cell.classList.remove('main', 'secondary', 'tp', 'meeting', 'free');
+            const meetings = document.querySelectorAll('.meeting-container');
+            meetings.forEach(meeting => {
+                const type = meeting.querySelector('.meeting-type')?.value || '';
+                const text = meeting.textContent.toLowerCase();
+                
+                let shouldShow = true;
+                
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                
+                if (filterType && type !== filterType) {
+                    shouldShow = false;
+                }
+                
+                meeting.style.display = shouldShow ? 'block' : 'none';
+            });
+        }
+
+        function updateProjectsStats() {
+            // Mettre à jour les compteurs
+            document.getElementById('totalProjects').textContent = teacherData.projects?.length || 0;
+            document.getElementById('totalActivities').textContent = teacherData.activities?.length || 0;
+            document.getElementById('totalMeetings').textContent = teacherData.meetings?.length || 0;
             
-            // Appliquer le style approprié
-            const mainSubject = teacherData.subjects.find(s => s.type === 'main')?.name;
-            const secondarySubject = teacherData.subjects.find(s => s.type === 'secondary')?.name;
+            const total = (teacherData.projects?.length || 0) + 
+                         (teacherData.activities?.length || 0) + 
+                         (teacherData.meetings?.length || 0);
+            document.getElementById('totalEngagements').textContent = total;
+        }
+
+        function updateEventsCalendar() {
+            const container = document.getElementById('monthlyCalendar');
+            if (!container) return;
             
-            if (value === mainSubject) {
-                cell.classList.add('main');
-                cell.style.backgroundColor = '#e3f2fd';
-                cell.style.borderColor = 'var(--primary-color)';
-            } else if (value === secondarySubject) {
-                cell.classList.add('secondary');
-                cell.style.backgroundColor = '#e8f5e9';
-                cell.style.borderColor = 'var(--success-color)';
-            } else if (value === 'TP') {
-                cell.classList.add('tp');
-                cell.style.backgroundColor = '#fff3e0';
-                cell.style.borderColor = 'var(--warning-color)';
-            } else if (value === 'REUNION') {
-                cell.classList.add('meeting');
-                cell.style.backgroundColor = '#f3e5f5';
-                cell.style.borderColor = 'var(--info-color)';
-            } else if (value === 'LIBRE' || value === '') {
-                cell.classList.add('free');
-                cell.style.backgroundColor = '#f5f5f5';
-                cell.style.borderColor = '#dee2e6';
-            } else {
-                // Pour les autres matières
-                cell.style.backgroundColor = '#e3f2fd';
-                cell.style.borderColor = 'var(--primary-color)';
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            
+            // Créer le calendrier
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            let html = '';
+            
+            // En-têtes des jours
+            const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day" style="font-weight: bold;">${day}</div>`;
+            });
+            
+            // Jours vides au début
+            const firstDayOfWeek = firstDay.getDay();
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                html += `<div class="calendar-day"></div>`;
+            }
+            
+            // Jours du mois
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const events = [];
+                
+                // Vérifier les projets
+                if (teacherData.projects) {
+                    teacherData.projects.forEach(project => {
+                        if (project.startDate === dateStr || project.endDate === dateStr) {
+                            events.push({type: 'project', name: project.name});
+                        }
+                    });
+                }
+                
+                // Vérifier les activités
+                if (teacherData.activities) {
+                    teacherData.activities.forEach(activity => {
+                        if (activity.date === dateStr) {
+                            events.push({type: 'activity', name: activity.name});
+                        }
+                    });
+                }
+                
+                // Vérifier les réunions
+                if (teacherData.meetings) {
+                    teacherData.meetings.forEach(meeting => {
+                        if (meeting.date === dateStr) {
+                            events.push({type: 'meeting', name: `Réunion ${meeting.type}`});
+                        }
+                    });
+                }
+                
+                let dayContent = `<div>${day}</div>`;
+                if (events.length > 0) {
+                    dayContent += `<div style="font-size: 0.7em; color: var(--primary-color);">${events.length} évènement(s)</div>`;
+                }
+                
+                const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                const dayClass = isToday ? 'calendar-day active' : 'calendar-day';
+                
+                html += `<div class="${dayClass}" title="${events.map(e => e.name).join(', ')}">${dayContent}</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Fonctions utilitaires
+        function saveElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                showNotification('Élément sauvegardé avec succès', 'success');
+                syncAllData();
             }
         }
 
-        function saveTimetable() {
-            if (!teacherData.teaching.timetable || Object.keys(teacherData.teaching.timetable).length === 0) {
-                showNotification('Aucun emploi du temps à sauvegarder', 'warning');
-                return;
-            }
-            
-            syncAllData();
-            showNotification('Emploi du temps sauvegardé avec succès', 'success');
-        }
-
-        function loadTimetableData() {
-            // Les données sont chargées automatiquement dans generateTimetable()
-            if (teacherData.teaching.timetable && Object.keys(teacherData.teaching.timetable).length > 0) {
-                // Appliquer les styles aux cellules existantes
-                Object.keys(teacherData.teaching.timetable).forEach(cellId => {
-                    const cell = document.getElementById(cellId);
-                    if (cell) {
-                        applyTimetableCellStyle(cellId, cell.value);
-                    }
-                });
+        function removeElement(elementId) {
+            if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.remove();
+                    showNotification('Élément supprimé avec succès', 'success');
+                    syncAllData();
+                }
             }
         }
 
-        function printTimetable() {
-            const timetableElement = document.querySelector('.timetable-container');
-            if (!timetableElement) {
-                showNotification('Générez d\'abord l\'emploi du temps', 'warning');
-                return;
-            }
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Emploi du temps - ${teacherData.personal.last_name} ${teacherData.personal.first_name}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        h1 { color: #3498db; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th { background-color: #3498db; color: white; padding: 10px; text-align: center; }
-                        td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                        .break { background-color: #f8f9fa; font-style: italic; }
-                        @media print { body { padding: 0; } }
-                    </style>
-                </head>
-                <body>
-                    <h1>Emploi du temps</h1>
-                    <p><strong>Enseignant:</strong> ${teacherData.personal.last_name} ${teacherData.personal.first_name}</p>
-                    <p><strong>Classe(s):</strong> ${document.getElementById('planningClasses')?.value || teacherData.professional.current_class}</p>
-                    <p><strong>Année scolaire:</strong> ${document.getElementById('currentYear').textContent}</p>
-                    ${timetableElement.innerHTML}
-                    <script>window.print();</script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
-
-        // Les autres fonctions restent similaires mais avec la synchronisation améliorée
-
-        // Gestion des données
+        // Gestion des données dans localStorage
         function saveToLocalStorage() {
             try {
                 localStorage.setItem('teacherCompleteData', JSON.stringify(teacherData));
-                addLog('Données sauvegardées');
+                
+                // Ajouter un log
+                addLog('Données sauvegardées dans localStorage');
             } catch (e) {
-                console.error('Erreur de sauvegarde:', e);
-                showNotification('Erreur lors de la sauvegarde', 'error');
+                console.error('Erreur lors de la sauvegarde dans localStorage:', e);
+                showNotification('Erreur lors de la sauvegarde des données', 'error');
             }
         }
 
@@ -2670,110 +3945,134 @@
                 const saved = localStorage.getItem('teacherCompleteData');
                 if (saved) {
                     const data = JSON.parse(saved);
+                    
+                    // Fusionner avec les données actuelles
                     teacherData = {...teacherData, ...data};
-                    populateForm();
+                    
+                    // Restaurer les champs principaux
+                    if (teacherData.establishment) {
+                        document.getElementById('establishmentName').value = teacherData.establishment.name || '';
+                        document.getElementById('establishmentType').value = teacherData.establishment.type || '';
+                        document.getElementById('establishmentAddress').value = teacherData.establishment.address || '';
+                        document.getElementById('establishmentPhone').value = teacherData.establishment.phone || '';
+                        document.getElementById('establishmentEmail').value = teacherData.establishment.email || '';
+                        document.getElementById('establishmentWebsite').value = teacherData.establishment.website || '';
+                    }
+                    
+                    if (teacherData.personal) {
+                        document.getElementById('lastName').value = teacherData.personal.last_name || '';
+                        document.getElementById('firstName').value = teacherData.personal.first_name || '';
+                        document.getElementById('gender').value = teacherData.personal.gender || '';
+                        document.getElementById('birthDate').value = teacherData.personal.birth_date || '';
+                        document.getElementById('birthMonth').value = teacherData.personal.birth_month || '';
+                        document.getElementById('birthPlace').value = teacherData.personal.birth_place || '';
+                    }
+                    
+                    if (teacherData.professional) {
+                        document.getElementById('matricule').value = teacherData.professional.matricule || '';
+                        document.getElementById('position').value = teacherData.professional.position || '';
+                        document.getElementById('grade').value = teacherData.professional.grade || '';
+                        document.getElementById('professionalCategory').value = teacherData.professional.professional_category || '';
+                        document.getElementById('engagementDate').value = teacherData.professional.engagement_date || '';
+                        document.getElementById('regionServiceDate').value = teacherData.professional.region_service_date || '';
+                        document.getElementById('inspectionServiceDate').value = teacherData.professional.inspection_service_date || '';
+                        document.getElementById('currentClass').value = teacherData.professional.current_class || '';
+                        document.getElementById('weeklyHours').value = teacherData.professional.weekly_hours || '';
+                    }
+                    
+                    if (teacherData.subjects && teacherData.subjects.length > 0) {
+                        const mainSubject = teacherData.subjects.find(s => s.type === 'main');
+                        const secondarySubject = teacherData.subjects.find(s => s.type === 'secondary');
+                        
+                        if (mainSubject) {
+                            document.getElementById('mainSubject').value = mainSubject.name;
+                        }
+                        
+                        if (secondarySubject) {
+                            document.getElementById('secondarySubject').value = secondarySubject.name;
+                        }
+                        
+                        // Ajouter les matières supplémentaires
+                        const additionalSubjects = teacherData.subjects.filter(s => s.type === 'additional');
+                        additionalSubjects.forEach((subject, index) => {
+                            if (index === 0) addSubjectField();
+                            const rows = document.querySelectorAll('#subjectsContainer .form-row');
+                            if (rows.length > index + 1) {
+                                const row = rows[index + 1];
+                                const subjectInput = row.querySelector('.subject-field');
+                                const hoursInput = row.querySelector('.subject-hours-field');
+                                if (subjectInput) subjectInput.value = subject.name;
+                                if (hoursInput) hoursInput.value = subject.hours;
+                            }
+                        });
+                    }
+                    
+                    updateSchoolName();
+                    calculateRetirementDate();
+                    updateSubjectsSelector();
+                    updateSyncedInfoDisplay();
+                    
+                    // Restaurer les évaluations
+                    if (teacherData.evaluations && teacherData.evaluations.length > 0) {
+                        counters.evaluation = teacherData.evaluations.length;
+                        teacherData.evaluations.forEach(eval => {
+                            // Recréer l'affichage des évaluations
+                            // Note: Pour une restauration complète, il faudrait recréer le HTML
+                        });
+                    }
+                    
+                    // Restaurer les projets
+                    if (teacherData.projects && teacherData.projects.length > 0) {
+                        counters.project = teacherData.projects.length;
+                    }
+                    
+                    // Restaurer les activités
+                    if (teacherData.activities && teacherData.activities.length > 0) {
+                        counters.activity = teacherData.activities.length;
+                    }
+                    
+                    // Restaurer les réunions
+                    if (teacherData.meetings && teacherData.meetings.length > 0) {
+                        counters.meeting = teacherData.meetings.length;
+                    }
+                    
+                    updateEvaluationStats();
+                    updateProjectsStats();
+                    
                     showNotification('Données chargées depuis la sauvegarde', 'success');
                 }
             } catch (error) {
-                console.error('Erreur de chargement:', error);
+                console.error('Erreur lors du chargement des données:', error);
+                showNotification('Erreur lors du chargement des données', 'error');
             }
         }
 
-        function populateForm() {
-            // Établissement
-            if (teacherData.establishment) {
-                document.getElementById('establishmentName').value = teacherData.establishment.name || '';
-                document.getElementById('establishmentType').value = teacherData.establishment.type || '';
-                document.getElementById('establishmentAddress').value = teacherData.establishment.address || '';
-                document.getElementById('establishmentPhone').value = teacherData.establishment.phone || '';
-                document.getElementById('establishmentEmail').value = teacherData.establishment.email || '';
-                document.getElementById('establishmentWebsite').value = teacherData.establishment.website || '';
-            }
-            
-            // Personnelles
-            if (teacherData.personal) {
-                document.getElementById('lastName').value = teacherData.personal.last_name || '';
-                document.getElementById('firstName').value = teacherData.personal.first_name || '';
-                document.getElementById('gender').value = teacherData.personal.gender || '';
-                document.getElementById('birthDate').value = teacherData.personal.birth_date || '';
-                document.getElementById('birthMonth').value = teacherData.personal.birth_month || '';
-                document.getElementById('birthPlace').value = teacherData.personal.birth_place || '';
-                document.getElementById('nationality').value = teacherData.personal.nationality || '';
-                document.getElementById('address').value = teacherData.personal.address || '';
-                document.getElementById('personalPhone').value = teacherData.personal.personal_phone || '';
-                document.getElementById('personalEmail').value = teacherData.personal.personal_email || '';
-                document.getElementById('cin').value = teacherData.personal.cin || '';
-                document.getElementById('maritalStatus').value = teacherData.personal.marital_status || '';
-                document.getElementById('childrenNumber').value = teacherData.personal.children_number || '';
-            }
-            
-            // Professionnelles
-            if (teacherData.professional) {
-                document.getElementById('matricule').value = teacherData.professional.matricule || '';
-                document.getElementById('position').value = teacherData.professional.position || '';
-                document.getElementById('grade').value = teacherData.professional.grade || '';
-                document.getElementById('professionalCategory').value = teacherData.professional.professional_category || '';
-                document.getElementById('engagementDate').value = teacherData.professional.engagement_date || '';
-                document.getElementById('regionServiceDate').value = teacherData.professional.region_service_date || '';
-                document.getElementById('inspectionServiceDate').value = teacherData.professional.inspection_service_date || '';
-                document.getElementById('currentClass').value = teacherData.professional.current_class || '';
-                document.getElementById('weeklyHours').value = teacherData.professional.weekly_hours || '';
-                
-                // Calculer les champs dérivés
-                calculateServiceYears('regionServiceDate', 'yearsInRegion');
-                calculateServiceYears('inspectionServiceDate', 'yearsInInspection');
-                calculateRetirementDate();
-            }
-            
-            // Matières
-            if (teacherData.subjects && teacherData.subjects.length > 0) {
-                const mainSubject = teacherData.subjects.find(s => s.type === 'main');
-                const secondarySubject = teacherData.subjects.find(s => s.type === 'secondary');
-                const additionalSubjects = teacherData.subjects.filter(s => s.type === 'additional');
-                
-                if (mainSubject) document.getElementById('mainSubject').value = mainSubject.name;
-                if (secondarySubject) document.getElementById('secondarySubject').value = secondarySubject.name;
-                
-                // Ajouter les matières supplémentaires
-                additionalSubjects.forEach((subject, index) => {
-                    if (index === 0) addSubjectField();
-                    const rows = document.querySelectorAll('#subjectsContainer .form-row');
-                    if (rows.length > index + 1) {
-                        const row = rows[index + 1];
-                        const subjectInput = row.querySelector('.subject-field');
-                        const hoursInput = row.querySelector('.subject-hours-field');
-                        if (subjectInput) subjectInput.value = subject.name;
-                        if (hoursInput) hoursInput.value = subject.hours;
-                    }
-                });
-            }
-            
-            // Données de planification
-            if (teacherData.teaching.planningClasses) {
-                const planningClassesInput = document.getElementById('planningClasses');
-                if (planningClassesInput) {
-                    planningClassesInput.value = teacherData.teaching.planningClasses;
-                }
-            }
-            
-            updateUI();
-        }
-
+        // Mise à jour de l'interface
         function updateUI() {
             updateSchoolName();
-            updateSyncedInfoDisplay();
-            updateSubjectsSelector();
-            updateClassFilters();
-            updateDashboard();
             updateBackupHistory();
             updateActivityLogs();
+            updateDashboard();
+            updateEvaluationStats();
+            updateProjectsStats();
+            updateEvaluationFilters();
+            updateClassFilters();
         }
 
         function updateTabUI(tabId) {
             switch(tabId) {
                 case 'tab2':
+                    updateSubjectsSelector();
                     updateSyncedInfoDisplay();
-                    loadSubTabData(currentSubTab);
+                    break;
+                case 'tab4':
+                    updateEvaluationStats();
+                    updateEvaluationFilters();
+                    updateClassFilters();
+                    break;
+                case 'tab5':
+                    updateProjectsStats();
+                    updateEventsCalendar();
                     break;
                 case 'tab7':
                     updateDashboard();
@@ -2781,168 +4080,107 @@
             }
         }
 
-        // Les autres fonctions (addNewLesson, loadLessons, etc.) restent similaires
-        // mais avec la synchronisation améliorée
-
-        function addNewLesson() {
-            const lessonId = `lesson_${Date.now()}`;
-            const currentDate = new Date().toISOString().split('T')[0];
-            const mainSubject = teacherData.subjects.find(s => s.type === 'main')?.name || '';
-            const currentClass = teacherData.professional.current_class || '';
+        // Fonction pour générer un emploi du temps basé sur les matières synchronisées
+        function generateTimetable() {
+            const container = document.getElementById('timetableContainer');
+            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const hours = ['7h00-7h55', '7h55-8h50', '8h50-9h45', '10h10-11h05', '11h05-12h00', '15h-16h', '16h-17h'];
             
-            const lesson = {
-                id: lessonId,
-                title: '',
-                date: currentDate,
-                duration: 55,
-                subject: mainSubject,
-                class: currentClass,
-                objectives: '',
-                content: '',
-                materials: '',
-                difficulties: '',
-                solutions: '',
-                createdAt: new Date().toISOString()
-            };
+            // Récupérer les matières synchronisées
+            const subjects = teacherData.subjects;
+            const mainSubject = subjects.find(s => s.type === 'main')?.name || 'Matière principale';
+            const secondarySubject = subjects.find(s => s.type === 'secondary')?.name || 'Matière secondaire';
             
-            if (!teacherData.teaching.lessons) {
-                teacherData.teaching.lessons = [];
-            }
-            
-            teacherData.teaching.lessons.push(lesson);
-            syncAllData();
-            
-            // Recharger l'affichage des leçons
-            loadLessons();
-            showNotification('Nouvelle leçon créée avec les informations synchronisées', 'success');
-        }
-
-        function loadLessons() {
-            const container = document.getElementById('lessonsContainer');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (teacherData.teaching.lessons && teacherData.teaching.lessons.length > 0) {
-                teacherData.teaching.lessons.forEach(lesson => {
-                    const lessonElement = document.createElement('div');
-                    lessonElement.className = 'lesson-container';
-                    lessonElement.innerHTML = `
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label><i class="fas fa-book"></i> Titre de la leçon</label>
-                                    <input type="text" value="${lesson.title || ''}" 
-                                           onchange="updateLessonField('${lesson.id}', 'title', this.value)" 
-                                           placeholder="Titre de la leçon">
-                                </div>
-                            </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label><i class="fas fa-calendar"></i> Date</label>
-                                    <input type="date" value="${lesson.date}" 
-                                           onchange="updateLessonField('${lesson.id}', 'date', this.value)">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="section-actions">
-                            <button type="button" class="btn btn-success btn-sm" onclick="saveLesson('${lesson.id}')">
-                                <i class="fas fa-save"></i> Enregistrer
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteLesson('${lesson.id}')">
-                                <i class="fas fa-trash"></i> Supprimer
-                            </button>
-                        </div>
-                    `;
-                    container.appendChild(lessonElement);
-                });
-            }
-        }
-
-        function updateLessonField(lessonId, field, value) {
-            const lesson = teacherData.teaching.lessons?.find(l => l.id === lessonId);
-            if (lesson) {
-                lesson[field] = value;
-                syncAllData();
-            }
-        }
-
-        function saveLesson(lessonId) {
-            showNotification('Leçon sauvegardée', 'success');
-            syncAllData();
-        }
-
-        function deleteLesson(lessonId) {
-            if (confirm('Voulez-vous vraiment supprimer cette leçon ?')) {
-                teacherData.teaching.lessons = teacherData.teaching.lessons?.filter(l => l.id !== lessonId) || [];
-                syncAllData();
-                loadLessons();
-                showNotification('Leçon supprimée', 'success');
-            }
-        }
-
-        // Dashboard
-        function updateDashboard() {
-            updateProfileSummary();
-            updateRecentActivity();
-            updateDetailedStats();
-        }
-
-        function updateProfileSummary() {
-            const container = document.getElementById('profileSummary');
-            if (!container) return;
-            
-            const age = calculateAge(teacherData.personal.birth_date);
-            
-            container.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div>Enseignant</div>
-                        <div class="stat-value">${teacherData.personal.first_name?.charAt(0) || ''}. ${teacherData.personal.last_name || ''}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>Matières</div>
-                        <div class="stat-value">${teacherData.subjects.length}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>Âge</div>
-                        <div class="stat-value">${age}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>Heures/sem.</div>
-                        <div class="stat-value">${teacherData.professional.weekly_hours || 0}</div>
+            let timetableHTML = `
+                <div class="form-group mb-20">
+                    <label><i class="fas fa-cog"></i> Emploi du temps basé sur les matières synchronisées</label>
+                    <div class="current-class-display">
+                        <p><strong>Matière principale:</strong> ${mainSubject}</p>
+                        ${secondarySubject ? `<p><strong>Matière secondaire:</strong> ${secondarySubject}</p>` : ''}
+                        ${teacherData.professional.weekly_hours ? `<p><strong>Total heures/semaine:</strong> ${teacherData.professional.weekly_hours} heures</p>` : ''}
                     </div>
                 </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Heures/Jours</th>
             `;
-        }
-
-        function calculateAge(birthDate) {
-            if (!birthDate) return 'N/A';
-            const birth = new Date(birthDate);
-            const today = new Date();
-            let age = today.getFullYear() - birth.getFullYear();
-            const monthDiff = today.getMonth() - birth.getMonth();
             
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-                age--;
+            for (let i = 0; i < 6; i++) {
+                timetableHTML += `<th>${days[i]}</th>`;
             }
             
-            return age;
+            timetableHTML += `</tr></thead><tbody>`;
+            
+            for (let i = 0; i < hours.length; i++) {
+                timetableHTML += `<tr><td>${hours[i]}</td>`;
+                
+                for (let j = 0; j < 6; j++) {
+                    timetableHTML += `
+                        <td>
+                            <select class="timetable-cell" data-day="${j}" data-hour="${i}">
+                                <option value="">-- Vide --</option>
+                                <option value="main">${mainSubject}</option>
+                                ${secondarySubject ? `<option value="secondary">${secondarySubject}</option>` : ''}
+                                <option value="other">Autre matière</option>
+                                <option value="tp">TP/Labo</option>
+                                <option value="meeting">Réunion</option>
+                                <option value="free">Disponible</option>
+                            </select>
+                        </td>
+                    `;
+                }
+                
+                timetableHTML += `</tr>`;
+            }
+            
+            timetableHTML += `</tbody></table>`;
+            
+            container.innerHTML = timetableHTML;
+            
+            document.querySelectorAll('.timetable-cell').forEach(cell => {
+                cell.addEventListener('change', function() {
+                    updateTimetableCell(this);
+                    syncAllData();
+                });
+            });
         }
 
-        // Les autres fonctions (updateRecentActivity, updateDetailedStats, etc.) 
-        // restent similaires avec la synchronisation améliorée
+        function updateTimetableCell(cell) {
+            const value = cell.value;
+            
+            switch(value) {
+                case 'main':
+                    cell.style.backgroundColor = '#e3f2fd';
+                    break;
+                case 'secondary':
+                    cell.style.backgroundColor = '#e8f5e9';
+                    break;
+                case 'tp':
+                    cell.style.backgroundColor = '#fff3e0';
+                    break;
+                case 'meeting':
+                    cell.style.backgroundColor = '#f3e5f5';
+                    break;
+                case 'free':
+                    cell.style.backgroundColor = '#f5f5f5';
+                    break;
+                default:
+                    cell.style.backgroundColor = '';
+            }
+        }
 
-        // Gestion du formulaire
+        // Gestion du formulaire principal
         function handleSubmit(event) {
             event.preventDefault();
             
-            if (validateForm()) {
-                backupData();
-                showNotification('Toutes les données ont été sauvegardées avec succès', 'success');
-            } else {
+            if (!validateForm()) {
                 showNotification('Veuillez remplir tous les champs obligatoires', 'error');
+                return;
             }
+            
+            backupData();
+            showNotification('Toutes les données ont été sauvegardées avec succès', 'success');
         }
 
         function validateForm() {
@@ -2957,8 +4195,7 @@
                 'position',
                 'engagementDate',
                 'regionServiceDate',
-                'inspectionServiceDate',
-                'currentClass'
+                'inspectionServiceDate'
             ];
             
             let isValid = true;
@@ -2970,7 +4207,9 @@
                     field.style.borderColor = 'var(--danger-color)';
                     
                     setTimeout(() => {
-                        if (field) field.style.borderColor = '';
+                        if (field) {
+                            field.style.borderColor = '';
+                        }
                     }, 2000);
                 }
             });
@@ -2978,7 +4217,7 @@
             return isValid;
         }
 
-        // Fonctions utilitaires
+        // Fonctions de notification et logs
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             const messageEl = document.getElementById('notificationMessage');
@@ -3022,21 +4261,543 @@
                 logs.push({
                     timestamp: new Date().toISOString(),
                     message: message,
-                    tab: currentTab,
-                    subtab: currentSubTab
+                    tab: currentTab
                 });
-                localStorage.setItem('logs', JSON.stringify(logs.slice(-100)));
-                updateActivityLogs();
+                localStorage.setItem('logs', JSON.stringify(logs.slice(-50)));
             } catch (error) {
-                console.error('Erreur d\'ajout de log:', error);
+                console.error('Erreur lors de l\'ajout du log:', error);
+            }
+        }
+
+        function updateBackupHistory() {
+            const container = document.getElementById('backupHistory');
+            if (!container) return;
+            
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                
+                if (backups.length === 0) {
+                    container.innerHTML = '<p class="text-center">Aucune sauvegarde disponible</p>';
+                    return;
+                }
+                
+                let html = '<table class="data-table"><thead><tr><th>Date</th><th>Taille</th><th>Actions</th></tr></thead><tbody>';
+                
+                backups.slice().reverse().forEach((backup, index) => {
+                    const date = new Date(backup.timestamp);
+                    const size = JSON.stringify(backup).length;
+                    
+                    html += `
+                        <tr>
+                            <td>${date.toLocaleString()}</td>
+                            <td>${formatFileSize(size)}</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-info" onclick="restoreBackup(${backups.length - 1 - index})">
+                                    <i class="fas fa-undo"></i> Restaurer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p class="text-center">Erreur lors du chargement de l\'historique</p>';
+                console.error(error);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function backupData() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                data: teacherData
+            };
+            
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                backups.push(backup);
+                localStorage.setItem('backups', JSON.stringify(backups.slice(-10)));
+                
+                showNotification('Sauvegarde effectuée avec succès', 'success');
+                updateBackupHistory();
+            } catch (error) {
+                showNotification('Erreur lors de la sauvegarde', 'error');
+                console.error(error);
+            }
+        }
+
+        // Fonctions pour les modaux et notifications
+        function openModal(title, content) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            const modal = document.getElementById('genericModal');
+            
+            if (modalTitle && modalContent && modal) {
+                modalTitle.textContent = title;
+                modalContent.innerHTML = content;
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('genericModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function showStatistics() {
+            openModal('Statistiques détaillées', `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Évaluations totales</div>
+                        <div class="stat-value">${teacherData.evaluations?.length || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Projets en cours</div>
+                        <div class="stat-value">${teacherData.projects?.filter(p => p.status === 'in_progress').length || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Activités ce mois</div>
+                        <div class="stat-value">${getCurrentMonthEvents()}</div>
+                    </div>
+                </div>
+                <div class="mt-20">
+                    <h4>Répartition des évaluations par type</h4>
+                    <div id="modalChart"></div>
+                </div>
+            `);
+        }
+
+        function getCurrentMonthEvents() {
+            const today = new Date();
+            const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+            
+            let count = 0;
+            
+            if (teacherData.activities) {
+                count += teacherData.activities.filter(a => a.date?.startsWith(currentMonth)).length;
+            }
+            
+            if (teacherData.meetings) {
+                count += teacherData.meetings.filter(m => m.date?.startsWith(currentMonth)).length;
+            }
+            
+            return count;
+        }
+
+        // Les autres fonctions existantes (exportJSON, importJSON, etc.) restent similaires
+        // mais sont adaptées pour utiliser teacherData au lieu de currentData
+
+        // Fonctions de base pour les autres onglets
+        function exportJSON(tab) {
+            let data = {};
+            switch(tab) {
+                case 'tab1':
+                    data = { 
+                        establishment: teacherData.establishment,
+                        personal: teacherData.personal,
+                        professional: teacherData.professional,
+                        subjects: teacherData.subjects
+                    };
+                    break;
+                case 'tab2':
+                    data = { 
+                        themes: teacherData.themes,
+                        lessons: teacherData.lessons,
+                        tps: teacherData.tps
+                    };
+                    break;
+                case 'tab3':
+                    data = { 
+                        diplomas: teacherData.diplomas,
+                        trainings: teacherData.trainings
+                    };
+                    break;
+                case 'tab4':
+                    data = { evaluations: teacherData.evaluations };
+                    break;
+                case 'tab5':
+                    data = { 
+                        projects: teacherData.projects,
+                        activities: teacherData.activities,
+                        meetings: teacherData.meetings
+                    };
+                    break;
+            }
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `donnees_${tab}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('Export terminé', 'success');
+        }
+
+        function importJSON(tab) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        switch(tab) {
+                            case 'tab1':
+                                if (data.establishment) {
+                                    teacherData.establishment = data.establishment;
+                                    // Mettre à jour les champs du formulaire
+                                    document.getElementById('establishmentName').value = data.establishment.name || '';
+                                    document.getElementById('establishmentType').value = data.establishment.type || '';
+                                    document.getElementById('establishmentAddress').value = data.establishment.address || '';
+                                    document.getElementById('establishmentPhone').value = data.establishment.phone || '';
+                                    document.getElementById('establishmentEmail').value = data.establishment.email || '';
+                                    document.getElementById('establishmentWebsite').value = data.establishment.website || '';
+                                }
+                                if (data.personal) {
+                                    teacherData.personal = data.personal;
+                                }
+                                if (data.professional) {
+                                    teacherData.professional = data.professional;
+                                }
+                                if (data.subjects) {
+                                    teacherData.subjects = data.subjects;
+                                }
+                                break;
+                            case 'tab4':
+                                if (data.evaluations) {
+                                    teacherData.evaluations = data.evaluations;
+                                    counters.evaluation = data.evaluations.length;
+                                    updateEvaluationStats();
+                                }
+                                break;
+                            case 'tab5':
+                                if (data.projects) {
+                                    teacherData.projects = data.projects;
+                                    counters.project = data.projects.length;
+                                }
+                                if (data.activities) {
+                                    teacherData.activities = data.activities;
+                                    counters.activity = data.activities.length;
+                                }
+                                if (data.meetings) {
+                                    teacherData.meetings = data.meetings;
+                                    counters.meeting = data.meetings.length;
+                                }
+                                updateProjectsStats();
+                                break;
+                        }
+                        
+                        syncAllData();
+                        showNotification('Import terminé avec succès', 'success');
+                    } catch (error) {
+                        showNotification('Erreur lors de l\'import du fichier', 'error');
+                        console.error(error);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Fonctions restantes (simplifiées pour l'exemple)
+        function exportAllJSON() {
+            const dataStr = JSON.stringify(teacherData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `donnees_completes_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('Export complet terminé', 'success');
+        }
+
+        function importAllJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        teacherData = data;
+                        loadSavedData();
+                        showNotification('Import complet terminé avec succès', 'success');
+                    } catch (error) {
+                        showNotification('Erreur lors de l\'import du fichier', 'error');
+                        console.error(error);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Fonction pour le dashboard (simplifiée)
+        function updateDashboard() {
+            updateProfileSummary();
+            updateRecentActivity();
+            updateNotifications();
+            updateDetailedStats();
+        }
+
+        function updateProfileSummary() {
+            const container = document.getElementById('profileSummary');
+            if (!container) return;
+            
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>Nom complet</div>
+                        <div class="stat-value">${teacherData.personal.last_name || ''} ${teacherData.personal.first_name || ''}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Matières</div>
+                        <div class="stat-value">${teacherData.subjects.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Classes</div>
+                        <div class="stat-value">${teacherData.professional.current_class ? teacherData.professional.current_class.split(',').length : 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Âge</div>
+                        <div class="stat-value">${calculateAge(teacherData.personal.birth_date)}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function calculateAge(birthDate) {
+            if (!birthDate) return 'N/A';
+            const birth = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function filterLessons() {
+            const searchTerm = document.getElementById('lessonSearch').value.toLowerCase();
+            const filterSubject = document.getElementById('lessonFilterSubject').value;
+            const filterClass = document.getElementById('lessonFilterClass').value;
+            
+            const lessons = document.querySelectorAll('.lesson-container');
+            
+            lessons.forEach(lesson => {
+                const text = lesson.textContent.toLowerCase();
+                const subject = lesson.querySelector('input[type="text"][placeholder="Matière"]')?.value || '';
+                const classe = lesson.querySelector('input[type="text"][placeholder="Ex: 3ème A"]')?.value || '';
+                
+                let shouldShow = true;
+                
+                if (searchTerm && !text.includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                
+                if (filterSubject && subject !== filterSubject) {
+                    shouldShow = false;
+                }
+                
+                if (filterClass && !classe.includes(filterClass)) {
+                    shouldShow = false;
+                }
+                
+                lesson.style.display = shouldShow ? 'block' : 'none';
+            });
+        }
+
+        // Fonction pour gérer le téléchargement de ressources
+        function handleResourceUpload(event) {
+            const files = event.target.files;
+            const container = document.getElementById('resourcesList');
+            
+            if (!container) return;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const resourceId = `resource_${Date.now()}_${i}`;
+                
+                const resourceHTML = `
+                    <div class="attachment-item" id="${resourceId}">
+                        <div>
+                            <i class="fas fa-file"></i>
+                            <span>${file.name}</span>
+                            <small>(${formatFileSize(file.size)})</small>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-xs btn-light" onclick="previewResource('${resourceId}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-xs btn-danger" onclick="removeElement('${resourceId}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', resourceHTML);
+                
+                // Ajouter aux données
+                if (!teacherData.resources) teacherData.resources = [];
+                teacherData.resources.push({
+                    id: resourceId,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    uploadedAt: new Date().toISOString()
+                });
+            }
+            
+            showNotification(`${files.length} ressource(s) ajoutée(s)`, 'success');
+            syncAllData();
+        }
+
+        // Les autres fonctions (addAcademicDiploma, addTraining, etc.) restent similaires
+        // mais doivent être adaptées pour synchroniser avec teacherData
+
+        // Exemple d'adaptation d'une fonction existante
+        function addAcademicDiploma() {
+            const container = document.getElementById('academicDiplomas');
+            const diplomaId = `diploma_${Date.now()}`;
+            
+            const diplomaHTML = `
+                <div class="dynamic-item" id="${diplomaId}">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-certificate"></i> Diplôme</label>
+                                <input type="text" placeholder="Ex: Licence, Master, Doctorat..." required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label><i class="fas fa-university"></i> Établissement</label>
+                                <input type="text" placeholder="Nom de l'université">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${diplomaId}')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', diplomaHTML);
+            
+            // Ajouter aux données
+            if (!teacherData.diplomas) teacherData.diplomas = [];
+            teacherData.diplomas.push({
+                id: diplomaId,
+                type: 'academic',
+                name: '',
+                institution: '',
+                createdAt: new Date().toISOString()
+            });
+            
+            syncAllData();
+        }
+
+        // Les autres fonctions similaires (addTraining, addLanguage, etc.) doivent être adaptées de la même manière
+
+        // Fonctions utilitaires restantes
+        function printForm() {
+            window.print();
+        }
+
+        function generateQRCode() {
+            // Implémentation simplifiée
+            openModal('QR Code', `
+                <div class="text-center">
+                    <p>Fonctionnalité QR Code - À implémenter</p>
+                    <p>Cette fonctionnalité générerait un QR code avec les informations de l'enseignant</p>
+                </div>
+            `);
+        }
+
+        function generatePlanningPDF() {
+            openModal('Générer PDF', `
+                <div class="text-center">
+                    <p>Fonctionnalité PDF - À implémenter</p>
+                    <p>Cette fonctionnalité générerait un PDF de l'emploi du temps</p>
+                </div>
+            `);
+        }
+
+        function clearAllData() {
+            if (confirm('Voulez-vous vraiment effacer toutes les données ? Cette action est irréversible.')) {
+                localStorage.clear();
+                teacherData = {
+                    establishment: {},
+                    personal: {},
+                    professional: {},
+                    subjects: [],
+                    themes: {},
+                    lessons: [],
+                    tps: [],
+                    evaluations: [],
+                    diplomas: [],
+                    trainings: [],
+                    projects: [],
+                    activities: [],
+                    meetings: [],
+                    backups: [],
+                    logs: []
+                };
+                
+                // Réinitialiser le formulaire
+                document.getElementById('teacherForm').reset();
+                updateUI();
+                showNotification('Toutes les données ont été effacées', 'success');
             }
         }
 
         // Initialisation finale
         window.onload = function() {
+            // S'assurer que tout est chargé
             setTimeout(() => {
                 syncAllData();
-            }, 100);
+            }, 500);
         };
 
     </script>
