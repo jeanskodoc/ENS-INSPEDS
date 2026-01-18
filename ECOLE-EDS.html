@@ -1095,18 +1095,15 @@
                     <i class="fas fa-chalkboard-teacher"></i> Enseignement & Pédagogie
                 </li>
                 <li class="tab" data-tab="tab3">
-                    <i class="fas fa-graduation-cap"></i> Formation & Compétences
-                </li>
-                <li class="tab" data-tab="tab4">
                     <i class="fas fa-chart-line"></i> Évaluations & Statistiques
                 </li>
-                <li class="tab" data-tab="tab5">
+                <li class="tab" data-tab="tab4">
                     <i class="fas fa-project-diagram"></i> Projets & Activités
                 </li>
-                <li class="tab" data-tab="tab6">
+                <li class="tab" data-tab="tab5">
                     <i class="fas fa-database"></i> Données & Archives
                 </li>
-                <li class="tab" data-tab="tab7">
+                <li class="tab" data-tab="tab6">
                     <i class="fas fa-tachometer-alt"></i> Tableau de bord
                 </li>
             </ul>
@@ -1542,80 +1539,13 @@
                 </div>
             </div>
 
-            <!-- Onglet 3: Formation & Compétences -->
+            <!-- Onglet 3: Évaluations & Statistiques -->
             <div id="tab3" class="tab-content">
                 <div class="tab-actions">
                     <button type="button" class="btn btn-info" onclick="exportJSON('tab3')">
                         <i class="fas fa-file-export"></i> Exporter
                     </button>
                     <button type="button" class="btn btn-warning" onclick="importJSON('tab3')">
-                        <i class="fas fa-file-import"></i> Importer
-                    </button>
-                </div>
-
-                <!-- Diplômes académiques -->
-                <div class="form-section">
-                    <h2><i class="fas fa-graduation-cap"></i> DIPLÔMES ACADÉMIQUES</h2>
-                    <div id="academicDiplomas">
-                        <!-- Diplômes seront ajoutés dynamiquement -->
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addAcademicDiploma()">
-                        <i class="fas fa-plus"></i> Ajouter un diplôme
-                    </button>
-                </div>
-
-                <!-- Diplômes professionnels -->
-                <div class="form-section">
-                    <h2><i class="fas fa-award"></i> DIPLÔMES PROFESSIONNELS</h2>
-                    <div id="professionalDiplomas">
-                        <!-- Diplômes professionnels -->
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addProfessionalDiploma()">
-                        <i class="fas fa-plus"></i> Ajouter un diplôme
-                    </button>
-                </div>
-
-                <!-- Formations continues -->
-                <div class="form-section">
-                    <h2><i class="fas fa-chalkboard-teacher"></i> FORMATIONS CONTINUES</h2>
-                    <div id="trainingContainer">
-                        <!-- Formations -->
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addTraining()">
-                        <i class="fas fa-plus"></i> Ajouter une formation
-                    </button>
-                </div>
-
-                <!-- Compétences linguistiques -->
-                <div class="form-section">
-                    <h2><i class="fas fa-language"></i> COMPÉTENCES LINGUISTIQUES</h2>
-                    <div id="languagesContainer">
-                        <!-- Langues -->
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addLanguage()">
-                        <i class="fas fa-plus"></i> Ajouter une langue
-                    </button>
-                </div>
-
-                <!-- Compétences informatiques -->
-                <div class="form-section">
-                    <h2><i class="fas fa-laptop-code"></i> COMPÉTENCES INFORMATIQUES</h2>
-                    <div id="itSkillsContainer">
-                        <!-- Compétences IT -->
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addITSkill()">
-                        <i class="fas fa-plus"></i> Ajouter une compétence
-                    </button>
-                </div>
-            </div>
-
-            <!-- Onglet 4: Évaluations & Statistiques -->
-            <div id="tab4" class="tab-content">
-                <div class="tab-actions">
-                    <button type="button" class="btn btn-info" onclick="exportJSON('tab4')">
-                        <i class="fas fa-file-export"></i> Exporter
-                    </button>
-                    <button type="button" class="btn btn-warning" onclick="importJSON('tab4')">
                         <i class="fas fa-file-import"></i> Importer
                     </button>
                     <button type="button" class="btn btn-light" onclick="showStatistics()">
@@ -1721,13 +1651,13 @@
                 </div>
             </div>
 
-            <!-- Onglet 5: Projets & Activités -->
-            <div id="tab5" class="tab-content">
+            <!-- Onglet 4: Projets & Activités -->
+            <div id="tab4" class="tab-content">
                 <div class="tab-actions">
-                    <button type="button" class="btn btn-info" onclick="exportJSON('tab5')">
+                    <button type="button" class="btn btn-info" onclick="exportJSON('tab4')">
                         <i class="fas fa-file-export"></i> Exporter
                     </button>
-                    <button type="button" class="btn btn-warning" onclick="importJSON('tab5')">
+                    <button type="button" class="btn btn-warning" onclick="importJSON('tab4')">
                         <i class="fas fa-file-import"></i> Importer
                     </button>
                     <button type="button" class="btn btn-primary" onclick="addProject()">
@@ -1865,8 +1795,8 @@
                 </div>
             </div>
 
-            <!-- Onglet 6: Données & Archives -->
-            <div id="tab6" class="tab-content">
+            <!-- Onglet 5: Données & Archives -->
+            <div id="tab5" class="tab-content">
                 <div class="tab-actions">
                     <button type="button" class="btn btn-info" onclick="backupData()">
                         <i class="fas fa-save"></i> Sauvegarder
@@ -1920,8 +1850,8 @@
                 </div>
             </div>
 
-            <!-- Onglet 7: Tableau de bord -->
-            <div id="tab7" class="tab-content">
+            <!-- Onglet 6: Tableau de bord -->
+            <div id="tab6" class="tab-content">
                 <div class="dashboard-grid">
                     <!-- Cartes de synthèse -->
                     <div class="dashboard-card">
@@ -2055,8 +1985,6 @@
             lessons: [],
             tps: [],
             evaluations: [],
-            diplomas: [],
-            trainings: [],
             projects: [],
             activities: [],
             meetings: [],
@@ -2928,7 +2856,7 @@
             }
         }
 
-        // ==================== ONGLET 4: ÉVALUATIONS ====================
+        // ==================== ONGLET 3: ÉVALUATIONS ====================
         
         function addEvaluation() {
             const evaluationId = `eval_${Date.now()}`;
@@ -3301,7 +3229,7 @@
             container.innerHTML = html;
         }
 
-        // ==================== ONGLET 5: PROJETS & ACTIVITÉS ====================
+        // ==================== ONGLET 4: PROJETS & ACTIVITÉS ====================
         
         function addProject() {
             const projectId = `proj_${Date.now()}`;
@@ -4041,16 +3969,16 @@
                     updateSubjectsSelector();
                     updateSyncedInfoDisplay();
                     break;
-                case 'tab4':
+                case 'tab3':
                     updateEvaluationStats();
                     updateEvaluationFilters();
                     updateClassFilters();
                     break;
-                case 'tab5':
+                case 'tab4':
                     updateProjectsStats();
                     updateEventsCalendar();
                     break;
-                case 'tab7':
+                case 'tab6':
                     updateDashboard();
                     break;
             }
@@ -4391,15 +4319,9 @@
                     };
                     break;
                 case 'tab3':
-                    data = { 
-                        diplomas: teacherData.diplomas,
-                        trainings: teacherData.trainings
-                    };
-                    break;
-                case 'tab4':
                     data = { evaluations: teacherData.evaluations };
                     break;
-                case 'tab5':
+                case 'tab4':
                     data = { 
                         projects: teacherData.projects,
                         activities: teacherData.activities,
@@ -4457,14 +4379,14 @@
                                     teacherData.subjects = data.subjects;
                                 }
                                 break;
-                            case 'tab4':
+                            case 'tab3':
                                 if (data.evaluations) {
                                     teacherData.evaluations = data.evaluations;
                                     counters.evaluation = data.evaluations.length;
                                     updateEvaluationStats();
                                 }
                                 break;
-                            case 'tab5':
+                            case 'tab4':
                                 if (data.projects) {
                                     teacherData.projects = data.projects;
                                     counters.project = data.projects.length;
@@ -4663,50 +4585,6 @@
             syncAllData();
         }
 
-        // Fonctions pour les diplômes et formations
-        function addAcademicDiploma() {
-            const container = document.getElementById('academicDiplomas');
-            const diplomaId = `diploma_${Date.now()}`;
-            
-            const diplomaHTML = `
-                <div class="dynamic-item" id="${diplomaId}">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label><i class="fas fa-certificate"></i> Diplôme</label>
-                                <input type="text" placeholder="Ex: Licence, Master, Doctorat..." required>
-                            </div>
-                        </div>
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label><i class="fas fa-university"></i> Établissement</label>
-                                <input type="text" placeholder="Nom de l'université">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-actions">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeElement('${diplomaId}')">
-                            <i class="fas fa-trash"></i> Supprimer
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            container.insertAdjacentHTML('beforeend', diplomaHTML);
-            
-            // Ajouter aux données
-            if (!teacherData.diplomas) teacherData.diplomas = [];
-            teacherData.diplomas.push({
-                id: diplomaId,
-                type: 'academic',
-                name: '',
-                institution: '',
-                createdAt: new Date().toISOString()
-            });
-            
-            syncAllData();
-        }
-
         // Fonctions utilitaires restantes
         function printForm() {
             window.print();
@@ -4742,8 +4620,6 @@
                     lessons: [],
                     tps: [],
                     evaluations: [],
-                    diplomas: [],
-                    trainings: [],
                     projects: [],
                     activities: [],
                     meetings: [],
