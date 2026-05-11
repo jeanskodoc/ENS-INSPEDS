@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Gest'Enseignant - Plateforme Pédagogique</title>
+    <title>Gest'Enseignant - Fiche par Enseignant</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #3498db;
@@ -27,7 +23,6 @@
             --border: #e9ecef;
             --radius: 10px;
             --shadow: 0 2px 8px rgba(0,0,0,0.08);
-            --transition: all 0.2s ease;
         }
 
         body {
@@ -38,7 +33,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             background: white;
             border-radius: var(--radius);
@@ -51,9 +46,7 @@
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             padding: 20px;
             color: white;
-            text-align: center;
         }
-
         .header-top {
             display: flex;
             justify-content: space-between;
@@ -62,93 +55,79 @@
             gap: 10px;
             margin-bottom: 12px;
         }
+        .logo { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .user-badge { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; }
+        header h1 { font-size: 1.3rem; margin-bottom: 5px; }
+        header p { font-size: 0.85rem; opacity: 0.9; }
 
-        .logo {
-            font-size: 1.2rem;
+        /* Filtre Enseignant */
+        .filter-bar {
+            background: var(--light);
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        .filter-label {
             font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-
-        .user-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 20px;
+        .teacher-select {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+        }
+        .teacher-info-card {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
             font-size: 0.8rem;
         }
+        .teacher-info-card span { font-weight: 600; color: var(--primary); }
 
-        header h1 {
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-        }
-
-        header p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-
-        /* Navigation responsive */
+        /* Navigation */
         .tabs-nav {
             background: var(--light);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
         }
-
-        .tabs {
-            display: flex;
-            list-style: none;
-            min-width: max-content;
-        }
-
+        .tabs { display: flex; list-style: none; min-width: max-content; }
         .tab {
-            padding: 12px 18px;
+            padding: 10px 16px;
             cursor: pointer;
             font-weight: 600;
             font-size: 0.85rem;
             color: var(--gray);
             border-bottom: 3px solid transparent;
-            transition: var(--transition);
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
-            white-space: nowrap;
         }
-
-        .tab:hover {
-            background: #e9ecef;
-            color: var(--dark);
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-            background: white;
-        }
-
-        @media (max-width: 480px) {
-            .tab span { display: none; }
-            .tab i { font-size: 1.1rem; }
-            .tab { padding: 10px 14px; }
-        }
+        .tab:hover { background: #e9ecef; color: var(--dark); }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
+        @media (max-width: 480px) { .tab span { display: none; } .tab i { font-size: 1.1rem; } .tab { padding: 10px 14px; } }
 
         /* Tab content */
-        .tab-pane {
-            display: none;
-            padding: 20px;
-            animation: fadeIn 0.2s ease;
-        }
-
+        .tab-pane { display: none; padding: 20px; animation: fadeIn 0.2s; }
         .tab-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Form sections */
+        /* Cards */
         .card {
             background: white;
             border-radius: var(--radius);
@@ -156,94 +135,62 @@
             border: 1px solid var(--border);
             overflow: hidden;
         }
-
         .card-header {
             background: var(--light);
-            padding: 12px 16px;
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .card-header h3 {
-            font-size: 1rem;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
             gap: 8px;
         }
-
-        .card-body {
-            padding: 16px;
-        }
+        .card-header h3 { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        .card-body { padding: 15px; }
 
         /* Grids */
         .grid-2, .grid-3 {
             display: grid;
             gap: 12px;
         }
-
         .grid-2 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         .grid-3 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+        @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-        @media (max-width: 640px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-        }
-
-        /* Form elements */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--dark);
-        }
-
+        /* Form */
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.75rem; color: var(--gray); }
         input, select, textarea {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 0.85rem;
-            transition: var(--transition);
-            background: white;
+            transition: all 0.2s;
         }
-
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 2px rgba(52,152,219,0.1);
         }
+        textarea { min-height: 60px; resize: vertical; }
 
-        textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        /* Boutons réduits */
+        /* Buttons */
         .btn {
             padding: 6px 12px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            transition: var(--transition);
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
-
-        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+        .btn-sm { padding: 4px 8px; font-size: 0.7rem; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-primary:hover { background: var(--primary-dark); }
         .btn-success { background: var(--success); color: white; }
         .btn-success:hover { background: #27ae60; }
         .btn-danger { background: var(--danger); color: white; }
@@ -255,21 +202,15 @@
         .btn-light { background: var(--light); color: var(--dark); border: 1px solid var(--border); }
         .btn-light:hover { background: #e9ecef; }
 
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
 
-        /* Stats cards */
+        /* Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
         }
-
         .stat-card {
             background: white;
             padding: 12px;
@@ -277,20 +218,10 @@
             text-align: center;
             border: 1px solid var(--border);
         }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); margin: 5px 0; }
+        .stat-label { font-size: 0.7rem; color: var(--gray); }
 
-        .stat-value {
-            font-size: 1.6rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 5px 0;
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: var(--gray);
-        }
-
-        /* Items cards */
+        /* Items */
         .item-card {
             background: var(--light);
             border-radius: 8px;
@@ -298,7 +229,6 @@
             margin-bottom: 10px;
             border-left: 3px solid var(--primary);
         }
-
         .item-header {
             display: flex;
             justify-content: space-between;
@@ -307,52 +237,17 @@
             gap: 8px;
             margin-bottom: 10px;
         }
-
-        .item-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        /* Badges */
+        .item-title { font-weight: 600; font-size: 0.85rem; }
         .badge {
             display: inline-block;
             padding: 2px 8px;
             border-radius: 12px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
         }
         .badge-info { background: #e3f2fd; color: var(--primary); }
         .badge-success { background: #d4edda; color: #155724; }
         .badge-warning { background: #fff3cd; color: #856404; }
-
-        /* Notification */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            left: auto;
-            padding: 10px 16px;
-            background: var(--success);
-            color: white;
-            border-radius: 8px;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .toast.show { opacity: 1; transform: translateX(0); }
-        .toast.error { background: var(--danger); }
-        .toast.warning { background: var(--warning); }
 
         /* Modal */
         .modal {
@@ -387,7 +282,27 @@
             border-bottom: 1px solid var(--border);
         }
 
-        /* Loader */
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background: var(--success);
+            color: white;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.error { background: var(--danger); }
+
         .loader {
             display: none;
             position: fixed;
@@ -401,33 +316,12 @@
             justify-content: center;
         }
         .loader.active { display: flex; }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid white;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        .spinner { width: 40px; height: 40px; border: 3px solid white; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Utilities */
         .text-center { text-align: center; }
         .mt-2 { margin-top: 8px; }
-        .mb-2 { margin-bottom: 8px; }
-        .w-100 { width: 100%; }
         .hidden { display: none !important; }
-
-        @media (max-width: 768px) {
-            body { padding: 8px; }
-            .tab-pane { padding: 15px; }
-            .card-body { padding: 12px; }
-        }
-
-        @media print {
-            .tabs-nav, .btn-group, .toast, .loader { display: none; }
-            .tab-pane { display: block !important; }
-        }
     </style>
 </head>
 <body>
@@ -440,10 +334,26 @@
                 <div class="logo"><i class="fas fa-chalkboard-user"></i> Gest'Enseignant</div>
                 <div class="user-badge"><i class="fas fa-user-shield"></i> Inspecteur - <span id="currentYear"></span></div>
             </div>
-            <h1><i class="fas fa-clipboard-list"></i> Fiche Administrative Enseignant</h1>
-            <p>Gestion des données pédagogiques et évaluations</p>
+            <h1><i class="fas fa-users"></i> Fiche par Enseignant</h1>
+            <p>Sélectionnez un enseignant pour voir ou modifier ses données</p>
         </header>
 
+        <!-- Filtre Enseignant -->
+        <div class="filter-bar">
+            <div class="filter-label"><i class="fas fa-user-graduate"></i> Enseignant :</div>
+            <select id="teacherSelect" class="teacher-select" onchange="switchTeacher()">
+                <option value="">-- Sélectionner un enseignant --</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="addNewTeacher()"><i class="fas fa-plus"></i> Nouvel enseignant</button>
+            <button class="btn btn-info btn-sm" onclick="showAllTeachers()"><i class="fas fa-list"></i> Liste</button>
+        </div>
+
+        <!-- Info enseignant sélectionné -->
+        <div id="selectedTeacherInfo" class="filter-bar" style="background: #e3f2fd; display: none;">
+            <div class="teacher-info-card" id="teacherInfoDisplay"></div>
+        </div>
+
+        <!-- Navigation -->
         <div class="tabs-nav">
             <ul class="tabs">
                 <li class="tab active" data-tab="tab-pedagogy"><i class="fas fa-chalkboard"></i><span> Pédagogie</span></li>
@@ -455,14 +365,13 @@
         <!-- ONGLET PÉDAGOGIE -->
         <div id="tab-pedagogy" class="tab-pane active">
             <div class="btn-group">
-                <button class="btn btn-info" onclick="exportPedagogy()"><i class="fas fa-download"></i> JSON</button>
-                <button class="btn btn-warning" onclick="importPedagogy()"><i class="fas fa-upload"></i> Importer</button>
+                <button class="btn btn-info" onclick="exportCurrentTeacher()"><i class="fas fa-download"></i> Exporter JSON</button>
+                <button class="btn btn-warning" onclick="importTeacherData()"><i class="fas fa-upload"></i> Importer JSON</button>
                 <button class="btn btn-success" onclick="exportPedagogyExcel()"><i class="fas fa-file-excel"></i> Excel</button>
             </div>
 
-            <!-- Infos enseignant -->
             <div class="card">
-                <div class="card-header"><h3><i class="fas fa-user-tie"></i> Enseignant</h3></div>
+                <div class="card-header"><h3><i class="fas fa-user-tie"></i> Informations</h3></div>
                 <div class="card-body">
                     <div class="grid-2">
                         <input type="text" id="teacherName" placeholder="Nom complet">
@@ -470,12 +379,11 @@
                         <input type="text" id="teacherSchool" placeholder="Établissement">
                         <input type="text" id="mainSubject" placeholder="Matière principale">
                         <input type="text" id="teacherClass" placeholder="Classe(s)">
-                        <input type="number" id="weeklyHours" placeholder="Heures/semaine" min="0" max="40">
+                        <input type="number" id="weeklyHours" placeholder="Heures/semaine">
                     </div>
                 </div>
             </div>
 
-            <!-- Leçons -->
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-book-open"></i> Leçons</h3>
@@ -484,7 +392,6 @@
                 <div class="card-body" id="lessonsList"></div>
             </div>
 
-            <!-- TP -->
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-flask"></i> Travaux Pratiques</h3>
@@ -497,13 +404,12 @@
         <!-- ONGLET ÉVALUATIONS -->
         <div id="tab-evals" class="tab-pane">
             <div class="btn-group">
-                <button class="btn btn-info" onclick="exportEvals()"><i class="fas fa-download"></i> JSON</button>
-                <button class="btn btn-warning" onclick="importEvals()"><i class="fas fa-upload"></i> Importer</button>
+                <button class="btn btn-info" onclick="exportCurrentTeacher()"><i class="fas fa-download"></i> Exporter JSON</button>
+                <button class="btn btn-warning" onclick="importTeacherData()"><i class="fas fa-upload"></i> Importer JSON</button>
                 <button class="btn btn-success" onclick="exportEvalsExcel()"><i class="fas fa-file-excel"></i> Excel</button>
                 <button class="btn btn-primary btn-sm" onclick="addEvaluation()"><i class="fas fa-plus"></i> Nouvelle</button>
             </div>
 
-            <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-value" id="totalEvals">0</div><div class="stat-label">Évaluations</div></div>
                 <div class="stat-card"><div class="stat-value" id="avgScore">0.0</div><div class="stat-label">Moyenne /20</div></div>
@@ -511,7 +417,6 @@
                 <div class="stat-card"><div class="stat-value" id="successRate">0</div><div class="stat-label">Taux réussite %</div></div>
             </div>
 
-            <!-- Liste évaluations -->
             <div class="card">
                 <div class="card-header"><h3><i class="fas fa-list-check"></i> Liste des évaluations</h3></div>
                 <div class="card-body" id="evalsList"></div>
@@ -527,11 +432,11 @@
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-success" onclick="exportAll()"><i class="fas fa-download"></i> Exporter tout (JSON)</button>
-                <button class="btn btn-warning" onclick="triggerImport()"><i class="fas fa-upload"></i> Importer JSON</button>
-                <button class="btn btn-danger" onclick="clearAll()"><i class="fas fa-trash"></i> Tout effacer</button>
+                <button class="btn btn-success" onclick="exportAllTeachers()"><i class="fas fa-download"></i> Exporter tous (JSON)</button>
+                <button class="btn btn-warning" onclick="triggerImportAll()"><i class="fas fa-upload"></i> Importer JSON</button>
+                <button class="btn btn-danger" onclick="deleteCurrentTeacher()"><i class="fas fa-trash"></i> Supprimer cet enseignant</button>
             </div>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAll(this)">
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllTeachers(this)">
 
             <div class="card mt-2">
                 <div class="card-header"><h3><i class="fas fa-history"></i> Sauvegarde</h3></div>
@@ -543,16 +448,16 @@
     <div class="modal" id="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle"></h3><button class="btn btn-light btn-sm" onclick="closeModal()">&times;</button></div><div id="modalBody"></div></div></div>
 
     <script>
-        // Données
-        let pedagogy = { teacher: {}, lessons: [], tps: [] };
-        let evaluations = [];
+        // Structure : liste des enseignants
+        let allTeachers = [];
+        let currentTeacherId = null;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentYear').innerHTML = new Date().getFullYear();
             initTabs();
-            loadData();
-            updateAllStats();
+            loadAllData();
+            updateTeacherSelect();
             setupAutoSave();
             toast('Application prête', 'success');
         });
@@ -564,19 +469,185 @@
                     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.tab).classList.add('active');
-                    if (this.dataset.tab === 'tab-data') updateDataStats();
                 });
             });
         }
 
-        function getTeacher() {
-            return {
-                name: getVal('teacherName'), matricule: getVal('teacherMatricule'), school: getVal('teacherSchool'),
-                mainSubject: getVal('mainSubject'), class: getVal('teacherClass'), weeklyHours: getVal('weeklyHours')
-            };
+        // ========== GESTION DES ENSEIGNANTS ==========
+        function getCurrentTeacher() {
+            if (!currentTeacherId) return null;
+            return allTeachers.find(t => t.id === currentTeacherId);
         }
 
+        function getTeacherData(teacher) {
+            if (!teacher) return { id: null, info: {}, lessons: [], tps: [], evaluations: [] };
+            return teacher;
+        }
+
+        function updateTeacherSelect() {
+            let select = document.getElementById('teacherSelect');
+            select.innerHTML = '<option value="">-- Sélectionner un enseignant --</option>';
+            allTeachers.forEach(teacher => {
+                let option = document.createElement('option');
+                option.value = teacher.id;
+                option.textContent = `${teacher.info?.name || 'Sans nom'} (${teacher.info?.matricule || 'N°'})`;
+                if (teacher.id === currentTeacherId) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        function updateTeacherInfoDisplay() {
+            let teacher = getCurrentTeacher();
+            let container = document.getElementById('teacherInfoDisplay');
+            let infoDiv = document.getElementById('selectedTeacherInfo');
+            
+            if (teacher && teacher.info) {
+                container.innerHTML = `
+                    <span><i class="fas fa-user"></i> ${teacher.info.name || '-'}</span>
+                    <span><i class="fas fa-id-card"></i> ${teacher.info.matricule || '-'}</span>
+                    <span><i class="fas fa-school"></i> ${teacher.info.school || '-'}</span>
+                    <span><i class="fas fa-book"></i> ${teacher.info.mainSubject || '-'}</span>
+                    <span><i class="fas fa-users"></i> ${teacher.info.class || '-'}</span>
+                    <span><i class="fas fa-clock"></i> ${teacher.info.weeklyHours || 0}h</span>
+                `;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        function switchTeacher() {
+            let select = document.getElementById('teacherSelect');
+            let newId = select.value;
+            
+            // Sauvegarder l'enseignant actuel si modifié
+            if (currentTeacherId) {
+                saveCurrentTeacherToArray();
+            }
+            
+            currentTeacherId = newId || null;
+            
+            if (currentTeacherId) {
+                loadTeacherToUI(currentTeacherId);
+            } else {
+                clearUI();
+            }
+            
+            updateTeacherInfoDisplay();
+            updateAllStats();
+            toast(currentTeacherId ? 'Enseignant chargé' : 'Aucun enseignant sélectionné', 'success');
+        }
+
+        function saveCurrentTeacherToArray() {
+            if (!currentTeacherId) return;
+            
+            let teacher = getCurrentTeacher();
+            if (teacher) {
+                teacher.info = {
+                    name: getVal('teacherName'),
+                    matricule: getVal('teacherMatricule'),
+                    school: getVal('teacherSchool'),
+                    mainSubject: getVal('mainSubject'),
+                    class: getVal('teacherClass'),
+                    weeklyHours: getVal('weeklyHours')
+                };
+                teacher.lessons = currentLessons;
+                teacher.tps = currentTPs;
+                teacher.evaluations = currentEvaluations;
+            }
+        }
+
+        function loadTeacherToUI(teacherId) {
+            let teacher = allTeachers.find(t => t.id === teacherId);
+            if (!teacher) return;
+            
+            // Charger les infos
+            setVal('teacherName', teacher.info?.name || '');
+            setVal('teacherMatricule', teacher.info?.matricule || '');
+            setVal('teacherSchool', teacher.info?.school || '');
+            setVal('mainSubject', teacher.info?.mainSubject || '');
+            setVal('teacherClass', teacher.info?.class || '');
+            setVal('weeklyHours', teacher.info?.weeklyHours || '');
+            
+            // Charger les leçons
+            currentLessons = teacher.lessons || [];
+            document.getElementById('lessonsList').innerHTML = '';
+            currentLessons.forEach(l => restoreLesson(l));
+            
+            // Charger les TP
+            currentTPs = teacher.tps || [];
+            document.getElementById('tpList').innerHTML = '';
+            currentTPs.forEach(t => restoreTP(t));
+            
+            // Charger les évaluations
+            currentEvaluations = teacher.evaluations || [];
+            document.getElementById('evalsList').innerHTML = '';
+            currentEvaluations.forEach(e => restoreEval(e));
+            updateEvalStats();
+        }
+
+        function clearUI() {
+            setVal('teacherName', '');
+            setVal('teacherMatricule', '');
+            setVal('teacherSchool', '');
+            setVal('mainSubject', '');
+            setVal('teacherClass', '');
+            setVal('weeklyHours', '');
+            document.getElementById('lessonsList').innerHTML = '';
+            document.getElementById('tpList').innerHTML = '';
+            document.getElementById('evalsList').innerHTML = '';
+            currentLessons = [];
+            currentTPs = [];
+            currentEvaluations = [];
+            updateEvalStats();
+        }
+
+        function addNewTeacher() {
+            let newId = 'teacher_' + Date.now();
+            let newTeacher = {
+                id: newId,
+                info: { name: 'Nouvel enseignant', matricule: '', school: '', mainSubject: '', class: '', weeklyHours: '' },
+                lessons: [],
+                tps: [],
+                evaluations: []
+            };
+            allTeachers.push(newTeacher);
+            currentTeacherId = newId;
+            updateTeacherSelect();
+            loadTeacherToUI(newId);
+            updateTeacherInfoDisplay();
+            saveAllToLocalStorage();
+            toast('Nouvel enseignant créé', 'success');
+        }
+
+        function deleteCurrentTeacher() {
+            if (!currentTeacherId) {
+                toast('Aucun enseignant sélectionné', 'warning');
+                return;
+            }
+            if (confirm('Supprimer cet enseignant ?')) {
+                allTeachers = allTeachers.filter(t => t.id !== currentTeacherId);
+                currentTeacherId = null;
+                updateTeacherSelect();
+                clearUI();
+                updateTeacherInfoDisplay();
+                saveAllToLocalStorage();
+                toast('Enseignant supprimé', 'success');
+            }
+        }
+
+        function showAllTeachers() {
+            let list = allTeachers.map(t => `${t.info?.name || 'Sans nom'} - ${t.info?.matricule || 'N°'} (${t.lessons?.length || 0} leçons, ${t.evaluations?.length || 0} évaluations)`).join('\n');
+            alert('Liste des enseignants :\n' + (list || 'Aucun enseignant'));
+        }
+
+        // ========== DONNÉES COURANTES ==========
+        let currentLessons = [];
+        let currentTPs = [];
+        let currentEvaluations = [];
+
         function getVal(id) { return document.getElementById(id)?.value || ''; }
+        function setVal(id, val) { let el = document.getElementById(id); if (el) el.value = val || ''; }
 
         // ========== PÉDAGOGIE ==========
         function addLesson() {
@@ -604,18 +675,20 @@
                 subject: el.querySelector('.l-subject')?.value, class: el.querySelector('.l-class')?.value,
                 objectives: el.querySelector('.l-objectives')?.value
             };
-            let idx = pedagogy.lessons.findIndex(l => l.id === id);
-            if (idx !== -1) pedagogy.lessons[idx] = lesson;
-            else pedagogy.lessons.push(lesson);
-            save();
+            let idx = currentLessons.findIndex(l => l.id === id);
+            if (idx !== -1) currentLessons[idx] = lesson;
+            else currentLessons.push(lesson);
+            saveCurrentTeacherToArray();
+            saveAllToLocalStorage();
             toast('Leçon sauvegardée', 'success');
         }
 
         function delLesson(id) {
             if (confirm('Supprimer cette leçon ?')) {
                 document.getElementById(id)?.remove();
-                pedagogy.lessons = pedagogy.lessons.filter(l => l.id !== id);
-                save();
+                currentLessons = currentLessons.filter(l => l.id !== id);
+                saveCurrentTeacherToArray();
+                saveAllToLocalStorage();
                 toast('Leçon supprimée', 'success');
             }
         }
@@ -645,20 +718,42 @@
                 subject: el.querySelector('.tp-subject')?.value, duration: el.querySelector('.tp-duration')?.value,
                 description: el.querySelector('.tp-desc')?.value
             };
-            let idx = pedagogy.tps.findIndex(t => t.id === id);
-            if (idx !== -1) pedagogy.tps[idx] = tp;
-            else pedagogy.tps.push(tp);
-            save();
+            let idx = currentTPs.findIndex(t => t.id === id);
+            if (idx !== -1) currentTPs[idx] = tp;
+            else currentTPs.push(tp);
+            saveCurrentTeacherToArray();
+            saveAllToLocalStorage();
             toast('TP sauvegardé', 'success');
         }
 
         function delTP(id) {
             if (confirm('Supprimer ce TP ?')) {
                 document.getElementById(id)?.remove();
-                pedagogy.tps = pedagogy.tps.filter(t => t.id !== id);
-                save();
+                currentTPs = currentTPs.filter(t => t.id !== id);
+                saveCurrentTeacherToArray();
+                saveAllToLocalStorage();
                 toast('TP supprimé', 'success');
             }
+        }
+
+        function restoreLesson(l) {
+            let html = `<div class="item-card" id="${l.id}"><div class="item-header"><span class="item-title"><i class="fas fa-book"></i> ${l.title || 'Leçon'}</span><span class="badge badge-info">${l.date || ''}</span></div>
+                <div class="grid-2"><input type="text" class="l-title" value="${l.title || ''}"><input type="date" class="l-date" value="${l.date || ''}">
+                <input type="text" class="l-subject" value="${l.subject || ''}"><input type="text" class="l-class" value="${l.class || ''}"></div>
+                <textarea class="l-objectives" rows="2">${l.objectives || ''}</textarea>
+                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveLesson('${l.id}')"><i class="fas fa-save"></i> OK</button>
+                <button class="btn btn-danger btn-sm" onclick="delLesson('${l.id}')"><i class="fas fa-trash"></i></button></div></div>`;
+            document.getElementById('lessonsList').insertAdjacentHTML('beforeend', html);
+        }
+
+        function restoreTP(t) {
+            let html = `<div class="item-card" id="${t.id}"><div class="item-header"><span class="item-title"><i class="fas fa-flask"></i> ${t.title || 'TP'}</span><span class="badge badge-warning">${t.date || ''}</span></div>
+                <div class="grid-2"><input type="text" class="tp-title" value="${t.title || ''}"><input type="date" class="tp-date" value="${t.date || ''}">
+                <input type="text" class="tp-subject" value="${t.subject || ''}"><input type="number" class="tp-duration" value="${t.duration || 2}"></div>
+                <textarea class="tp-desc" rows="2">${t.description || ''}</textarea>
+                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveTP('${t.id}')"><i class="fas fa-save"></i> OK</button>
+                <button class="btn btn-danger btn-sm" onclick="delTP('${t.id}')"><i class="fas fa-trash"></i></button></div></div>`;
+            document.getElementById('tpList').insertAdjacentHTML('beforeend', html);
         }
 
         // ========== ÉVALUATIONS ==========
@@ -697,28 +792,43 @@
                 students: parseInt(el.querySelector('.e-students')?.value) || 1, coefficient: parseInt(el.querySelector('.e-coef')?.value) || 1,
                 comments: el.querySelector('.e-comments')?.value
             };
-            let idx = evaluations.findIndex(e => e.id === id);
-            if (idx !== -1) evaluations[idx] = evalData;
-            else evaluations.push(evalData);
+            let idx = currentEvaluations.findIndex(e => e.id === id);
+            if (idx !== -1) currentEvaluations[idx] = evalData;
+            else currentEvaluations.push(evalData);
             updateEvalStats();
-            save();
+            saveCurrentTeacherToArray();
+            saveAllToLocalStorage();
             toast('Évaluation sauvegardée', 'success');
         }
 
         function delEval(id) {
             if (confirm('Supprimer cette évaluation ?')) {
                 document.getElementById(id)?.remove();
-                evaluations = evaluations.filter(e => e.id !== id);
+                currentEvaluations = currentEvaluations.filter(e => e.id !== id);
                 updateEvalStats();
-                save();
+                saveCurrentTeacherToArray();
+                saveAllToLocalStorage();
                 toast('Évaluation supprimée', 'success');
             }
         }
 
+        function restoreEval(e) {
+            let html = `<div class="item-card" id="${e.id}"><div class="item-header"><span class="item-title"><i class="fas fa-clipboard-list"></i> ${e.type || 'Évaluation'}</span><span class="badge badge-success">${e.date || ''}</span></div>
+                <div class="grid-3"><select class="e-type">${e.type || 'Devoir'}</select>
+                <input type="text" class="e-subject" value="${e.subject || ''}"><input type="date" class="e-date" value="${e.date || ''}"></div>
+                <div class="grid-3"><input type="number" class="e-avg" step="0.5" value="${e.average || 0}">
+                <input type="number" class="e-best" step="0.5" value="${e.best || 0}"><input type="number" class="e-worst" step="0.5" value="${e.worst || 0}"></div>
+                <div class="grid-2"><input type="number" class="e-students" value="${e.students || 25}"><input type="number" class="e-coef" value="${e.coefficient || 1}"></div>
+                <textarea class="e-comments" rows="2">${e.comments || ''}</textarea>
+                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveEval('${e.id}')"><i class="fas fa-save"></i> OK</button>
+                <button class="btn btn-danger btn-sm" onclick="delEval('${e.id}')"><i class="fas fa-trash"></i></button></div></div>`;
+            document.getElementById('evalsList').insertAdjacentHTML('beforeend', html);
+        }
+
         function updateEvalStats() {
-            let total = evaluations.length;
+            let total = currentEvaluations.length;
             let sum = 0, best = 0, totalStudents = 0, pass = 0;
-            evaluations.forEach(e => {
+            currentEvaluations.forEach(e => {
                 sum += e.average;
                 if (e.best > best) best = e.best;
                 totalStudents += e.students;
@@ -730,99 +840,70 @@
             document.getElementById('successRate').innerHTML = totalStudents ? Math.round(pass / totalStudents * 100) : 0;
         }
 
+        function updateAllStats() {
+            updateEvalStats();
+            document.getElementById('statLessons').innerHTML = currentLessons.length;
+            document.getElementById('statTP').innerHTML = currentTPs.length;
+            document.getElementById('statEvalsCount').innerHTML = currentEvaluations.length;
+        }
+
         // ========== SAUVEGARDE ==========
-        function save() {
-            pedagogy.teacher = getTeacher();
-            let all = { pedagogy, evaluations };
-            localStorage.setItem('pedaEvalsData', JSON.stringify(all));
+        function saveAllToLocalStorage() {
+            localStorage.setItem('allTeachersData', JSON.stringify(allTeachers));
             document.getElementById('backupInfo').innerHTML = `<i class="fas fa-check-circle"></i> ${new Date().toLocaleString()}`;
         }
 
-        function loadData() {
-            let saved = localStorage.getItem('pedaEvalsData');
+        function loadAllData() {
+            let saved = localStorage.getItem('allTeachersData');
             if (saved) {
-                let data = JSON.parse(saved);
-                if (data.pedagogy) {
-                    pedagogy = data.pedagogy;
-                    if (pedagogy.teacher) {
-                        setVal('teacherName', pedagogy.teacher.name);
-                        setVal('teacherMatricule', pedagogy.teacher.matricule);
-                        setVal('teacherSchool', pedagogy.teacher.school);
-                        setVal('mainSubject', pedagogy.teacher.mainSubject);
-                        setVal('teacherClass', pedagogy.teacher.class);
-                        setVal('weeklyHours', pedagogy.teacher.weeklyHours);
-                    }
-                    if (pedagogy.lessons) pedagogy.lessons.forEach(l => restoreLesson(l));
-                    if (pedagogy.tps) pedagogy.tps.forEach(t => restoreTP(t));
+                allTeachers = JSON.parse(saved);
+                if (allTeachers.length > 0) {
+                    currentTeacherId = allTeachers[0].id;
+                    loadTeacherToUI(currentTeacherId);
+                    updateTeacherSelect();
+                    updateTeacherInfoDisplay();
                 }
-                if (data.evaluations) {
-                    evaluations = data.evaluations;
-                    evaluations.forEach(e => restoreEval(e));
-                    updateEvalStats();
-                }
-                toast('Données chargées', 'success');
+                toast(`${allTeachers.length} enseignant(s) chargé(s)`, 'success');
+            } else {
+                // Enseignant par défaut
+                let defaultTeacher = {
+                    id: 'teacher_default',
+                    info: { name: 'Enseignant exemple', matricule: 'EX123', school: 'Établissement Test', mainSubject: 'Mathématiques', class: '3ème A', weeklyHours: 18 },
+                    lessons: [],
+                    tps: [],
+                    evaluations: []
+                };
+                allTeachers = [defaultTeacher];
+                currentTeacherId = defaultTeacher.id;
+                loadTeacherToUI(currentTeacherId);
+                updateTeacherSelect();
+                updateTeacherInfoDisplay();
+                saveAllToLocalStorage();
             }
             updateAllStats();
         }
 
-        function restoreLesson(l) {
-            let html = `<div class="item-card" id="${l.id}"><div class="item-header"><span class="item-title"><i class="fas fa-book"></i> ${l.title || 'Leçon'}</span><span class="badge badge-info">${l.date || ''}</span></div>
-                <div class="grid-2"><input type="text" class="l-title" value="${l.title || ''}"><input type="date" class="l-date" value="${l.date || ''}">
-                <input type="text" class="l-subject" value="${l.subject || ''}"><input type="text" class="l-class" value="${l.class || ''}"></div>
-                <textarea class="l-objectives" rows="2">${l.objectives || ''}</textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveLesson('${l.id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delLesson('${l.id}')"><i class="fas fa-trash"></i></button></div></div>`;
-            document.getElementById('lessonsList').insertAdjacentHTML('beforeend', html);
-        }
-
-        function restoreTP(t) {
-            let html = `<div class="item-card" id="${t.id}"><div class="item-header"><span class="item-title"><i class="fas fa-flask"></i> ${t.title || 'TP'}</span><span class="badge badge-warning">${t.date || ''}</span></div>
-                <div class="grid-2"><input type="text" class="tp-title" value="${t.title || ''}"><input type="date" class="tp-date" value="${t.date || ''}">
-                <input type="text" class="tp-subject" value="${t.subject || ''}"><input type="number" class="tp-duration" value="${t.duration || 2}"></div>
-                <textarea class="tp-desc" rows="2">${t.description || ''}</textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveTP('${t.id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delTP('${t.id}')"><i class="fas fa-trash"></i></button></div></div>`;
-            document.getElementById('tpList').insertAdjacentHTML('beforeend', html);
-        }
-
-        function restoreEval(e) {
-            let html = `<div class="item-card" id="${e.id}"><div class="item-header"><span class="item-title"><i class="fas fa-clipboard-list"></i> ${e.type || 'Évaluation'}</span><span class="badge badge-success">${e.date || ''}</span></div>
-                <div class="grid-3"><select class="e-type"><option>${e.type || 'Devoir'}</option><option>Examen</option><option>Oral</option></select>
-                <input type="text" class="e-subject" value="${e.subject || ''}"><input type="date" class="e-date" value="${e.date || ''}"></div>
-                <div class="grid-3"><input type="number" class="e-avg" step="0.5" value="${e.average || 0}">
-                <input type="number" class="e-best" step="0.5" value="${e.best || 0}"><input type="number" class="e-worst" step="0.5" value="${e.worst || 0}"></div>
-                <div class="grid-2"><input type="number" class="e-students" value="${e.students || 25}"><input type="number" class="e-coef" value="${e.coefficient || 1}"></div>
-                <textarea class="e-comments" rows="2">${e.comments || ''}</textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveEval('${e.id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delEval('${e.id}')"><i class="fas fa-trash"></i></button></div></div>`;
-            document.getElementById('evalsList').insertAdjacentHTML('beforeend', html);
-        }
-
-        function setVal(id, val) { let el = document.getElementById(id); if (el) el.value = val || ''; }
-
         function setupAutoSave() {
             let inputs = document.querySelectorAll('#tab-pedagogy input, #tab-pedagogy select, #tab-pedagogy textarea');
-            inputs.forEach(i => { i.addEventListener('change', () => save()); i.addEventListener('input', () => save()); });
-        }
-
-        function updateAllStats() { updateEvalStats(); updateDataStats(); }
-        function updateDataStats() {
-            document.getElementById('statLessons').innerHTML = pedagogy.lessons.length;
-            document.getElementById('statTP').innerHTML = pedagogy.tps.length;
-            document.getElementById('statEvalsCount').innerHTML = evaluations.length;
+            inputs.forEach(i => {
+                i.addEventListener('change', () => { saveCurrentTeacherToArray(); saveAllToLocalStorage(); });
+                i.addEventListener('input', () => { saveCurrentTeacherToArray(); saveAllToLocalStorage(); });
+            });
         }
 
         // ========== EXPORT/IMPORT ==========
-        function exportPedagogy() { downloadJSON({ teacher: getTeacher(), lessons: pedagogy.lessons, tps: pedagogy.tps }, 'pedagogie.json'); }
-        function exportEvals() { downloadJSON(evaluations, 'evaluations.json'); }
-        function exportAll() { downloadJSON({ pedagogy: { teacher: getTeacher(), lessons: pedagogy.lessons, tps: pedagogy.tps }, evaluations }, 'donnees_completes.json'); }
-        function downloadJSON(data, name) { let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type:'application/json'})); a.download = name; a.click(); URL.revokeObjectURL(a.href); toast(`Exporté: ${name}`, 'success'); }
+        function exportCurrentTeacher() {
+            let teacher = getCurrentTeacher();
+            if (!teacher) { toast('Aucun enseignant sélectionné', 'warning'); return; }
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(teacher, null, 2)], { type: 'application/json' }));
+            a.download = `enseignant_${teacher.info?.matricule || teacher.id}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            toast('Exporté', 'success');
+        }
 
-        function importPedagogy() { importFile('pedagogy'); }
-        function importEvals() { importFile('evaluations'); }
-        function triggerImport() { document.getElementById('importFile').click(); }
-
-        function importFile(type) {
+        function importTeacherData() {
             let input = document.createElement('input');
             input.type = 'file'; input.accept = '.json';
             input.onchange = e => {
@@ -831,47 +912,57 @@
                 r.onload = ev => {
                     try {
                         let data = JSON.parse(ev.target.result);
-                        if (type === 'pedagogy' && data.teacher) {
-                            setVal('teacherName', data.teacher.name); setVal('teacherMatricule', data.teacher.matricule);
-                            setVal('teacherSchool', data.teacher.school); setVal('mainSubject', data.teacher.mainSubject);
-                            setVal('teacherClass', data.teacher.class); setVal('weeklyHours', data.teacher.weeklyHours);
-                            if (data.lessons) { pedagogy.lessons = data.lessons; document.getElementById('lessonsList').innerHTML = ''; pedagogy.lessons.forEach(l => restoreLesson(l)); }
-                            if (data.tps) { pedagogy.tps = data.tps; document.getElementById('tpList').innerHTML = ''; pedagogy.tps.forEach(t => restoreTP(t)); }
-                            save(); toast('Import pédagogie réussi', 'success');
-                        } else if (type === 'evaluations' && Array.isArray(data)) {
-                            evaluations = data; document.getElementById('evalsList').innerHTML = '';
-                            evaluations.forEach(e => restoreEval(e)); updateEvalStats(); save();
-                            toast('Import évaluations réussi', 'success');
+                        if (data.id) {
+                            // Remplacer ou ajouter
+                            let existing = allTeachers.findIndex(t => t.id === data.id);
+                            if (existing !== -1) allTeachers[existing] = data;
+                            else allTeachers.push(data);
+                            currentTeacherId = data.id;
+                            updateTeacherSelect();
+                            loadTeacherToUI(currentTeacherId);
+                            updateTeacherInfoDisplay();
+                            saveAllToLocalStorage();
+                            toast('Enseignant importé', 'success');
+                        } else {
+                            toast('Format JSON invalide', 'error');
                         }
-                    } catch(err) { toast('Erreur fichier JSON', 'error'); }
+                    } catch(err) { toast('Erreur fichier', 'error'); }
                 };
                 r.readAsText(f);
             };
             input.click();
         }
 
-        function importAll(input) {
+        function exportAllTeachers() {
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(allTeachers, null, 2)], { type: 'application/json' }));
+            a.download = `tous_enseignants_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            toast('Export tous enseignants', 'success');
+        }
+
+        function triggerImportAll() { document.getElementById('importFile').click(); }
+
+        function importAllTeachers(input) {
             let f = input.files[0]; if (!f) return;
             let r = new FileReader();
             r.onload = ev => {
                 try {
                     let data = JSON.parse(ev.target.result);
-                    if (data.pedagogy) {
-                        pedagogy = data.pedagogy;
-                        if (pedagogy.teacher) {
-                            setVal('teacherName', pedagogy.teacher.name); setVal('teacherMatricule', pedagogy.teacher.matricule);
-                            setVal('teacherSchool', pedagogy.teacher.school); setVal('mainSubject', pedagogy.teacher.mainSubject);
-                            setVal('teacherClass', pedagogy.teacher.class); setVal('weeklyHours', pedagogy.teacher.weeklyHours);
-                        }
-                        document.getElementById('lessonsList').innerHTML = ''; document.getElementById('tpList').innerHTML = '';
-                        if (pedagogy.lessons) pedagogy.lessons.forEach(l => restoreLesson(l));
-                        if (pedagogy.tps) pedagogy.tps.forEach(t => restoreTP(t));
+                    if (Array.isArray(data)) {
+                        allTeachers = data;
+                        if (allTeachers.length > 0) currentTeacherId = allTeachers[0].id;
+                        else currentTeacherId = null;
+                        updateTeacherSelect();
+                        if (currentTeacherId) loadTeacherToUI(currentTeacherId);
+                        else clearUI();
+                        updateTeacherInfoDisplay();
+                        saveAllToLocalStorage();
+                        toast(`${allTeachers.length} enseignant(s) importé(s)`, 'success');
+                    } else {
+                        toast('Format JSON invalide (doit être un tableau)', 'error');
                     }
-                    if (data.evaluations) {
-                        evaluations = data.evaluations; document.getElementById('evalsList').innerHTML = '';
-                        evaluations.forEach(e => restoreEval(e)); updateEvalStats();
-                    }
-                    save(); toast('Import complet réussi', 'success');
                 } catch(err) { toast('Erreur fichier', 'error'); }
             };
             r.readAsText(f);
@@ -881,46 +972,30 @@
         // ========== EXPORT EXCEL ==========
         function exportPedagogyExcel() {
             let ws = [["Type", "Titre", "Date", "Matière", "Classe", "Contenu"]];
-            pedagogy.lessons.forEach(l => ws.push(["Leçon", l.title, l.date, l.subject, l.class, l.objectives]));
-            pedagogy.tps.forEach(t => ws.push(["TP", t.title, t.date, t.subject, "", t.description]));
+            currentLessons.forEach(l => ws.push(["Leçon", l.title, l.date, l.subject, l.class, l.objectives]));
+            currentTPs.forEach(t => ws.push(["TP", t.title, t.date, t.subject, "", t.description]));
             let wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws), "Pédagogie");
-            XLSX.writeFile(wb, `pedagogie_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `pedagogie_${Date.now()}.xlsx`);
             toast('Excel exporté', 'success');
         }
 
         function exportEvalsExcel() {
             let ws = [["Type", "Matière", "Date", "Moyenne", "Meilleure", "Plus basse", "Élèves", "Coeff", "Commentaires"]];
-            evaluations.forEach(e => ws.push([e.type, e.subject, e.date, e.average, e.best, e.worst, e.students, e.coefficient, e.comments]));
+            currentEvaluations.forEach(e => ws.push([e.type, e.subject, e.date, e.average, e.best, e.worst, e.students, e.coefficient, e.comments]));
             let wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws), "Évaluations");
-            XLSX.writeFile(wb, `evaluations_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `evaluations_${Date.now()}.xlsx`);
             toast('Excel exporté', 'success');
-        }
-
-        function clearAll() {
-            if (confirm('⚠️ Effacer TOUTES les données ? Action irréversible.')) {
-                localStorage.removeItem('pedaEvalsData');
-                pedagogy = { teacher: {}, lessons: [], tps: [] };
-                evaluations = [];
-                document.getElementById('lessonsList').innerHTML = '';
-                document.getElementById('tpList').innerHTML = '';
-                document.getElementById('evalsList').innerHTML = '';
-                document.querySelectorAll('#tab-pedagogy input').forEach(i => i.value = '');
-                updateAllStats();
-                toast('Toutes les données effacées', 'success');
-            }
         }
 
         function toast(msg, type = 'success') {
             let t = document.getElementById('toast');
-            let icon = t.querySelector('i');
-            let span = t.querySelector('span');
+            let span = document.getElementById('toastMsg');
             span.innerHTML = msg;
             t.className = 'toast';
-            if (type === 'error') { t.classList.add('error'); icon.className = 'fas fa-exclamation-circle'; }
-            else if (type === 'warning') { t.classList.add('warning'); icon.className = 'fas fa-exclamation-triangle'; }
-            else { t.classList.add('success'); icon.className = 'fas fa-check-circle'; }
+            if (type === 'error') { t.classList.add('error'); }
+            else { t.classList.add('success'); }
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2500);
         }
