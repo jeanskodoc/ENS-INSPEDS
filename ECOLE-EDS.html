@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>Fiche Administrative Enseignant - Gestion Pédagogique</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
-        /* ==================== VARIABLES & RESET ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary-color: #3498db;
             --secondary-color: #2980b9;
@@ -20,15 +27,6 @@
             --border-radius: 10px;
             --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
-            --header-height: 60px;
-            --sidebar-width: 250px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -36,10 +34,8 @@
             padding: clamp(10px, 3vw, 20px);
             color: var(--dark-color);
             line-height: 1.6;
-            min-height: 100vh;
         }
 
-        /* ==================== CONTAINER PRINCIPAL ==================== */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -47,66 +43,58 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             overflow: hidden;
-            width: 100%;
         }
 
-        /* ==================== HEADER RESPONSIVE ==================== */
+        /* Header */
         header {
             text-align: center;
             padding: clamp(15px, 4vw, 25px) clamp(15px, 4vw, 30px);
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            position: relative;
         }
 
-        .school-info {
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: clamp(10px, 3vw, 20px);
+            gap: 15px;
             margin-bottom: 15px;
         }
 
-        .school-name {
+        .platform-name {
             font-size: clamp(1rem, 4vw, 1.4rem);
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex: 1;
-            min-width: 200px;
+            gap: 10px;
         }
 
-        .academic-year {
+        .user-info {
             background: rgba(255, 255, 255, 0.2);
-            padding: 6px clamp(10px, 3vw, 15px);
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: clamp(0.75rem, 3vw, 0.9rem);
-            display: inline-flex;
+            font-size: 0.85rem;
+            display: flex;
             align-items: center;
             gap: 8px;
         }
 
         header h1 {
             font-size: clamp(1.2rem, 5vw, 1.8rem);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         header p {
-            font-size: clamp(0.8rem, 3vw, 1rem);
-            opacity: 0.9;
+            font-size: clamp(0.85rem, 3vw, 1rem);
         }
 
-        /* ==================== NAVIGATION RESPONSIVE ==================== */
+        /* Navigation */
         .tabs-container {
             background-color: #f8f9fa;
             border-bottom: 1px solid #dee2e6;
             overflow-x: auto;
-            overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            position: relative;
         }
 
         .tabs {
@@ -118,7 +106,7 @@
         }
 
         .tab {
-            padding: clamp(10px, 3vw, 15px) clamp(12px, 4vw, 20px);
+            padding: 12px 16px;
             cursor: pointer;
             font-weight: 600;
             color: var(--gray-color);
@@ -142,29 +130,22 @@
             background-color: white;
         }
 
-        /* Mode mobile - icônes seulement sur petits écrans */
         @media (max-width: 640px) {
-            .tab span {
-                display: none;
-            }
-            .tab i {
-                font-size: 1.2rem;
-            }
-            .tab {
-                padding: 12px 16px;
-            }
+            .tab span { display: none; }
+            .tab i { font-size: 1.2rem; }
+            .tab { padding: 12px; }
         }
 
-        /* ==================== CONTENU DES ONGLETS ==================== */
+        /* Tab content */
         .tab-content {
             display: none;
             padding: clamp(15px, 4vw, 30px);
             min-height: 500px;
-            animation: fadeIn 0.3s ease;
         }
 
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
@@ -172,9 +153,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ==================== SECTIONS DE FORMULAIRES ==================== */
+        /* Form sections */
         .form-section {
-            margin-bottom: clamp(20px, 5vw, 30px);
+            margin-bottom: 30px;
             padding: clamp(15px, 4vw, 25px);
             background-color: #f9f9f9;
             border-radius: var(--border-radius);
@@ -196,7 +177,6 @@
             gap: 10px;
         }
 
-        /* ==================== GRILLES RESPONSIVES ==================== */
         .form-row {
             display: flex;
             flex-wrap: wrap;
@@ -209,38 +189,8 @@
             min-width: min(100%, 250px);
         }
 
-        /* Grilles statistiques */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-            gap: clamp(15px, 3vw, 20px);
-            margin: 20px 0;
-        }
-
-        .stat-card {
-            background: white;
-            padding: clamp(15px, 4vw, 20px);
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-            transition: var(--transition);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--box-shadow);
-        }
-
-        .stat-value {
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 10px 0;
-        }
-
-        /* ==================== CHAMPS DE FORMULAIRES ==================== */
         .form-group {
-            margin-bottom: clamp(15px, 4vw, 20px);
+            margin-bottom: 20px;
         }
 
         label {
@@ -258,8 +208,6 @@
             border-radius: 5px;
             font-size: clamp(0.85rem, 3vw, 1rem);
             transition: var(--transition);
-            -webkit-appearance: none;
-            appearance: none;
         }
 
         input:focus, select:focus, textarea:focus {
@@ -273,9 +221,9 @@
             resize: vertical;
         }
 
-        /* ==================== BOUTONS ==================== */
+        /* Buttons */
         .btn {
-            padding: clamp(10px, 3vw, 12px) clamp(16px, 4vw, 24px);
+            padding: clamp(8px, 3vw, 12px) clamp(16px, 4vw, 24px);
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -284,79 +232,81 @@
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            text-decoration: none;
-            text-align: center;
         }
 
         .btn-primary { background: var(--primary-color); color: white; }
+        .btn-primary:hover { background: var(--secondary-color); transform: translateY(-2px); }
         .btn-secondary { background: var(--success-color); color: white; }
+        .btn-secondary:hover { background: #27ae60; transform: translateY(-2px); }
         .btn-danger { background: var(--danger-color); color: white; }
+        .btn-danger:hover { background: #c0392b; transform: translateY(-2px); }
         .btn-warning { background: var(--warning-color); color: white; }
+        .btn-warning:hover { background: #d68910; transform: translateY(-2px); }
         .btn-info { background: var(--info-color); color: white; }
+        .btn-info:hover { background: #8e44ad; transform: translateY(-2px); }
         .btn-light { background: #f8f9fa; color: var(--dark-color); border: 1px solid #dee2e6; }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(0.95);
-        }
-
+        .btn-light:hover { background: #e9ecef; }
         .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
-        .btn-xs { padding: 4px 8px; font-size: 0.75rem; }
 
-        /* ==================== ACTIONS ==================== */
-        .form-actions, .tab-actions {
+        .form-actions {
             display: flex;
-            justify-content: center;
-            gap: clamp(10px, 3vw, 15px);
+            justify-content: space-between;
+            gap: 15px;
             margin-top: 30px;
-            margin-bottom: 25px;
             flex-wrap: wrap;
-            padding: clamp(15px, 4vw, 20px);
+            padding: 20px;
             background: #f8f9fa;
             border-radius: var(--border-radius);
         }
 
-        /* ==================== TABLEAUX RESPONSIVES ==================== */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        .tab-actions {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+            gap: clamp(15px, 3vw, 20px);
             margin: 20px 0;
+        }
+
+        .stat-card {
             background: white;
+            padding: clamp(15px, 4vw, 20px);
             border-radius: 8px;
-            overflow-x: auto;
-            display: block;
+            text-align: center;
+            border: 1px solid #e9ecef;
         }
 
-        @media (max-width: 768px) {
-            .data-table {
-                display: block;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            .data-table thead, .data-table tbody, .data-table tr {
-                display: table;
-                min-width: 600px;
-            }
+        .stat-value {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
         }
 
-        .data-table th {
-            background-color: var(--primary-color);
-            color: white;
-            padding: clamp(10px, 3vw, 15px);
-            text-align: left;
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 2.5vw, 0.8rem);
             font-weight: 600;
         }
+        .badge-success { background: #e8f5e9; color: var(--success-color); }
+        .badge-warning { background: #fff3e0; color: var(--warning-color); }
+        .badge-info { background: #e3f2fd; color: var(--primary-color); }
 
-        .data-table td {
-            padding: clamp(8px, 2.5vw, 12px) clamp(10px, 3vw, 15px);
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        /* ==================== CONTENEURS D'ÉLÉMENTS ==================== */
-        .lesson-container, .tp-container, .evaluation-container, 
-        .project-container, .activity-container {
+        /* Dynamic containers */
+        .lesson-container, .tp-container, .evaluation-container, .project-container, .activity-container {
             background: white;
             border-radius: 8px;
             padding: clamp(15px, 4vw, 20px);
@@ -364,7 +314,6 @@
             border-left: 4px solid var(--info-color);
             transition: var(--transition);
         }
-
         .tp-container { border-left-color: var(--warning-color); }
         .evaluation-container { border-left-color: var(--success-color); }
         .project-container { border-left-color: var(--info-color); }
@@ -377,25 +326,12 @@
             flex-wrap: wrap;
         }
 
-        /* ==================== BADGES ==================== */
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: clamp(0.7rem, 2.5vw, 0.8rem);
-            font-weight: 600;
-        }
-        .badge-success { background: #e8f5e9; color: var(--success-color); }
-        .badge-warning { background: #fff3e0; color: var(--warning-color); }
-        .badge-info { background: #e3f2fd; color: var(--primary-color); }
-
-        /* ==================== NOTIFICATION ==================== */
+        /* Notification */
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            left: auto;
-            padding: clamp(12px, 3vw, 15px) clamp(16px, 4vw, 25px);
+            padding: 12px 20px;
             background: var(--success-color);
             color: white;
             border-radius: 5px;
@@ -408,114 +344,15 @@
             gap: 10px;
             max-width: calc(100% - 40px);
             font-size: clamp(0.85rem, 3vw, 1rem);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-
         @media (max-width: 480px) {
-            .notification {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
-            }
+            .notification { top: 10px; right: 10px; left: 10px; max-width: none; }
         }
-
         .notification.show { opacity: 1; transform: translateY(0); }
         .notification.error { background: var(--danger-color); }
         .notification.warning { background: var(--warning-color); }
 
-        /* ==================== MODAL RESPONSIVE ==================== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: clamp(15px, 4vw, 20px);
-        }
-
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: clamp(20px, 5vw, 30px);
-            max-width: 90%;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        @media (min-width: 768px) {
-            .modal-content { max-width: 700px; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #dee2e6;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-color);
-            padding: 5px 10px;
-        }
-
-        /* ==================== BOUTONS FLOTTANTS ==================== */
-        .btn-retour, .btn-accueil {
-            position: fixed;
-            bottom: 20px;
-            padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 20px);
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 999;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-            transition: var(--transition);
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-        }
-
-        @media (max-width: 768px) {
-            .btn-retour, .btn-accueil {
-                padding: 8px 12px;
-            }
-            .btn-retour span, .btn-accueil span {
-                display: none;
-            }
-            .btn-retour i, .btn-accueil i {
-                margin: 0;
-            }
-        }
-
-        .btn-retour { left: 20px; }
-        .btn-accueil { right: 20px; }
-
-        .btn-retour:hover, .btn-accueil:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            color: white;
-        }
-
-        /* ==================== LOADER ==================== */
+        /* Loader */
         .loader {
             display: none;
             position: fixed;
@@ -528,9 +365,7 @@
             align-items: center;
             justify-content: center;
         }
-
         .loader.active { display: flex; }
-
         .spinner {
             width: 40px;
             height: 40px;
@@ -539,40 +374,90 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* ==================== UTILITAIRES ==================== */
-        .hidden { display: none !important; }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: clamp(20px, 5vw, 30px);
+            max-width: 90%;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @media (min-width: 768px) { .modal-content { max-width: 700px; } }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .btn-retour, .btn-accueil {
+            position: fixed;
+            bottom: 20px;
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transition: var(--transition);
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+        }
+        @media (max-width: 768px) {
+            .btn-retour span, .btn-accueil span { display: none; }
+            .btn-retour, .btn-accueil { padding: 10px 12px; }
+        }
+        .btn-retour { left: 20px; }
+        .btn-accueil { right: 20px; }
+        .btn-retour:hover, .btn-accueil:hover { background-color: var(--secondary-color); transform: translateY(-2px); color: white; }
+
+        /* Utilities */
         .text-center { text-align: center; }
         .mt-20 { margin-top: 20px; }
-        .mb-20 { margin-bottom: 20px; }
         .mt-30 { margin-top: 30px; }
+        .mb-20 { margin-bottom: 20px; }
         .mb-30 { margin-bottom: 30px; }
+        .hidden { display: none !important; }
         .w-100 { width: 100%; }
 
-        /* ==================== IMPRESSION ==================== */
         @media print {
-            .btn-retour, .btn-accueil, .form-actions, button:not(.no-print),
-            .tabs-container, .tab-actions, .modal, .notification, .loader {
-                display: none !important;
-            }
+            .btn-retour, .btn-accueil, .form-actions, button, .tabs-container, .tab-actions, .modal, .notification { display: none !important; }
             .tab-content { display: block !important; }
             body { background: white; padding: 0; }
-            .container { box-shadow: none; border-radius: 0; }
         }
-
-        /* ==================== SCROLLBAR ==================== */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--secondary-color); }
     </style>
 </head>
 <body>
@@ -584,9 +469,9 @@
 
     <div class="container">
         <header>
-            <div class="school-info">
-                <div class="school-name"><i class="fas fa-school"></i> <span id="schoolName">Établissement Scolaire</span></div>
-                <div class="academic-year"><i class="fas fa-calendar-alt"></i> Année: <span id="currentYear"></span></div>
+            <div class="header-content">
+                <div class="platform-name"><i class="fas fa-chart-line"></i><span>Fiche Enseignant</span></div>
+                <div class="user-info"><i class="fas fa-user-shield"></i><span>Inspecteur - <span id="currentYear"></span></span></div>
             </div>
             <h1><i class="fas fa-id-card"></i> FICHE ADMINISTRATIVE ENSEIGNANT</h1>
             <p>Gestion pédagogique et administrative complète</p>
@@ -594,172 +479,185 @@
 
         <div class="tabs-container">
             <ul class="tabs">
-                <li class="tab active" data-tab="tab1"><i class="fas fa-user-tie"></i><span> Générales</span></li>
-                <li class="tab" data-tab="tab2"><i class="fas fa-chalkboard-teacher"></i><span> Pédagogie</span></li>
-                <li class="tab" data-tab="tab3"><i class="fas fa-chart-line"></i><span> Évaluations</span></li>
-                <li class="tab" data-tab="tab4"><i class="fas fa-project-diagram"></i><span> Projets</span></li>
-                <li class="tab" data-tab="tab5"><i class="fas fa-database"></i><span> Archives</span></li>
-                <li class="tab" data-tab="tab6"><i class="fas fa-tachometer-alt"></i><span> Dashboard</span></li>
+                <li class="tab active" data-tab="tab-general"><i class="fas fa-user-tie"></i><span> Générales</span></li>
+                <li class="tab" data-tab="tab-pedagogy"><i class="fas fa-chalkboard-teacher"></i><span> Pédagogie</span></li>
+                <li class="tab" data-tab="tab-evaluations"><i class="fas fa-chart-line"></i><span> Évaluations</span></li>
+                <li class="tab" data-tab="tab-projects"><i class="fas fa-project-diagram"></i><span> Projets</span></li>
+                <li class="tab" data-tab="tab-export"><i class="fas fa-download"></i><span> Export/Import</span></li>
             </ul>
         </div>
 
-        <form id="teacherForm">
-            <!-- Onglet 1 -->
-            <div id="tab1" class="tab-content active">
-                <div class="tab-actions">
-                    <button type="button" class="btn btn-info" onclick="exportJSON('tab1')"><i class="fas fa-file-export"></i> Exporter</button>
-                    <button type="button" class="btn btn-warning" onclick="importJSON('tab1')"><i class="fas fa-file-import"></i> Importer</button>
-                </div>
+        <!-- ONGLET 1: GÉNÉRALES -->
+        <div id="tab-general" class="tab-content active">
+            <div class="tab-actions">
+                <button class="btn btn-info" onclick="exportSection('general')"><i class="fas fa-file-export"></i> Exporter JSON</button>
+                <button class="btn btn-warning" onclick="importSection('general')"><i class="fas fa-file-import"></i> Importer JSON</button>
+            </div>
 
-                <div class="form-section">
-                    <h2><i class="fas fa-university"></i> Établissement</h2>
-                    <div class="form-row">
-                        <div class="form-col"><label>Nom *</label><input type="text" id="establishmentName" required></div>
-                        <div class="form-col"><label>Type</label><select id="establishmentType"><option value="">Sélectionner</option><option>Collège</option><option>Lycée</option><option>Lycée Pro</option></select></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col"><label>Adresse</label><input type="text" id="establishmentAddress"></div>
-                        <div class="form-col"><label>Téléphone</label><input type="tel" id="establishmentPhone"></div>
-                    </div>
+            <div class="form-section">
+                <h2><i class="fas fa-university"></i> INFORMATIONS ÉTABLISSEMENT</h2>
+                <div class="form-row">
+                    <div class="form-col"><label>Nom établissement *</label><input type="text" id="establishmentName" required></div>
+                    <div class="form-col"><label>Type</label><select id="establishmentType"><option>Collège</option><option>Lycée</option><option>Lycée Pro</option></select></div>
                 </div>
-
-                <div class="form-section">
-                    <h2><i class="fas fa-user"></i> Personnel</h2>
-                    <div class="form-row">
-                        <div class="form-col"><label>Nom *</label><input type="text" id="lastName" required></div>
-                        <div class="form-col"><label>Prénoms *</label><input type="text" id="firstName" required></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col"><label>Date naissance *</label><input type="date" id="birthDate" required onchange="calculateRetirementDate()"></div>
-                        <div class="form-col"><label>Lieu naissance *</label><input type="text" id="birthPlace" required></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col"><label>Adresse</label><input type="text" id="address"></div>
-                        <div class="form-col"><label>Téléphone</label><input type="tel" id="personalPhone"></div>
-                        <div class="form-col"><label>Email</label><input type="email" id="personalEmail"></div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2><i class="fas fa-briefcase"></i> Professionnel</h2>
-                    <div class="form-row">
-                        <div class="form-col"><label>Matricule *</label><input type="text" id="matricule" required></div>
-                        <div class="form-col"><label>Fonction</label><select id="position"><option>Professeur</option><option>Agrégé</option></select></div>
-                        <div class="form-col"><label>Catégorie</label><select id="professionalCategory" onchange="calculateRetirementDate()"><option value="">Choisir</option><option>A1</option><option>A2</option><option>B</option><option>C</option><option>D</option></select></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col"><label>Engagement *</label><input type="date" id="engagementDate" required></div>
-                        <div class="form-col"><label>Retraite</label><input type="date" id="retirementDate" readonly></div>
-                        <div class="form-col"><label>Heures/semaine</label><input type="number" id="weeklyHours" min="0" max="40"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col"><label>Classe(s)</label><input type="text" id="currentClass" placeholder="Ex: 3ème A"></div>
-                    </div>
-                    <div id="retirementDetails"></div>
-                </div>
-
-                <div class="form-section">
-                    <h2><i class="fas fa-book"></i> Matières</h2>
-                    <div id="subjectsContainer">
-                        <div class="form-row">
-                            <div class="form-col"><label>Principale *</label><input type="text" id="mainSubject" required></div>
-                            <div class="form-col"><label>Secondaire</label><input type="text" id="secondarySubject"></div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addSubjectField()"><i class="fas fa-plus"></i> Ajouter</button>
+                <div class="form-row">
+                    <div class="form-col"><label>Adresse</label><input type="text" id="establishmentAddress"></div>
+                    <div class="form-col"><label>Téléphone</label><input type="tel" id="establishmentPhone"></div>
                 </div>
             </div>
 
-            <!-- Onglet 2 -->
-            <div id="tab2" class="tab-content">
-                <div class="tab-actions">
-                    <button type="button" class="btn btn-info" onclick="exportJSON('tab2')"><i class="fas fa-file-export"></i> Exporter</button>
-                    <button type="button" class="btn btn-warning" onclick="importJSON('tab2')"><i class="fas fa-file-import"></i> Importer</button>
+            <div class="form-section">
+                <h2><i class="fas fa-user"></i> INFORMATIONS PERSONNELLES</h2>
+                <div class="form-row">
+                    <div class="form-col"><label>Nom *</label><input type="text" id="lastName" required></div>
+                    <div class="form-col"><label>Prénoms *</label><input type="text" id="firstName" required></div>
+                    <div class="form-col"><label>Sexe</label><select id="gender"><option>Masculin</option><option>Féminin</option></select></div>
                 </div>
-                <div class="form-section">
-                    <h2><i class="fas fa-sync-alt"></i> Infos synchronisées</h2>
-                    <div id="syncedInfoDisplay" style="background:#e8f5e9;padding:15px;border-radius:5px;border-left:4px solid var(--success-color)"></div>
+                <div class="form-row">
+                    <div class="form-col"><label>Date naissance *</label><input type="date" id="birthDate" required onchange="calculateAge()"></div>
+                    <div class="form-col"><label>Lieu naissance *</label><input type="text" id="birthPlace" required></div>
+                    <div class="form-col"><label>Nationalité</label><input type="text" id="nationality"></div>
                 </div>
-                <div class="form-section">
-                    <h2><i class="fas fa-chalkboard"></i> Leçons</h2>
-                    <div id="lessonsContainer"></div>
-                    <button class="btn btn-primary" onclick="addNewLesson()"><i class="fas fa-plus"></i> Nouvelle leçon</button>
-                </div>
-                <div class="form-section">
-                    <h2><i class="fas fa-flask"></i> Travaux Pratiques</h2>
-                    <div id="tpContainer"></div>
-                    <button class="btn btn-primary" onclick="addNewTP()"><i class="fas fa-plus"></i> Nouveau TP</button>
+                <div class="form-row">
+                    <div class="form-col"><label>Adresse</label><input type="text" id="address"></div>
+                    <div class="form-col"><label>Téléphone</label><input type="tel" id="personalPhone"></div>
+                    <div class="form-col"><label>Email</label><input type="email" id="personalEmail"></div>
                 </div>
             </div>
 
-            <!-- Onglet 3 -->
-            <div id="tab3" class="tab-content">
-                <div class="tab-actions">
-                    <button type="button" class="btn btn-info" onclick="exportJSON('tab3')"><i class="fas fa-file-export"></i> Exporter</button>
-                    <button type="button" class="btn btn-warning" onclick="importJSON('tab3')"><i class="fas fa-file-import"></i> Importer</button>
-                    <button class="btn btn-secondary" onclick="addEvaluation()"><i class="fas fa-plus"></i> Ajouter</button>
+            <div class="form-section">
+                <h2><i class="fas fa-briefcase"></i> INFORMATIONS PROFESSIONNELLES</h2>
+                <div class="form-row">
+                    <div class="form-col"><label>Matricule *</label><input type="text" id="matricule" required></div>
+                    <div class="form-col"><label>Fonction</label><select id="position"><option>Professeur</option><option>Professeur Agrégé</option><option>Chargé de Cours</option></select></div>
+                    <div class="form-col"><label>Catégorie</label><select id="professionalCategory"><option>A1</option><option>A2</option><option>B</option><option>C</option><option>D</option></select></div>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-card"><div>Évaluations</div><div class="stat-value" id="totalEvaluations">0</div></div>
-                    <div class="stat-card"><div>Moyenne</div><div class="stat-value" id="averageScore">0.0</div><div>/20</div></div>
-                    <div class="stat-card"><div>Meilleure note</div><div class="stat-value" id="bestScore">0</div><div>/20</div></div>
-                </div>
-                <div class="form-section">
-                    <h2><i class="fas fa-list"></i> Liste des évaluations</h2>
-                    <div id="evaluationsContainer"><div class="text-center"><p>Aucune évaluation</p><button class="btn btn-primary mt-20" onclick="addEvaluation()">Créer</button></div></div>
+                <div class="form-row">
+                    <div class="form-col"><label>Date engagement *</label><input type="date" id="engagementDate" required></div>
+                    <div class="form-col"><label>Heures/semaine</label><input type="number" id="weeklyHours" min="0" max="40"></div>
+                    <div class="form-col"><label>Classe(s)</label><input type="text" id="currentClass" placeholder="Ex: 3ème A, Terminale"></div>
                 </div>
             </div>
 
-            <!-- Onglet 4 -->
-            <div id="tab4" class="tab-content">
-                <div class="tab-actions">
-                    <button type="button" class="btn btn-info" onclick="exportJSON('tab4')"><i class="fas fa-file-export"></i> Exporter</button>
-                    <button type="button" class="btn btn-warning" onclick="importJSON('tab4')"><i class="fas fa-file-import"></i> Importer</button>
-                    <button class="btn btn-primary" onclick="addProject()"><i class="fas fa-plus"></i> Projet</button>
-                    <button class="btn btn-warning" onclick="addActivity()"><i class="fas fa-plus"></i> Activité</button>
+            <div class="form-section">
+                <h2><i class="fas fa-book"></i> MATIÈRES ENSEIGNÉES</h2>
+                <div id="subjectsContainer">
+                    <div class="form-row">
+                        <div class="form-col"><label>Matière principale *</label><input type="text" id="mainSubject" required></div>
+                        <div class="form-col"><label>Matière secondaire</label><input type="text" id="secondarySubject"></div>
+                    </div>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-card"><div>Projets</div><div class="stat-value" id="totalProjects">0</div></div>
-                    <div class="stat-card"><div>Activités</div><div class="stat-value" id="totalActivities">0</div></div>
-                </div>
-                <div class="form-section"><h2><i class="fas fa-project-diagram"></i> Projets</h2><div id="projectsContainer"></div></div>
-                <div class="form-section"><h2><i class="fas fa-futbol"></i> Activités</h2><div id="activitiesContainer"></div></div>
+                <button type="button" class="btn btn-secondary" onclick="addSubjectField()"><i class="fas fa-plus"></i> Ajouter matière</button>
+            </div>
+        </div>
+
+        <!-- ONGLET 2: PÉDAGOGIE -->
+        <div id="tab-pedagogy" class="tab-content">
+            <div class="tab-actions">
+                <button class="btn btn-info" onclick="exportSection('pedagogy')"><i class="fas fa-file-export"></i> Exporter JSON</button>
+                <button class="btn btn-warning" onclick="importSection('pedagogy')"><i class="fas fa-file-import"></i> Importer JSON</button>
             </div>
 
-            <!-- Onglet 5 -->
-            <div id="tab5" class="tab-content">
-                <div class="tab-actions">
-                    <button class="btn btn-info" onclick="exportAllJSON()"><i class="fas fa-download"></i> Exporter tout</button>
-                    <button class="btn btn-warning" onclick="triggerImportFile()"><i class="fas fa-upload"></i> Importer JSON</button>
-                    <button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Effacer</button>
-                </div>
-                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllJSON(this)">
-                <div class="form-section"><h2><i class="fas fa-history"></i> Historique</h2><div id="backupHistory"></div></div>
+            <div class="form-section">
+                <h2><i class="fas fa-sync-alt"></i> SYNCHRONISATION</h2>
+                <div id="syncedInfo" style="background:#e8f5e9;padding:15px;border-radius:5px;border-left:4px solid var(--success-color)"></div>
             </div>
 
-            <!-- Onglet 6 -->
-            <div id="tab6" class="tab-content">
-                <div class="stats-grid" id="dashboardStats"></div>
-                <div class="form-section"><h2><i class="fas fa-chart-bar"></i> Activité récente</h2><div id="recentActivity"></div></div>
+            <div class="form-section">
+                <h2><i class="fas fa-chalkboard"></i> LEÇONS</h2>
+                <div id="lessonsList"></div>
+                <button class="btn btn-primary" onclick="addLesson()"><i class="fas fa-plus"></i> Nouvelle leçon</button>
             </div>
 
-            <div class="form-actions">
-                <button type="reset" class="btn btn-danger"><i class="fas fa-trash"></i> Annuler</button>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Sauvegarder</button>
+            <div class="form-section">
+                <h2><i class="fas fa-flask"></i> TRAVAUX PRATIQUES</h2>
+                <div id="tpList"></div>
+                <button class="btn btn-primary" onclick="addTP()"><i class="fas fa-plus"></i> Nouveau TP</button>
             </div>
-        </form>
+
+            <div class="form-section">
+                <h2><i class="fas fa-folder-open"></i> RESSOURCES</h2>
+                <div id="resourcesList"></div>
+                <button class="btn btn-secondary" onclick="addResource()"><i class="fas fa-plus"></i> Ajouter ressource</button>
+            </div>
+        </div>
+
+        <!-- ONGLET 3: ÉVALUATIONS -->
+        <div id="tab-evaluations" class="tab-content">
+            <div class="tab-actions">
+                <button class="btn btn-info" onclick="exportSection('evaluations')"><i class="fas fa-file-export"></i> Exporter JSON</button>
+                <button class="btn btn-warning" onclick="importSection('evaluations')"><i class="fas fa-file-import"></i> Importer JSON</button>
+                <button class="btn btn-secondary" onclick="addEvaluation()"><i class="fas fa-plus"></i> Nouvelle évaluation</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div>Évaluations</div><div class="stat-value" id="totalEvals">0</div></div>
+                <div class="stat-card"><div>Moyenne générale</div><div class="stat-value" id="avgScore">0.0</div><div>/20</div></div>
+                <div class="stat-card"><div>Meilleure note</div><div class="stat-value" id="bestNote">0</div><div>/20</div></div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class="fas fa-list"></i> LISTE DES ÉVALUATIONS</h2>
+                <div id="evaluationsList"></div>
+            </div>
+        </div>
+
+        <!-- ONGLET 4: PROJETS -->
+        <div id="tab-projects" class="tab-content">
+            <div class="tab-actions">
+                <button class="btn btn-info" onclick="exportSection('projects')"><i class="fas fa-file-export"></i> Exporter JSON</button>
+                <button class="btn btn-warning" onclick="importSection('projects')"><i class="fas fa-file-import"></i> Importer JSON</button>
+                <button class="btn btn-primary" onclick="addProject()"><i class="fas fa-plus"></i> Nouveau projet</button>
+                <button class="btn btn-warning" onclick="addActivity()"><i class="fas fa-plus"></i> Nouvelle activité</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div>Projets</div><div class="stat-value" id="totalProjects">0</div></div>
+                <div class="stat-card"><div>Activités</div><div class="stat-value" id="totalActivities">0</div></div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class="fas fa-project-diagram"></i> PROJETS</h2>
+                <div id="projectsList"></div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class="fas fa-futbol"></i> ACTIVITÉS EXTRASCOLAIRES</h2>
+                <div id="activitiesList"></div>
+            </div>
+        </div>
+
+        <!-- ONGLET 5: EXPORT/IMPORT -->
+        <div id="tab-export" class="tab-content">
+            <div class="tab-actions">
+                <button class="btn btn-success" onclick="exportAllData()"><i class="fas fa-download"></i> Exporter tout (JSON)</button>
+                <button class="btn btn-info" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Exporter Excel</button>
+                <button class="btn btn-warning" onclick="triggerImportFile()"><i class="fas fa-upload"></i> Importer JSON</button>
+                <button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Tout effacer</button>
+            </div>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(this)">
+            <div class="form-section"><h2><i class="fas fa-database"></i> SAUVEGARDES LOCAL</h2><div id="backupInfo"></div></div>
+        </div>
     </div>
 
-    <div class="modal" id="genericModal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div><div id="modalContent"></div></div></div>
-
     <script>
-        let teacherData = { establishment: {}, personal: {}, professional: {}, subjects: [], lessons: [], tps: [], evaluations: [], projects: [], activities: [] };
+        // Structure des données
+        let appData = {
+            general: { establishment: {}, personal: {}, professional: {}, subjects: [] },
+            pedagogy: { lessons: [], tps: [], resources: [] },
+            evaluations: [],
+            projects: [],
+            activities: []
+        };
 
+        // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('currentYear').textContent = `${new Date().getFullYear()}-${new Date().getFullYear()+1}`;
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
             initTabs();
-            loadSavedData();
+            loadAllData();
             setupAutoSave();
+            updateSyncedInfo();
+            updateStats();
             showNotification('Application prête', 'success');
         });
 
@@ -770,282 +668,544 @@
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.tab).classList.add('active');
-                    if (this.dataset.tab === 'tab6') updateDashboard();
-                    if (this.dataset.tab === 'tab2') updateSyncedInfoDisplay();
+                    if (this.dataset.tab === 'tab-pedagogy') updateSyncedInfo();
+                    if (this.dataset.tab === 'tab-evaluations') updateStats();
                 });
             });
         }
 
-        function syncAllData() {
-            teacherData.establishment = { name: g('establishmentName'), type: g('establishmentType'), address: g('establishmentAddress'), phone: g('establishmentPhone') };
-            teacherData.personal = { last_name: g('lastName'), first_name: g('firstName'), birth_date: g('birthDate'), birth_place: g('birthPlace'), address: g('address'), personal_phone: g('personalPhone'), personal_email: g('personalEmail') };
-            teacherData.professional = { matricule: g('matricule'), position: g('position'), professional_category: g('professionalCategory'), engagement_date: g('engagementDate'), retirement_date: g('retirementDate'), weekly_hours: g('weeklyHours'), current_class: g('currentClass') };
-            teacherData.subjects = [{ name: g('mainSubject'), type: 'main' }];
-            if (g('secondarySubject')) teacherData.subjects.push({ name: g('secondarySubject'), type: 'secondary' });
-            document.querySelectorAll('#subjectsContainer .form-row').forEach((row, idx) => { if (idx > 0) { let inp = row.querySelector('input'); if (inp?.value) teacherData.subjects.push({ name: inp.value, type: 'additional' }); } });
-            document.getElementById('schoolName').textContent = teacherData.establishment.name || 'Établissement';
-            saveToLocalStorage();
+        // Récupération des données générales
+        function getGeneralData() {
+            return {
+                establishment: {
+                    name: document.getElementById('establishmentName')?.value || '',
+                    type: document.getElementById('establishmentType')?.value || '',
+                    address: document.getElementById('establishmentAddress')?.value || '',
+                    phone: document.getElementById('establishmentPhone')?.value || ''
+                },
+                personal: {
+                    last_name: document.getElementById('lastName')?.value || '',
+                    first_name: document.getElementById('firstName')?.value || '',
+                    gender: document.getElementById('gender')?.value || '',
+                    birth_date: document.getElementById('birthDate')?.value || '',
+                    birth_place: document.getElementById('birthPlace')?.value || '',
+                    nationality: document.getElementById('nationality')?.value || '',
+                    address: document.getElementById('address')?.value || '',
+                    personal_phone: document.getElementById('personalPhone')?.value || '',
+                    personal_email: document.getElementById('personalEmail')?.value || ''
+                },
+                professional: {
+                    matricule: document.getElementById('matricule')?.value || '',
+                    position: document.getElementById('position')?.value || '',
+                    professional_category: document.getElementById('professionalCategory')?.value || '',
+                    engagement_date: document.getElementById('engagementDate')?.value || '',
+                    weekly_hours: document.getElementById('weeklyHours')?.value || '',
+                    current_class: document.getElementById('currentClass')?.value || ''
+                },
+                subjects: []
+            };
         }
-        function g(id) { return document.getElementById(id)?.value || ''; }
-        function s(id, val) { let el = document.getElementById(id); if (el) el.value = val || ''; }
 
-        function calculateRetirementDate() {
-            let birth = g('birthDate'), cat = g('professionalCategory');
-            if (!birth || !cat) return;
-            let year = new Date(birth).getFullYear(), age = cat === 'B' || cat === 'C' ? 58 : cat === 'D' ? 55 : 60;
-            s('retirementDate', `${year+age}-01-01`);
-            document.getElementById('retirementDetails').innerHTML = `<div style="background:#f8f9fa;padding:15px;border-radius:5px;margin-top:10px"><h4 style="color:var(--primary-color)">Calcul retraite</h4><p>Naissance: ${year} | Catégorie: ${cat} | Départ à ${age} ans</p><p>Date estimée: 1er Janvier ${year+age}</p></div>`;
-            syncAllData();
+        function collectSubjects() {
+            let subjects = [];
+            let main = document.getElementById('mainSubject')?.value;
+            let secondary = document.getElementById('secondarySubject')?.value;
+            if (main) subjects.push({ name: main, type: 'main' });
+            if (secondary) subjects.push({ name: secondary, type: 'secondary' });
+            document.querySelectorAll('#subjectsContainer .subject-additional').forEach(input => {
+                if (input.value) subjects.push({ name: input.value, type: 'additional' });
+            });
+            return subjects;
         }
 
-        function updateSyncedInfoDisplay() {
-            let html = `<h4><i class="fas fa-sync"></i> Données synchronisées</h4>
-                <p><strong>Enseignant:</strong> ${teacherData.personal.last_name || ''} ${teacherData.personal.first_name || ''}</p>
-                <p><strong>Matricule:</strong> ${teacherData.professional.matricule || ''}</p>
-                <p><strong>Classe(s):</strong> ${teacherData.professional.current_class || ''}</p>
-                <p><strong>Matières:</strong> ${teacherData.subjects.map(s=>s.name).join(', ') || ''}</p>
-                <p><strong>Heures:</strong> ${teacherData.professional.weekly_hours || 0}h/semaine</p>`;
-            document.getElementById('syncedInfoDisplay').innerHTML = html;
+        function calculateAge() {
+            let birth = document.getElementById('birthDate').value;
+            if (birth) {
+                let age = new Date().getFullYear() - new Date(birth).getFullYear();
+                document.getElementById('ageDisplay')?.remove();
+                let ageDiv = document.createElement('div');
+                ageDiv.id = 'ageDisplay';
+                ageDiv.innerHTML = `<div class="badge badge-info" style="margin-top:10px">Âge: ${age} ans</div>`;
+                document.getElementById('birthDate')?.parentElement.appendChild(ageDiv);
+            }
         }
 
-        function addNewLesson() {
-            let id = `lesson_${Date.now()}`;
-            let main = teacherData.subjects.find(s=>s.type==='main')?.name || '';
-            let html = `<div class="lesson-container" id="${id}"><div class="form-row"><div class="form-col"><label>Titre</label><input type="text" class="lesson-title"></div><div class="form-col"><label>Date</label><input type="date" class="lesson-date" value="${new Date().toISOString().split('T')[0]}"></div></div>
-                <div class="form-row"><div class="form-col"><label>Matière</label><input type="text" class="lesson-subject" value="${main}"></div><div class="form-col"><label>Classe</label><input type="text" class="lesson-class" value="${teacherData.professional.current_class || ''}"></div></div>
-                <div class="form-group"><label>Objectifs</label><textarea class="lesson-objectives" rows="2"></textarea></div>
-                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveLesson('${id}')">Enregistrer</button><button class="btn btn-danger btn-sm" onclick="removeEl('${id}')">Supprimer</button></div></div>`;
-            document.getElementById('lessonsContainer').insertAdjacentHTML('beforeend', html);
-            if (!teacherData.lessons) teacherData.lessons = [];
-            teacherData.lessons.push({id});
-            showNotification('Leçon créée', 'success');
+        function addSubjectField() {
+            let container = document.getElementById('subjectsContainer');
+            let div = document.createElement('div');
+            div.className = 'form-row';
+            div.innerHTML = `<div class="form-col"><label>Matière supplémentaire</label><input type="text" class="subject-additional" placeholder="Nom matière"></div>
+                <div class="form-col"><button class="btn btn-danger btn-sm" onclick="this.closest('.form-row').remove()"><i class="fas fa-trash"></i> Supprimer</button></div>`;
+            container.appendChild(div);
+        }
+
+        // Pédagogie - Leçons
+        function addLesson() {
+            let id = 'lesson_' + Date.now();
+            let mainSubject = document.getElementById('mainSubject')?.value || '';
+            let currentClass = document.getElementById('currentClass')?.value || '';
+            let html = `<div class="lesson-container" id="${id}">
+                <div class="form-row"><div class="form-col"><label>Titre</label><input type="text" class="lesson-title" placeholder="Titre leçon"></div>
+                <div class="form-col"><label>Date</label><input type="date" class="lesson-date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+                <div class="form-row"><div class="form-col"><label>Matière</label><input type="text" class="lesson-subject" value="${mainSubject}"></div>
+                <div class="form-col"><label>Classe</label><input type="text" class="lesson-class" value="${currentClass}"></div></div>
+                <div class="form-group"><label>Objectifs</label><textarea class="lesson-objectives" rows="2" placeholder="Objectifs pédagogiques"></textarea></div>
+                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveLesson('${id}')">Enregistrer</button>
+                <button class="btn btn-danger btn-sm" onclick="removeItem('${id}', 'pedagogy', 'lessons')">Supprimer</button></div>
+            </div>`;
+            document.getElementById('lessonsList').insertAdjacentHTML('beforeend', html);
+            if (!appData.pedagogy.lessons) appData.pedagogy.lessons = [];
+            appData.pedagogy.lessons.push({ id });
+            showNotification('Nouvelle leçon créée', 'success');
         }
 
         function saveLesson(id) {
             let el = document.getElementById(id);
-            if(!el) return;
-            let lesson = {id, title: el.querySelector('.lesson-title')?.value, date: el.querySelector('.lesson-date')?.value,
-                subject: el.querySelector('.lesson-subject')?.value, class: el.querySelector('.lesson-class')?.value,
-                objectives: el.querySelector('.lesson-objectives')?.value};
-            let idx = teacherData.lessons.findIndex(l=>l.id===id);
-            if(idx!==-1) teacherData.lessons[idx]=lesson;
-            else teacherData.lessons.push(lesson);
-            syncAllData();
+            if (!el) return;
+            let lesson = {
+                id, title: el.querySelector('.lesson-title')?.value,
+                date: el.querySelector('.lesson-date')?.value,
+                subject: el.querySelector('.lesson-subject')?.value,
+                class: el.querySelector('.lesson-class')?.value,
+                objectives: el.querySelector('.lesson-objectives')?.value
+            };
+            let idx = appData.pedagogy.lessons.findIndex(l => l.id === id);
+            if (idx !== -1) appData.pedagogy.lessons[idx] = lesson;
+            else appData.pedagogy.lessons.push(lesson);
+            saveToLocalStorage();
             showNotification('Leçon sauvegardée', 'success');
         }
 
-        function addNewTP() {
-            let id = `tp_${Date.now()}`;
-            let main = teacherData.subjects.find(s=>s.type==='main')?.name || '';
-            let html = `<div class="tp-container" id="${id}"><div class="form-row"><div class="form-col"><label>Titre</label><input type="text" class="tp-title"></div><div class="form-col"><label>Date</label><input type="date" class="tp-date" value="${new Date().toISOString().split('T')[0]}"></div></div>
-                <div class="form-row"><div class="form-col"><label>Matière</label><input type="text" class="tp-subject" value="${main}"></div></div>
-                <div class="form-group"><label>Description</label><textarea class="tp-desc" rows="2"></textarea></div>
-                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveTP('${id}')">Enregistrer</button><button class="btn btn-danger btn-sm" onclick="removeEl('${id}')">Supprimer</button></div></div>`;
-            document.getElementById('tpContainer').insertAdjacentHTML('beforeend', html);
-            if (!teacherData.tps) teacherData.tps = [];
-            teacherData.tps.push({id});
-            showNotification('TP créé', 'success');
+        function addTP() {
+            let id = 'tp_' + Date.now();
+            let mainSubject = document.getElementById('mainSubject')?.value || '';
+            let html = `<div class="tp-container" id="${id}">
+                <div class="form-row"><div class="form-col"><label>Titre TP</label><input type="text" class="tp-title" placeholder="Titre"></div>
+                <div class="form-col"><label>Date</label><input type="date" class="tp-date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+                <div class="form-row"><div class="form-col"><label>Matière</label><input type="text" class="tp-subject" value="${mainSubject}"></div></div>
+                <div class="form-group"><label>Description</label><textarea class="tp-desc" rows="2" placeholder="Description TP"></textarea></div>
+                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveTP('${id}')">Enregistrer</button>
+                <button class="btn btn-danger btn-sm" onclick="removeItem('${id}', 'pedagogy', 'tps')">Supprimer</button></div>
+            </div>`;
+            document.getElementById('tpList').insertAdjacentHTML('beforeend', html);
+            if (!appData.pedagogy.tps) appData.pedagogy.tps = [];
+            appData.pedagogy.tps.push({ id });
+            showNotification('Nouveau TP créé', 'success');
         }
 
         function saveTP(id) {
             let el = document.getElementById(id);
-            if(!el) return;
-            let tp = {id, title: el.querySelector('.tp-title')?.value, date: el.querySelector('.tp-date')?.value,
-                subject: el.querySelector('.tp-subject')?.value, description: el.querySelector('.tp-desc')?.value};
-            let idx = teacherData.tps.findIndex(t=>t.id===id);
-            if(idx!==-1) teacherData.tps[idx]=tp;
-            else teacherData.tps.push(tp);
-            syncAllData();
+            if (!el) return;
+            let tp = {
+                id, title: el.querySelector('.tp-title')?.value,
+                date: el.querySelector('.tp-date')?.value,
+                subject: el.querySelector('.tp-subject')?.value,
+                description: el.querySelector('.tp-desc')?.value
+            };
+            let idx = appData.pedagogy.tps.findIndex(t => t.id === id);
+            if (idx !== -1) appData.pedagogy.tps[idx] = tp;
+            else appData.pedagogy.tps.push(tp);
+            saveToLocalStorage();
             showNotification('TP sauvegardé', 'success');
         }
 
+        function addResource() {
+            let name = prompt("Nom de la ressource :");
+            if (name) {
+                let resource = { id: 'res_' + Date.now(), name, date: new Date().toISOString().split('T')[0] };
+                if (!appData.pedagogy.resources) appData.pedagogy.resources = [];
+                appData.pedagogy.resources.push(resource);
+                displayResources();
+                saveToLocalStorage();
+                showNotification('Ressource ajoutée', 'success');
+            }
+        }
+
+        function displayResources() {
+            let container = document.getElementById('resourcesList');
+            if (!container) return;
+            let html = '';
+            (appData.pedagogy.resources || []).forEach(res => {
+                html += `<div class="resource-item" style="background:white;padding:10px;margin-bottom:10px;border-radius:5px;display:flex;justify-content:space-between">
+                    <div><i class="fas fa-file"></i> ${res.name} <small>(${res.date})</small></div>
+                    <button class="btn btn-danger btn-xs" onclick="removeResource('${res.id}')"><i class="fas fa-trash"></i></button>
+                </div>`;
+            });
+            container.innerHTML = html || '<p class="text-center">Aucune ressource</p>';
+        }
+
+        function removeResource(id) {
+            appData.pedagogy.resources = appData.pedagogy.resources.filter(r => r.id !== id);
+            displayResources();
+            saveToLocalStorage();
+            showNotification('Ressource supprimée', 'success');
+        }
+
+        // Évaluations
         function addEvaluation() {
-            let id = `eval_${Date.now()}`;
-            let main = teacherData.subjects.find(s=>s.type==='main')?.name || '';
-            let html = `<div class="evaluation-container" id="${id}"><div class="form-row"><div class="form-col"><label>Type</label><select class="eval-type"><option>Examen</option><option>Devoir</option><option>Oral</option></select></div>
-                <div class="form-col"><label>Matière</label><input type="text" class="eval-subject" value="${main}"></div><div class="form-col"><label>Date</label><input type="date" class="eval-date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+            let id = 'eval_' + Date.now();
+            let mainSubject = document.getElementById('mainSubject')?.value || '';
+            let html = `<div class="evaluation-container" id="${id}">
+                <div class="form-row"><div class="form-col"><label>Type</label><select class="eval-type"><option>Examen</option><option>Devoir</option><option>Oral</option><option>TP</option></select></div>
+                <div class="form-col"><label>Matière</label><input type="text" class="eval-subject" value="${mainSubject}"></div>
+                <div class="form-col"><label>Date</label><input type="date" class="eval-date" value="${new Date().toISOString().split('T')[0]}"></div></div>
                 <div class="form-row"><div class="form-col"><label>Moyenne /20</label><input type="number" class="eval-avg" step="0.1" min="0" max="20"></div>
                 <div class="form-col"><label>Meilleure note</label><input type="number" class="eval-best" step="0.1" min="0" max="20"></div>
                 <div class="form-col"><label>Nb élèves</label><input type="number" class="eval-count" min="1" value="1"></div></div>
-                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveEvaluation('${id}')">Enregistrer</button><button class="btn btn-danger btn-sm" onclick="removeEvaluation('${id}')">Supprimer</button></div></div>`;
-            document.getElementById('evaluationsContainer').innerHTML = html;
-            if (!teacherData.evaluations) teacherData.evaluations = [];
-            teacherData.evaluations.push({id});
-            showNotification('Évaluation créée', 'success');
+                <div class="form-group"><label>Commentaires</label><textarea class="eval-comments" rows="2" placeholder="Observations"></textarea></div>
+                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveEvaluation('${id}')">Enregistrer</button>
+                <button class="btn btn-danger btn-sm" onclick="removeEvaluation('${id}')">Supprimer</button></div>
+            </div>`;
+            document.getElementById('evaluationsList').insertAdjacentHTML('afterbegin', html);
+            if (!appData.evaluations) appData.evaluations = [];
+            appData.evaluations.push({ id });
+            updateStats();
+            showNotification('Nouvelle évaluation', 'success');
         }
 
         function saveEvaluation(id) {
             let el = document.getElementById(id);
-            if(!el) return;
-            let evalData = {id, type: el.querySelector('.eval-type')?.value, subject: el.querySelector('.eval-subject')?.value,
-                date: el.querySelector('.eval-date')?.value, average: parseFloat(el.querySelector('.eval-avg')?.value)||0,
-                best: parseFloat(el.querySelector('.eval-best')?.value)||0, studentCount: parseInt(el.querySelector('.eval-count')?.value)||1};
-            let idx = teacherData.evaluations.findIndex(e=>e.id===id);
-            if(idx!==-1) teacherData.evaluations[idx]=evalData;
-            else teacherData.evaluations.push(evalData);
-            updateEvaluationStats();
-            syncAllData();
+            if (!el) return;
+            let evalData = {
+                id, type: el.querySelector('.eval-type')?.value,
+                subject: el.querySelector('.eval-subject')?.value,
+                date: el.querySelector('.eval-date')?.value,
+                average: parseFloat(el.querySelector('.eval-avg')?.value) || 0,
+                best: parseFloat(el.querySelector('.eval-best')?.value) || 0,
+                studentCount: parseInt(el.querySelector('.eval-count')?.value) || 1,
+                comments: el.querySelector('.eval-comments')?.value
+            };
+            let idx = appData.evaluations.findIndex(e => e.id === id);
+            if (idx !== -1) appData.evaluations[idx] = evalData;
+            else appData.evaluations.push(evalData);
+            updateStats();
+            saveToLocalStorage();
             showNotification('Évaluation sauvegardée', 'success');
         }
 
         function removeEvaluation(id) {
-            if(confirm('Supprimer ?')) {
+            if (confirm('Supprimer cette évaluation ?')) {
                 document.getElementById(id)?.remove();
-                teacherData.evaluations = teacherData.evaluations.filter(e=>e.id!==id);
-                updateEvaluationStats();
-                syncAllData();
-                if(teacherData.evaluations.length===0) document.getElementById('evaluationsContainer').innerHTML = '<div class="text-center"><p>Aucune évaluation</p><button class="btn btn-primary mt-20" onclick="addEvaluation()">Créer</button></div>';
+                appData.evaluations = appData.evaluations.filter(e => e.id !== id);
+                updateStats();
+                saveToLocalStorage();
                 showNotification('Supprimée', 'success');
             }
         }
 
-        function updateEvaluationStats() {
-            let total=0, sum=0, best=0;
-            teacherData.evaluations.forEach(e=>{ total++; if(e.average) sum+=e.average; if(e.best && e.best>best) best=e.best; });
-            document.getElementById('totalEvaluations').textContent = total;
-            document.getElementById('averageScore').textContent = total ? (sum/total).toFixed(1) : '0.0';
-            document.getElementById('bestScore').textContent = best.toFixed(1);
+        function updateStats() {
+            let total = appData.evaluations.length;
+            let sum = 0;
+            let best = 0;
+            appData.evaluations.forEach(e => {
+                if (e.average) sum += e.average;
+                if (e.best && e.best > best) best = e.best;
+            });
+            document.getElementById('totalEvals').textContent = total;
+            document.getElementById('avgScore').textContent = total ? (sum / total).toFixed(1) : '0.0';
+            document.getElementById('bestNote').textContent = best.toFixed(1);
         }
 
+        // Projets et activités
         function addProject() {
-            let id = `proj_${Date.now()}`;
-            let html = `<div class="project-container" id="${id}"><div class="form-row"><div class="form-col"><label>Nom</label><input type="text" class="proj-name"></div><div class="form-col"><label>Statut</label><select class="proj-status"><option>Planifié</option><option>En cours</option><option>Terminé</option></select></div></div>
-                <div class="form-row"><div class="form-col"><label>Début</label><input type="date" class="proj-start"></div><div class="form-col"><label>Fin</label><input type="date" class="proj-end"></div></div>
-                <div class="form-group"><label>Description</label><textarea class="proj-desc" rows="2"></textarea></div>
-                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveProject('${id}')">Enregistrer</button><button class="btn btn-danger btn-sm" onclick="removeProject('${id}')">Supprimer</button></div></div>`;
-            document.getElementById('projectsContainer').insertAdjacentHTML('beforeend', html);
-            if (!teacherData.projects) teacherData.projects = [];
-            teacherData.projects.push({id});
-            updateProjectStats();
-            showNotification('Projet créé', 'success');
+            let id = 'proj_' + Date.now();
+            let html = `<div class="project-container" id="${id}">
+                <div class="form-row"><div class="form-col"><label>Nom projet</label><input type="text" class="proj-name" placeholder="Titre"></div>
+                <div class="form-col"><label>Statut</label><select class="proj-status"><option>Planifié</option><option>En cours</option><option>Terminé</option></select></div></div>
+                <div class="form-row"><div class="form-col"><label>Début</label><input type="date" class="proj-start"></div>
+                <div class="form-col"><label>Fin</label><input type="date" class="proj-end"></div></div>
+                <div class="form-group"><label>Description</label><textarea class="proj-desc" rows="2" placeholder="Description"></textarea></div>
+                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveProject('${id}')">Enregistrer</button>
+                <button class="btn btn-danger btn-sm" onclick="removeProject('${id}')">Supprimer</button></div>
+            </div>`;
+            document.getElementById('projectsList').insertAdjacentHTML('afterbegin', html);
+            if (!appData.projects) appData.projects = [];
+            appData.projects.push({ id });
+            updateProjectsStats();
+            showNotification('Nouveau projet', 'success');
         }
 
         function saveProject(id) {
             let el = document.getElementById(id);
-            if(!el) return;
-            let proj = {id, name: el.querySelector('.proj-name')?.value, status: el.querySelector('.proj-status')?.value,
-                startDate: el.querySelector('.proj-start')?.value, endDate: el.querySelector('.proj-end')?.value,
-                description: el.querySelector('.proj-desc')?.value};
-            let idx = teacherData.projects.findIndex(p=>p.id===id);
-            if(idx!==-1) teacherData.projects[idx]=proj;
-            else teacherData.projects.push(proj);
-            updateProjectStats();
-            syncAllData();
+            if (!el) return;
+            let proj = {
+                id, name: el.querySelector('.proj-name')?.value,
+                status: el.querySelector('.proj-status')?.value,
+                startDate: el.querySelector('.proj-start')?.value,
+                endDate: el.querySelector('.proj-end')?.value,
+                description: el.querySelector('.proj-desc')?.value
+            };
+            let idx = appData.projects.findIndex(p => p.id === id);
+            if (idx !== -1) appData.projects[idx] = proj;
+            else appData.projects.push(proj);
+            updateProjectsStats();
+            saveToLocalStorage();
             showNotification('Projet sauvegardé', 'success');
         }
 
         function removeProject(id) {
-            if(confirm('Supprimer ?')) {
+            if (confirm('Supprimer ce projet ?')) {
                 document.getElementById(id)?.remove();
-                teacherData.projects = teacherData.projects.filter(p=>p.id!==id);
-                updateProjectStats();
-                syncAllData();
-                showNotification('Supprimé', 'success');
+                appData.projects = appData.projects.filter(p => p.id !== id);
+                updateProjectsStats();
+                saveToLocalStorage();
+                showNotification('Projet supprimé', 'success');
             }
         }
 
         function addActivity() {
-            let id = `act_${Date.now()}`;
-            let html = `<div class="activity-container" id="${id}"><div class="form-row"><div class="form-col"><label>Nom</label><input type="text" class="act-name"></div><div class="form-col"><label>Type</label><select class="act-type"><option>Sportive</option><option>Culturelle</option></select></div><div class="form-col"><label>Date</label><input type="date" class="act-date"></div></div>
-                <div class="form-group"><label>Description</label><textarea class="act-desc" rows="2"></textarea></div>
-                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveActivity('${id}')">Enregistrer</button><button class="btn btn-danger btn-sm" onclick="removeActivity('${id}')">Supprimer</button></div></div>`;
-            document.getElementById('activitiesContainer').insertAdjacentHTML('beforeend', html);
-            if (!teacherData.activities) teacherData.activities = [];
-            teacherData.activities.push({id});
-            updateProjectStats();
-            showNotification('Activité créée', 'success');
+            let id = 'act_' + Date.now();
+            let html = `<div class="activity-container" id="${id}">
+                <div class="form-row"><div class="form-col"><label>Nom activité</label><input type="text" class="act-name" placeholder="Titre"></div>
+                <div class="form-col"><label>Type</label><select class="act-type"><option>Sportive</option><option>Culturelle</option><option>Artistique</option></select></div>
+                <div class="form-col"><label>Date</label><input type="date" class="act-date"></div></div>
+                <div class="form-group"><label>Description</label><textarea class="act-desc" rows="2" placeholder="Description"></textarea></div>
+                <div class="section-actions"><button class="btn btn-success btn-sm" onclick="saveActivity('${id}')">Enregistrer</button>
+                <button class="btn btn-danger btn-sm" onclick="removeActivity('${id}')">Supprimer</button></div>
+            </div>`;
+            document.getElementById('activitiesList').insertAdjacentHTML('afterbegin', html);
+            if (!appData.activities) appData.activities = [];
+            appData.activities.push({ id });
+            updateProjectsStats();
+            showNotification('Nouvelle activité', 'success');
         }
 
         function saveActivity(id) {
             let el = document.getElementById(id);
-            if(!el) return;
-            let act = {id, name: el.querySelector('.act-name')?.value, type: el.querySelector('.act-type')?.value,
-                date: el.querySelector('.act-date')?.value, description: el.querySelector('.act-desc')?.value};
-            let idx = teacherData.activities.findIndex(a=>a.id===id);
-            if(idx!==-1) teacherData.activities[idx]=act;
-            else teacherData.activities.push(act);
-            updateProjectStats();
-            syncAllData();
+            if (!el) return;
+            let act = {
+                id, name: el.querySelector('.act-name')?.value,
+                type: el.querySelector('.act-type')?.value,
+                date: el.querySelector('.act-date')?.value,
+                description: el.querySelector('.act-desc')?.value
+            };
+            let idx = appData.activities.findIndex(a => a.id === id);
+            if (idx !== -1) appData.activities[idx] = act;
+            else appData.activities.push(act);
+            updateProjectsStats();
+            saveToLocalStorage();
             showNotification('Activité sauvegardée', 'success');
         }
 
         function removeActivity(id) {
-            if(confirm('Supprimer ?')) {
+            if (confirm('Supprimer cette activité ?')) {
                 document.getElementById(id)?.remove();
-                teacherData.activities = teacherData.activities.filter(a=>a.id!==id);
-                updateProjectStats();
-                syncAllData();
-                showNotification('Supprimée', 'success');
+                appData.activities = appData.activities.filter(a => a.id !== id);
+                updateProjectsStats();
+                saveToLocalStorage();
+                showNotification('Activité supprimée', 'success');
             }
         }
 
-        function updateProjectStats() {
-            document.getElementById('totalProjects').textContent = teacherData.projects?.length || 0;
-            document.getElementById('totalActivities').textContent = teacherData.activities?.length || 0;
+        function updateProjectsStats() {
+            document.getElementById('totalProjects').textContent = appData.projects?.length || 0;
+            document.getElementById('totalActivities').textContent = appData.activities?.length || 0;
         }
 
-        function updateDashboard() {
-            document.getElementById('dashboardStats').innerHTML = `<div class="stat-card"><div>Enseignant</div><div class="stat-value">${teacherData.personal.first_name || '-'}</div></div>
-                <div class="stat-card"><div>Matières</div><div class="stat-value">${teacherData.subjects.length}</div></div>
-                <div class="stat-card"><div>Évaluations</div><div class="stat-value">${teacherData.evaluations.length}</div></div>
-                <div class="stat-card"><div>Projets</div><div class="stat-value">${teacherData.projects?.length || 0}</div></div>`;
-            let recent = '<ul>';
-            [...(teacherData.lessons || []), ...(teacherData.evaluations || [])].slice(-5).forEach(i => recent += `<li>${i.title || i.type || 'Élément'} - ${i.date || 'Date?'}</li>`);
-            recent += '</ul>';
-            document.getElementById('recentActivity').innerHTML = recent || '<p>Aucune activité</p>';
+        function removeItem(id, category, arrayName) {
+            if (confirm('Supprimer cet élément ?')) {
+                document.getElementById(id)?.remove();
+                if (appData[category] && appData[category][arrayName]) {
+                    appData[category][arrayName] = appData[category][arrayName].filter(i => i.id !== id);
+                }
+                saveToLocalStorage();
+                showNotification('Supprimé', 'success');
+            }
         }
 
-        function saveToLocalStorage() { try { localStorage.setItem('teacherCompleteData', JSON.stringify(teacherData)); } catch(e){} }
-        function loadSavedData() {
+        function updateSyncedInfo() {
+            let personal = appData.general.personal;
+            let professional = appData.general.professional;
+            let subjects = appData.general.subjects;
+            let html = `<h4><i class="fas fa-sync"></i> Données synchronisées</h4>
+                <p><strong>Enseignant:</strong> ${personal.last_name || ''} ${personal.first_name || ''}</p>
+                <p><strong>Matricule:</strong> ${professional.matricule || ''}</p>
+                <p><strong>Classe(s):</strong> ${professional.current_class || ''}</p>
+                <p><strong>Matières:</strong> ${subjects.map(s => s.name).join(', ') || ''}</p>
+                <p><strong>Heures/semaine:</strong> ${professional.weekly_hours || 0}h</p>`;
+            document.getElementById('syncedInfo').innerHTML = html;
+        }
+
+        // Sauvegarde et chargement
+        function syncAllData() {
+            appData.general = getGeneralData();
+            appData.general.subjects = collectSubjects();
+            appData.pedagogy.lessons = appData.pedagogy.lessons || [];
+            appData.pedagogy.tps = appData.pedagogy.tps || [];
+            appData.pedagogy.resources = appData.pedagogy.resources || [];
+            appData.evaluations = appData.evaluations || [];
+            appData.projects = appData.projects || [];
+            appData.activities = appData.activities || [];
+            updateSyncedInfo();
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
             try {
-                let saved = localStorage.getItem('teacherCompleteData');
-                if(saved) {
+                localStorage.setItem('teacherCompleteAppData', JSON.stringify(appData));
+                document.getElementById('backupInfo').innerHTML = `<p class="text-center"><i class="fas fa-check-circle"></i> Dernière sauvegarde: ${new Date().toLocaleString()}</p>`;
+            } catch(e) { console.error(e); }
+        }
+
+        function loadAllData() {
+            try {
+                let saved = localStorage.getItem('teacherCompleteAppData');
+                if (saved) {
                     let data = JSON.parse(saved);
-                    teacherData = {...teacherData, ...data};
-                    if(data.establishment) { s('establishmentName', data.establishment.name); s('establishmentType', data.establishment.type); s('establishmentAddress', data.establishment.address); s('establishmentPhone', data.establishment.phone); }
-                    if(data.personal) { s('lastName', data.personal.last_name); s('firstName', data.personal.first_name); s('birthDate', data.personal.birth_date); s('birthPlace', data.personal.birth_place); s('address', data.personal.address); s('personalPhone', data.personal.personal_phone); s('personalEmail', data.personal.personal_email); }
-                    if(data.professional) { s('matricule', data.professional.matricule); s('position', data.professional.position); s('professionalCategory', data.professional.professional_category); s('engagementDate', data.professional.engagement_date); s('retirementDate', data.professional.retirement_date); s('weeklyHours', data.professional.weekly_hours); s('currentClass', data.professional.current_class); }
-                    if(data.subjects) { let m=data.subjects.find(s=>s.type==='main'); if(m) s('mainSubject', m.name); let sec=data.subjects.find(s=>s.type==='secondary'); if(sec) s('secondarySubject', sec.name); }
-                    updateEvaluationStats(); updateProjectStats(); updateSyncedInfoDisplay();
+                    appData = { ...appData, ...data };
+                    // Restaurer formulaires généraux
+                    if (appData.general.establishment) {
+                        document.getElementById('establishmentName').value = appData.general.establishment.name || '';
+                        document.getElementById('establishmentType').value = appData.general.establishment.type || '';
+                        document.getElementById('establishmentAddress').value = appData.general.establishment.address || '';
+                        document.getElementById('establishmentPhone').value = appData.general.establishment.phone || '';
+                    }
+                    if (appData.general.personal) {
+                        document.getElementById('lastName').value = appData.general.personal.last_name || '';
+                        document.getElementById('firstName').value = appData.general.personal.first_name || '';
+                        document.getElementById('gender').value = appData.general.personal.gender || '';
+                        document.getElementById('birthDate').value = appData.general.personal.birth_date || '';
+                        document.getElementById('birthPlace').value = appData.general.personal.birth_place || '';
+                        document.getElementById('nationality').value = appData.general.personal.nationality || '';
+                        document.getElementById('address').value = appData.general.personal.address || '';
+                        document.getElementById('personalPhone').value = appData.general.personal.personal_phone || '';
+                        document.getElementById('personalEmail').value = appData.general.personal.personal_email || '';
+                    }
+                    if (appData.general.professional) {
+                        document.getElementById('matricule').value = appData.general.professional.matricule || '';
+                        document.getElementById('position').value = appData.general.professional.position || '';
+                        document.getElementById('professionalCategory').value = appData.general.professional.professional_category || '';
+                        document.getElementById('engagementDate').value = appData.general.professional.engagement_date || '';
+                        document.getElementById('weeklyHours').value = appData.general.professional.weekly_hours || '';
+                        document.getElementById('currentClass').value = appData.general.professional.current_class || '';
+                    }
+                    if (appData.general.subjects && appData.general.subjects.length) {
+                        let main = appData.general.subjects.find(s => s.type === 'main');
+                        let secondary = appData.general.subjects.find(s => s.type === 'secondary');
+                        if (main) document.getElementById('mainSubject').value = main.name;
+                        if (secondary) document.getElementById('secondarySubject').value = secondary.name;
+                        appData.general.subjects.filter(s => s.type === 'additional').forEach((s, i) => {
+                            if (i === 0) addSubjectField();
+                            let inputs = document.querySelectorAll('#subjectsContainer .subject-additional');
+                            if (inputs[i]) inputs[i].value = s.name;
+                        });
+                    }
+                    updateStats();
+                    updateProjectsStats();
+                    displayResources();
                     showNotification('Données chargées', 'success');
                 }
-            } catch(e){}
+            } catch(e) { console.error(e); }
         }
 
         function setupAutoSave() {
-            document.getElementById('teacherForm').addEventListener('input', ()=>syncAllData());
-            document.getElementById('teacherForm').addEventListener('change', ()=>syncAllData());
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.addEventListener('change', () => syncAllData());
+                el.addEventListener('input', () => syncAllData());
+            });
         }
 
-        function addSubjectField() {
-            let div = document.createElement('div'); div.className = 'form-row';
-            div.innerHTML = `<div class="form-col"><label>Matière supp.</label><input type="text" placeholder="Nom"></div><div class="form-col"><button class="btn btn-danger btn-sm" onclick="this.closest('.form-row').remove();syncAllData()"><i class="fas fa-trash"></i> Suppr</button></div>`;
-            document.getElementById('subjectsContainer').appendChild(div);
-        }
-        function removeEl(id) { if(confirm('Supprimer ?')) document.getElementById(id)?.remove(); }
-
-        function exportJSON(tab) {
+        // Export/Import
+        function exportSection(section) {
             let data = {};
-            if(tab==='tab1') data = {establishment:teacherData.establishment, personal:teacherData.personal, professional:teacherData.professional, subjects:teacherData.subjects};
-            if(tab==='tab2') data = {lessons:teacherData.lessons, tps:teacherData.tps};
-            if(tab==='tab3') data = {evaluations:teacherData.evaluations};
-            if(tab==='tab4') data = {projects:teacherData.projects, activities:teacherData.activities};
-            let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})); a.download=`donnees_${tab}_${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(a.href);
+            if (section === 'general') data = appData.general;
+            else if (section === 'pedagogy') data = appData.pedagogy;
+            else if (section === 'evaluations') data = { evaluations: appData.evaluations };
+            else if (section === 'projects') data = { projects: appData.projects, activities: appData.activities };
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+            a.download = `${section}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
             showNotification('Exporté', 'success');
         }
 
-        function importJSON(tab) {
-            let inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
-            inp.onchange=e=>{ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ try{ let data=JSON.parse(ev.target.result); if(tab==='tab1'){ teacherData.establishment=data.establishment||{}; teacherData.personal=data.personal||{}; teacherData.professional=data.professional||{}; teacherData.subjects=data.subjects||[]; loadSavedData(); } if(tab==='tab3' && data.evaluations){ teacherData.evaluations=data.evaluations; updateEvaluationStats(); } if(tab==='tab4'){ if(data.projects) teacherData.projects=data.projects; if(data.activities) teacherData.activities=data.activities; updateProjectStats(); } syncAllData(); showNotification('Import OK','success'); } catch(err){ showNotification('Erreur JSON','error'); } }; r.readAsText(f); }; inp.click();
+        function importSection(section) {
+            let input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                let f = e.target.files[0];
+                if (!f) return;
+                let r = new FileReader();
+                r.onload = ev => {
+                    try {
+                        let data = JSON.parse(ev.target.result);
+                        if (section === 'general') appData.general = { ...appData.general, ...data };
+                        else if (section === 'pedagogy') appData.pedagogy = { ...appData.pedagogy, ...data };
+                        else if (section === 'evaluations' && data.evaluations) appData.evaluations = data.evaluations;
+                        else if (section === 'projects') {
+                            if (data.projects) appData.projects = data.projects;
+                            if (data.activities) appData.activities = data.activities;
+                        }
+                        loadAllData();
+                        showNotification('Import OK', 'success');
+                    } catch(err) { showNotification('Erreur JSON', 'error'); }
+                };
+                r.readAsText(f);
+            };
+            input.click();
         }
 
-        function exportAllJSON() { let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(teacherData,null,2)],{type:'application/json'})); a.download=`complet_${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(a.href); showNotification('Export complet','success'); }
+        function exportAllData() {
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' }));
+            a.download = `complete_data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showNotification('Export complet', 'success');
+        }
+
         function triggerImportFile() { document.getElementById('importFile').click(); }
-        function importAllJSON(input) { let f=input.files[0]; if(!f) return; let r=new FileReader(); r.onload=e=>{ try{ teacherData=JSON.parse(e.target.result); loadSavedData(); showNotification('Import complet','success'); } catch(err){ showNotification('Erreur','error'); } }; r.readAsText(f); input.value=''; }
-        function clearAllData() { if(confirm('Effacer TOUT ?')){ localStorage.clear(); teacherData={establishment:{},personal:{},professional:{},subjects:[],lessons:[],tps:[],evaluations:[],projects:[],activities:[]}; location.reload(); } }
-        function showNotification(msg,type='success'){ let n=document.getElementById('notification'); let t=document.getElementById('notificationMessage'); let i=document.getElementById('notificationIcon'); t.textContent=msg; n.className='notification'; if(type==='error'){ n.classList.add('error'); i.className='fas fa-exclamation-circle'; }else{ n.classList.add('success'); i.className='fas fa-check-circle'; } n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),3000); }
-        function closeModal(){ document.getElementById('genericModal').classList.remove('active'); }
-        document.getElementById('teacherForm').addEventListener('submit',(e)=>{ e.preventDefault(); syncAllData(); showNotification('Sauvegardé','success'); });
+
+        function importAllData(input) {
+            let f = input.files[0];
+            if (!f) return;
+            let r = new FileReader();
+            r.onload = e => {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    loadAllData();
+                    showNotification('Import complet réussi', 'success');
+                } catch(err) { showNotification('Erreur fichier', 'error'); }
+            };
+            r.readAsText(f);
+            input.value = '';
+        }
+
+        function exportToExcel() {
+            let wb = XLSX.utils.book_new();
+            let wsData = [["Section", "Donnée", "Valeur"]];
+            wsData.push(["Établissement", "Nom", appData.general.establishment.name || ""]);
+            wsData.push(["Personnel", "Nom", `${appData.general.personal.last_name || ""} ${appData.general.personal.first_name || ""}`]);
+            wsData.push(["Professionnel", "Matricule", appData.general.professional.matricule || ""]);
+            wsData.push(["Évaluations", "Total", appData.evaluations.length]);
+            wsData.push(["Projets", "Total", appData.projects.length]);
+            wsData.push(["Activités", "Total", appData.activities.length]);
+            let ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Synthèse");
+            XLSX.writeFile(wb, `rapport_enseignant_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showNotification('Excel généré', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('Effacer TOUTES les données ? Action irréversible.')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function showNotification(msg, type = 'success') {
+            let n = document.getElementById('notification');
+            let icon = document.getElementById('notificationIcon');
+            let text = document.getElementById('notificationMessage');
+            text.textContent = msg;
+            n.className = 'notification';
+            if (type === 'error') { n.classList.add('error'); icon.className = 'fas fa-exclamation-circle'; }
+            else { n.classList.add('success'); icon.className = 'fas fa-check-circle'; }
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 3000);
+        }
     </script>
 </body>
 </html>
