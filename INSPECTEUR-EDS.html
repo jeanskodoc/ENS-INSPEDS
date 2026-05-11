@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Gest'Enseignant - Fiche par Enseignant</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
+    <title>Gest'Enseignant - Import Multiple & Synchronisation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
@@ -20,9 +19,8 @@
             --dark: #2c3e50;
             --light: #f8f9fa;
             --gray: #6c757d;
-            --border: #e9ecef;
+            --border: #dee2e6;
             --radius: 10px;
-            --shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         body {
@@ -33,7 +31,7 @@
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: var(--radius);
@@ -41,7 +39,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         }
 
-        /* Header */
         header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             padding: 20px;
@@ -86,6 +83,7 @@
             border-radius: 6px;
             font-size: 0.85rem;
             background: white;
+            cursor: pointer;
         }
         .teacher-info-card {
             background: #e3f2fd;
@@ -103,7 +101,6 @@
             background: var(--light);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
         .tabs { display: flex; list-style: none; min-width: max-content; }
         .tab {
@@ -120,9 +117,8 @@
         }
         .tab:hover { background: #e9ecef; color: var(--dark); }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
-        @media (max-width: 480px) { .tab span { display: none; } .tab i { font-size: 1.1rem; } .tab { padding: 10px 14px; } }
+        @media (max-width: 480px) { .tab span { display: none; } .tab i { font-size: 1.1rem; } }
 
-        /* Tab content */
         .tab-pane { display: none; padding: 20px; animation: fadeIn 0.2s; }
         .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -148,34 +144,27 @@
         .card-header h3 { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
         .card-body { padding: 15px; }
 
-        /* Grids */
         .grid-2, .grid-3 {
             display: grid;
             gap: 12px;
         }
         .grid-2 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
         @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-        /* Form */
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.75rem; color: var(--gray); }
         input, select, textarea {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 0.85rem;
-            transition: all 0.2s;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(52,152,219,0.1);
         }
         textarea { min-height: 60px; resize: vertical; }
 
-        /* Buttons */
         .btn {
             padding: 6px 12px;
             border: none;
@@ -199,8 +188,6 @@
         .btn-warning:hover { background: #d68910; }
         .btn-info { background: var(--info); color: white; }
         .btn-info:hover { background: #8e44ad; }
-        .btn-light { background: var(--light); color: var(--dark); border: 1px solid var(--border); }
-        .btn-light:hover { background: #e9ecef; }
 
         .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
 
@@ -249,40 +236,63 @@
         .badge-success { background: #d4edda; color: #155724; }
         .badge-warning { background: #fff3cd; color: #856404; }
 
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: white;
+        .item-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .mt-2 { margin-top: 8px; }
+
+        /* Zone d'import multiple */
+        .import-zone {
+            border: 2px dashed var(--primary);
             border-radius: var(--radius);
             padding: 20px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
+            text-align: center;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .modal-header {
+        .import-zone:hover {
+            background: #e3f2fd;
+            border-color: var(--primary-dark);
+        }
+        .import-zone.drag-over {
+            background: #d4edda;
+            border-color: var(--success);
+        }
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .file-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            border: 1px solid var(--border);
+        }
+        .sync-progress {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s;
+            width: 0%;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -302,30 +312,13 @@
         }
         .toast.show { opacity: 1; transform: translateX(0); }
         .toast.error { background: var(--danger); }
-
-        .loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1001;
-            align-items: center;
-            justify-content: center;
-        }
-        .loader.active { display: flex; }
-        .spinner { width: 40px; height: 40px; border: 3px solid white; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast.warning { background: var(--warning); }
 
         .text-center { text-align: center; }
-        .mt-2 { margin-top: 8px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="loader" id="loader"><div class="spinner"></div></div>
     <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 
     <div class="container">
@@ -334,21 +327,20 @@
                 <div class="logo"><i class="fas fa-chalkboard-user"></i> Gest'Enseignant</div>
                 <div class="user-badge"><i class="fas fa-user-shield"></i> Inspecteur - <span id="currentYear"></span></div>
             </div>
-            <h1><i class="fas fa-users"></i> Fiche par Enseignant</h1>
-            <p>Sélectionnez un enseignant pour voir ou modifier ses données</p>
+            <h1><i class="fas fa-users"></i> Gestion Multi-Enseignants</h1>
+            <p>Import multiple, synchronisation automatique et filtrage par enseignant</p>
         </header>
 
         <!-- Filtre Enseignant -->
         <div class="filter-bar">
             <div class="filter-label"><i class="fas fa-user-graduate"></i> Enseignant :</div>
-            <select id="teacherSelect" class="teacher-select" onchange="switchTeacher()">
+            <select id="teacherSelect" class="teacher-select">
                 <option value="">-- Sélectionner un enseignant --</option>
             </select>
-            <button class="btn btn-primary btn-sm" onclick="addNewTeacher()"><i class="fas fa-plus"></i> Nouvel enseignant</button>
-            <button class="btn btn-info btn-sm" onclick="showAllTeachers()"><i class="fas fa-list"></i> Liste</button>
+            <button class="btn btn-primary btn-sm" id="btnNewTeacher"><i class="fas fa-plus"></i> Nouveau</button>
+            <button class="btn btn-info btn-sm" id="btnListTeachers"><i class="fas fa-list"></i> Liste</button>
         </div>
 
-        <!-- Info enseignant sélectionné -->
         <div id="selectedTeacherInfo" class="filter-bar" style="background: #e3f2fd; display: none;">
             <div class="teacher-info-card" id="teacherInfoDisplay"></div>
         </div>
@@ -356,18 +348,59 @@
         <!-- Navigation -->
         <div class="tabs-nav">
             <ul class="tabs">
-                <li class="tab active" data-tab="tab-pedagogy"><i class="fas fa-chalkboard"></i><span> Pédagogie</span></li>
+                <li class="tab active" data-tab="tab-import"><i class="fas fa-upload"></i><span> Import Multiple</span></li>
+                <li class="tab" data-tab="tab-pedagogy"><i class="fas fa-chalkboard"></i><span> Pédagogie</span></li>
                 <li class="tab" data-tab="tab-evals"><i class="fas fa-chart-line"></i><span> Évaluations</span></li>
                 <li class="tab" data-tab="tab-data"><i class="fas fa-database"></i><span> Données</span></li>
             </ul>
         </div>
 
+        <!-- ONGLET IMPORT MULTIPLE -->
+        <div id="tab-import" class="tab-pane active">
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-cloud-upload-alt"></i> Import Multiple de Fichiers JSON</h3></div>
+                <div class="card-body">
+                    <div class="import-zone" id="dropZone">
+                        <i class="fas fa-file-upload" style="font-size: 2rem; color: var(--primary);"></i>
+                        <p><strong>Glissez/Déposez vos fichiers JSON ici</strong></p>
+                        <p>ou</p>
+                        <button class="btn btn-primary" id="btnSelectFiles"><i class="fas fa-folder-open"></i> Sélectionner des fichiers</button>
+                        <input type="file" id="fileInput" multiple accept=".json" style="display:none">
+                    </div>
+                    
+                    <div id="selectedFilesList" class="file-list"></div>
+                    
+                    <div class="btn-group" style="margin-top: 15px;">
+                        <button class="btn btn-success" id="btnSyncAll"><i class="fas fa-sync-alt"></i> Synchroniser tous les fichiers</button>
+                        <button class="btn btn-warning" id="btnClearFiles"><i class="fas fa-trash"></i> Effacer la liste</button>
+                    </div>
+                    
+                    <div id="syncProgress" class="sync-progress hidden">
+                        <div><i class="fas fa-spinner fa-spin"></i> Synchronisation en cours...</div>
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        <div id="syncStatus" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-chart-line"></i> Statistiques des enseignants</h3></div>
+                <div class="card-body">
+                    <div class="stats-grid" id="globalStats"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-list"></i> Enseignants enregistrés</h3></div>
+                <div class="card-body" id="teachersList"></div>
+            </div>
+        </div>
+
         <!-- ONGLET PÉDAGOGIE -->
-        <div id="tab-pedagogy" class="tab-pane active">
+        <div id="tab-pedagogy" class="tab-pane">
             <div class="btn-group">
-                <button class="btn btn-info" onclick="exportCurrentTeacher()"><i class="fas fa-download"></i> Exporter JSON</button>
-                <button class="btn btn-warning" onclick="importTeacherData()"><i class="fas fa-upload"></i> Importer JSON</button>
-                <button class="btn btn-success" onclick="exportPedagogyExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+                <button class="btn btn-info" id="btnExportTeacher"><i class="fas fa-download"></i> Exporter JSON</button>
+                <button class="btn btn-success" id="btnExportPedagogyExcel"><i class="fas fa-file-excel"></i> Excel</button>
             </div>
 
             <div class="card">
@@ -387,7 +420,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-book-open"></i> Leçons</h3>
-                    <button class="btn btn-primary btn-sm" onclick="addLesson()"><i class="fas fa-plus"></i> Ajouter</button>
+                    <button class="btn btn-primary btn-sm" id="btnAddLesson"><i class="fas fa-plus"></i> Ajouter</button>
                 </div>
                 <div class="card-body" id="lessonsList"></div>
             </div>
@@ -395,7 +428,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-flask"></i> Travaux Pratiques</h3>
-                    <button class="btn btn-primary btn-sm" onclick="addTP()"><i class="fas fa-plus"></i> Ajouter</button>
+                    <button class="btn btn-primary btn-sm" id="btnAddTP"><i class="fas fa-plus"></i> Ajouter</button>
                 </div>
                 <div class="card-body" id="tpList"></div>
             </div>
@@ -404,10 +437,9 @@
         <!-- ONGLET ÉVALUATIONS -->
         <div id="tab-evals" class="tab-pane">
             <div class="btn-group">
-                <button class="btn btn-info" onclick="exportCurrentTeacher()"><i class="fas fa-download"></i> Exporter JSON</button>
-                <button class="btn btn-warning" onclick="importTeacherData()"><i class="fas fa-upload"></i> Importer JSON</button>
-                <button class="btn btn-success" onclick="exportEvalsExcel()"><i class="fas fa-file-excel"></i> Excel</button>
-                <button class="btn btn-primary btn-sm" onclick="addEvaluation()"><i class="fas fa-plus"></i> Nouvelle</button>
+                <button class="btn btn-info" id="btnExportTeacher2"><i class="fas fa-download"></i> Exporter JSON</button>
+                <button class="btn btn-success" id="btnExportEvalsExcel"><i class="fas fa-file-excel"></i> Excel</button>
+                <button class="btn btn-primary btn-sm" id="btnAddEvaluation"><i class="fas fa-plus"></i> Nouvelle</button>
             </div>
 
             <div class="stats-grid">
@@ -432,11 +464,9 @@
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-success" onclick="exportAllTeachers()"><i class="fas fa-download"></i> Exporter tous (JSON)</button>
-                <button class="btn btn-warning" onclick="triggerImportAll()"><i class="fas fa-upload"></i> Importer JSON</button>
-                <button class="btn btn-danger" onclick="deleteCurrentTeacher()"><i class="fas fa-trash"></i> Supprimer cet enseignant</button>
+                <button class="btn btn-success" id="btnExportAll"><i class="fas fa-download"></i> Exporter tous (JSON)</button>
+                <button class="btn btn-danger" id="btnDeleteTeacher"><i class="fas fa-trash"></i> Supprimer cet enseignant</button>
             </div>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllTeachers(this)">
 
             <div class="card mt-2">
                 <div class="card-header"><h3><i class="fas fa-history"></i> Sauvegarde</h3></div>
@@ -445,21 +475,26 @@
         </div>
     </div>
 
-    <div class="modal" id="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle"></h3><button class="btn btn-light btn-sm" onclick="closeModal()">&times;</button></div><div id="modalBody"></div></div></div>
-
     <script>
-        // Structure : liste des enseignants
+        // Structure des données
         let allTeachers = [];
         let currentTeacherId = null;
+        let currentLessons = [];
+        let currentTPs = [];
+        let currentEvaluations = [];
+        let pendingFiles = [];
 
         // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('currentYear').innerHTML = new Date().getFullYear();
             initTabs();
+            initButtons();
+            initDragAndDrop();
             loadAllData();
             updateTeacherSelect();
+            updateGlobalStats();
             setupAutoSave();
-            toast('Application prête', 'success');
+            showToast('Application prête', 'success');
         });
 
         function initTabs() {
@@ -469,78 +504,199 @@
                     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.tab).classList.add('active');
+                    if (this.dataset.tab === 'tab-import') updateGlobalStats();
                 });
             });
         }
 
-        // ========== GESTION DES ENSEIGNANTS ==========
+        function initButtons() {
+            document.getElementById('btnNewTeacher').addEventListener('click', addNewTeacher);
+            document.getElementById('btnListTeachers').addEventListener('click', showAllTeachers);
+            document.getElementById('btnExportTeacher').addEventListener('click', exportCurrentTeacher);
+            document.getElementById('btnExportTeacher2').addEventListener('click', exportCurrentTeacher);
+            document.getElementById('btnExportPedagogyExcel').addEventListener('click', exportPedagogyExcel);
+            document.getElementById('btnExportEvalsExcel').addEventListener('click', exportEvalsExcel);
+            document.getElementById('btnExportAll').addEventListener('click', exportAllTeachers);
+            document.getElementById('btnDeleteTeacher').addEventListener('click', deleteCurrentTeacher);
+            document.getElementById('btnAddLesson').addEventListener('click', addLesson);
+            document.getElementById('btnAddTP').addEventListener('click', addTP);
+            document.getElementById('btnAddEvaluation').addEventListener('click', addEvaluation);
+            document.getElementById('teacherSelect').addEventListener('change', switchTeacher);
+            
+            // Import multiple
+            document.getElementById('btnSelectFiles').addEventListener('click', () => document.getElementById('fileInput').click());
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+            document.getElementById('btnSyncAll').addEventListener('click', syncAllFiles);
+            document.getElementById('btnClearFiles').addEventListener('click', clearFileList);
+        }
+
+        function initDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.json'));
+                if (files.length > 0) {
+                    addFilesToList(files);
+                } else {
+                    showToast('Veuillez déposer des fichiers JSON', 'warning');
+                }
+            });
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            addFilesToList(files);
+            e.target.value = '';
+        }
+
+        function addFilesToList(files) {
+            files.forEach(file => {
+                if (!pendingFiles.some(f => f.name === file.name)) {
+                    pendingFiles.push(file);
+                }
+            });
+            updateFileListDisplay();
+            showToast(`${files.length} fichier(s) ajouté(s)`, 'success');
+        }
+
+        function updateFileListDisplay() {
+            const container = document.getElementById('selectedFilesList');
+            if (pendingFiles.length === 0) {
+                container.innerHTML = '<div class="text-center" style="color: var(--gray); padding: 20px;">Aucun fichier sélectionné</div>';
+                return;
+            }
+            
+            container.innerHTML = pendingFiles.map((file, index) => `
+                <div class="file-item">
+                    <span><i class="fas fa-file-code"></i> ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
+                    <button class="btn btn-danger btn-sm" onclick="removeFile(${index})"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(index) {
+            pendingFiles.splice(index, 1);
+            updateFileListDisplay();
+        }
+
+        function clearFileList() {
+            pendingFiles = [];
+            updateFileListDisplay();
+            showToast('Liste effacée', 'success');
+        }
+
+        async function syncAllFiles() {
+            if (pendingFiles.length === 0) {
+                showToast('Aucun fichier à synchroniser', 'warning');
+                return;
+            }
+            
+            const progressDiv = document.getElementById('syncProgress');
+            const progressFill = document.getElementById('progressFill');
+            const syncStatus = document.getElementById('syncStatus');
+            
+            progressDiv.classList.remove('hidden');
+            let imported = 0;
+            let merged = 0;
+            let errors = 0;
+            
+            for (let i = 0; i < pendingFiles.length; i++) {
+                const file = pendingFiles[i];
+                progressFill.style.width = `${((i + 1) / pendingFiles.length) * 100}%`;
+                syncStatus.innerHTML = `Traitement de ${file.name}...`;
+                
+                try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    const result = processImportedData(data, file.name);
+                    if (result === 'imported') imported++;
+                    else if (result === 'merged') merged++;
+                    else errors++;
+                } catch (error) {
+                    errors++;
+                    console.error('Erreur lecture fichier:', error);
+                }
+            }
+            
+            progressFill.style.width = '100%';
+            syncStatus.innerHTML = `✅ Terminé ! ${imported} importé(s), ${merged} fusionné(s), ${errors} erreur(s)`;
+            
+            setTimeout(() => {
+                progressDiv.classList.add('hidden');
+                progressFill.style.width = '0%';
+            }, 3000);
+            
+            clearFileList();
+            updateTeacherSelect();
+            updateGlobalStats();
+            showToast(`Synchronisation terminée: ${imported + merged} enseignant(s) traité(s)`, 'success');
+        }
+
+        function processImportedData(data, filename) {
+            // Si c'est un fichier d'enseignant unique
+            if (data.id && data.info) {
+                const existingIndex = allTeachers.findIndex(t => t.id === data.id);
+                if (existingIndex !== -1) {
+                    // Fusionner les données
+                    const existing = allTeachers[existingIndex];
+                    if (data.lessons) existing.lessons = [...existing.lessons, ...data.lessons];
+                    if (data.tps) existing.tps = [...existing.tps, ...data.tps];
+                    if (data.evaluations) existing.evaluations = [...existing.evaluations, ...data.evaluations];
+                    if (data.info && !existing.info.name) existing.info = data.info;
+                    allTeachers[existingIndex] = existing;
+                    return 'merged';
+                } else {
+                    allTeachers.push(data);
+                    return 'imported';
+                }
+            }
+            // Si c'est un tableau d'enseignants
+            else if (Array.isArray(data)) {
+                data.forEach(teacher => {
+                    const existingIndex = allTeachers.findIndex(t => t.id === teacher.id);
+                    if (existingIndex === -1) {
+                        allTeachers.push(teacher);
+                    } else {
+                        const existing = allTeachers[existingIndex];
+                        if (teacher.lessons) existing.lessons = [...existing.lessons, ...teacher.lessons];
+                        if (teacher.tps) existing.tps = [...existing.tps, ...teacher.tps];
+                        if (teacher.evaluations) existing.evaluations = [...existing.evaluations, ...teacher.evaluations];
+                        if (teacher.info && !existing.info.name) existing.info = teacher.info;
+                    }
+                });
+                return 'imported';
+            }
+            // Si c'est un fichier avec structure différente (pédagogie seule)
+            else if (data.teacher && currentTeacherId) {
+                const teacher = getCurrentTeacher();
+                if (data.lessons) teacher.lessons = [...teacher.lessons, ...data.lessons];
+                if (data.tps) teacher.tps = [...teacher.tps, ...data.tps];
+                saveCurrentTeacher();
+                saveAllToLocalStorage();
+                if (currentTeacherId === teacher.id) loadTeacherToUI(currentTeacherId);
+                return 'merged';
+            }
+            return 'error';
+        }
+
         function getCurrentTeacher() {
             if (!currentTeacherId) return null;
             return allTeachers.find(t => t.id === currentTeacherId);
         }
 
-        function getTeacherData(teacher) {
-            if (!teacher) return { id: null, info: {}, lessons: [], tps: [], evaluations: [] };
-            return teacher;
-        }
-
-        function updateTeacherSelect() {
-            let select = document.getElementById('teacherSelect');
-            select.innerHTML = '<option value="">-- Sélectionner un enseignant --</option>';
-            allTeachers.forEach(teacher => {
-                let option = document.createElement('option');
-                option.value = teacher.id;
-                option.textContent = `${teacher.info?.name || 'Sans nom'} (${teacher.info?.matricule || 'N°'})`;
-                if (teacher.id === currentTeacherId) option.selected = true;
-                select.appendChild(option);
-            });
-        }
-
-        function updateTeacherInfoDisplay() {
-            let teacher = getCurrentTeacher();
-            let container = document.getElementById('teacherInfoDisplay');
-            let infoDiv = document.getElementById('selectedTeacherInfo');
-            
-            if (teacher && teacher.info) {
-                container.innerHTML = `
-                    <span><i class="fas fa-user"></i> ${teacher.info.name || '-'}</span>
-                    <span><i class="fas fa-id-card"></i> ${teacher.info.matricule || '-'}</span>
-                    <span><i class="fas fa-school"></i> ${teacher.info.school || '-'}</span>
-                    <span><i class="fas fa-book"></i> ${teacher.info.mainSubject || '-'}</span>
-                    <span><i class="fas fa-users"></i> ${teacher.info.class || '-'}</span>
-                    <span><i class="fas fa-clock"></i> ${teacher.info.weeklyHours || 0}h</span>
-                `;
-                infoDiv.style.display = 'block';
-            } else {
-                infoDiv.style.display = 'none';
-            }
-        }
-
-        function switchTeacher() {
-            let select = document.getElementById('teacherSelect');
-            let newId = select.value;
-            
-            // Sauvegarder l'enseignant actuel si modifié
-            if (currentTeacherId) {
-                saveCurrentTeacherToArray();
-            }
-            
-            currentTeacherId = newId || null;
-            
-            if (currentTeacherId) {
-                loadTeacherToUI(currentTeacherId);
-            } else {
-                clearUI();
-            }
-            
-            updateTeacherInfoDisplay();
-            updateAllStats();
-            toast(currentTeacherId ? 'Enseignant chargé' : 'Aucun enseignant sélectionné', 'success');
-        }
-
-        function saveCurrentTeacherToArray() {
+        function saveCurrentTeacher() {
             if (!currentTeacherId) return;
-            
             let teacher = getCurrentTeacher();
             if (teacher) {
                 teacher.info = {
@@ -551,9 +707,9 @@
                     class: getVal('teacherClass'),
                     weeklyHours: getVal('weeklyHours')
                 };
-                teacher.lessons = currentLessons;
-                teacher.tps = currentTPs;
-                teacher.evaluations = currentEvaluations;
+                teacher.lessons = [...currentLessons];
+                teacher.tps = [...currentTPs];
+                teacher.evaluations = [...currentEvaluations];
             }
         }
 
@@ -561,7 +717,6 @@
             let teacher = allTeachers.find(t => t.id === teacherId);
             if (!teacher) return;
             
-            // Charger les infos
             setVal('teacherName', teacher.info?.name || '');
             setVal('teacherMatricule', teacher.info?.matricule || '');
             setVal('teacherSchool', teacher.info?.school || '');
@@ -569,21 +724,220 @@
             setVal('teacherClass', teacher.info?.class || '');
             setVal('weeklyHours', teacher.info?.weeklyHours || '');
             
-            // Charger les leçons
-            currentLessons = teacher.lessons || [];
-            document.getElementById('lessonsList').innerHTML = '';
-            currentLessons.forEach(l => restoreLesson(l));
+            currentLessons = teacher.lessons ? [...teacher.lessons] : [];
+            currentTPs = teacher.tps ? [...teacher.tps] : [];
+            currentEvaluations = teacher.evaluations ? [...teacher.evaluations] : [];
             
-            // Charger les TP
-            currentTPs = teacher.tps || [];
-            document.getElementById('tpList').innerHTML = '';
-            currentTPs.forEach(t => restoreTP(t));
-            
-            // Charger les évaluations
-            currentEvaluations = teacher.evaluations || [];
-            document.getElementById('evalsList').innerHTML = '';
-            currentEvaluations.forEach(e => restoreEval(e));
+            refreshLessonsList();
+            refreshTPList();
+            refreshEvalsList();
             updateEvalStats();
+            updateDataStats();
+            updateTeacherInfoDisplay();
+        }
+
+        function refreshLessonsList() {
+            let container = document.getElementById('lessonsList');
+            if (!container) return;
+            container.innerHTML = '';
+            currentLessons.forEach(lesson => {
+                container.appendChild(createLessonElement(lesson));
+            });
+        }
+
+        function refreshTPList() {
+            let container = document.getElementById('tpList');
+            if (!container) return;
+            container.innerHTML = '';
+            currentTPs.forEach(tp => {
+                container.appendChild(createTPElement(tp));
+            });
+        }
+
+        function refreshEvalsList() {
+            let container = document.getElementById('evalsList');
+            if (!container) return;
+            container.innerHTML = '';
+            currentEvaluations.forEach(evalData => {
+                container.appendChild(createEvalElement(evalData));
+            });
+        }
+
+        function createLessonElement(lesson) {
+            let div = document.createElement('div');
+            div.className = 'item-card';
+            div.id = lesson.id;
+            div.innerHTML = `
+                <div class="item-header">
+                    <span class="item-title"><i class="fas fa-book"></i> ${escapeHtml(lesson.title) || 'Leçon'}</span>
+                    <span class="badge badge-info">${lesson.date || ''}</span>
+                </div>
+                <div class="grid-2">
+                    <input type="text" class="l-title" value="${escapeHtml(lesson.title || '')}" placeholder="Titre">
+                    <input type="date" class="l-date" value="${lesson.date || ''}">
+                    <input type="text" class="l-subject" value="${escapeHtml(lesson.subject || '')}" placeholder="Matière">
+                    <input type="text" class="l-class" value="${escapeHtml(lesson.class || '')}" placeholder="Classe">
+                </div>
+                <textarea class="l-objectives" rows="2" placeholder="Objectifs">${escapeHtml(lesson.objectives || '')}</textarea>
+                <div class="item-actions mt-2">
+                    <button class="btn btn-success btn-sm" onclick="saveLesson('${lesson.id}')"><i class="fas fa-save"></i> OK</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteLesson('${lesson.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            return div;
+        }
+
+        function createTPElement(tp) {
+            let div = document.createElement('div');
+            div.className = 'item-card';
+            div.id = tp.id;
+            div.innerHTML = `
+                <div class="item-header">
+                    <span class="item-title"><i class="fas fa-flask"></i> ${escapeHtml(tp.title) || 'TP'}</span>
+                    <span class="badge badge-warning">${tp.date || ''}</span>
+                </div>
+                <div class="grid-2">
+                    <input type="text" class="tp-title" value="${escapeHtml(tp.title || '')}" placeholder="Titre">
+                    <input type="date" class="tp-date" value="${tp.date || ''}">
+                    <input type="text" class="tp-subject" value="${escapeHtml(tp.subject || '')}" placeholder="Matière">
+                    <input type="number" class="tp-duration" value="${tp.duration || 2}" placeholder="Durée (h)">
+                </div>
+                <textarea class="tp-desc" rows="2" placeholder="Description">${escapeHtml(tp.description || '')}</textarea>
+                <div class="item-actions mt-2">
+                    <button class="btn btn-success btn-sm" onclick="saveTP('${tp.id}')"><i class="fas fa-save"></i> OK</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTP('${tp.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            return div;
+        }
+
+        function createEvalElement(evalData) {
+            let div = document.createElement('div');
+            div.className = 'item-card';
+            div.id = evalData.id;
+            div.innerHTML = `
+                <div class="item-header">
+                    <span class="item-title"><i class="fas fa-clipboard-list"></i> ${escapeHtml(evalData.type) || 'Évaluation'}</span>
+                    <span class="badge badge-success">${evalData.date || ''}</span>
+                </div>
+                <div class="grid-3">
+                    <select class="e-type">
+                        <option ${evalData.type === 'Devoir' ? 'selected' : ''}>Devoir</option>
+                        <option ${evalData.type === 'Examen' ? 'selected' : ''}>Examen</option>
+                        <option ${evalData.type === 'Oral' ? 'selected' : ''}>Oral</option>
+                        <option ${evalData.type === 'TP' ? 'selected' : ''}>TP</option>
+                    </select>
+                    <input type="text" class="e-subject" value="${escapeHtml(evalData.subject || '')}" placeholder="Matière">
+                    <input type="date" class="e-date" value="${evalData.date || ''}">
+                </div>
+                <div class="grid-3">
+                    <input type="number" class="e-avg" step="0.5" value="${evalData.average || 0}" placeholder="Moyenne">
+                    <input type="number" class="e-best" step="0.5" value="${evalData.best || 0}" placeholder="Meilleure">
+                    <input type="number" class="e-worst" step="0.5" value="${evalData.worst || 0}" placeholder="Plus basse">
+                </div>
+                <div class="grid-2">
+                    <input type="number" class="e-students" value="${evalData.students || 25}" placeholder="Nb élèves">
+                    <input type="number" class="e-coef" value="${evalData.coefficient || 1}" placeholder="Coefficient">
+                </div>
+                <textarea class="e-comments" rows="2" placeholder="Commentaires">${escapeHtml(evalData.comments || '')}</textarea>
+                <div class="item-actions mt-2">
+                    <button class="btn btn-success btn-sm" onclick="saveEvaluation('${evalData.id}')"><i class="fas fa-save"></i> OK</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteEvaluation('${evalData.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            return div;
+        }
+
+        function updateTeacherSelect() {
+            let select = document.getElementById('teacherSelect');
+            select.innerHTML = '<option value="">-- Sélectionner un enseignant --</option>';
+            allTeachers.forEach(teacher => {
+                let option = document.createElement('option');
+                option.value = teacher.id;
+                option.textContent = `${teacher.info?.name || 'Sans nom'} (${teacher.info?.matricule || 'N°'}) - ${teacher.lessons?.length || 0} leçons, ${teacher.evaluations?.length || 0} évals`;
+                if (teacher.id === currentTeacherId) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        function updateTeacherInfoDisplay() {
+            let teacher = getCurrentTeacher();
+            let container = document.getElementById('teacherInfoDisplay');
+            let infoDiv = document.getElementById('selectedTeacherInfo');
+            
+            if (teacher && teacher.info && teacher.info.name) {
+                container.innerHTML = `
+                    <span><i class="fas fa-user"></i> ${escapeHtml(teacher.info.name) || '-'}</span>
+                    <span><i class="fas fa-id-card"></i> ${escapeHtml(teacher.info.matricule) || '-'}</span>
+                    <span><i class="fas fa-school"></i> ${escapeHtml(teacher.info.school) || '-'}</span>
+                    <span><i class="fas fa-book"></i> ${escapeHtml(teacher.info.mainSubject) || '-'}</span>
+                    <span><i class="fas fa-users"></i> ${escapeHtml(teacher.info.class) || '-'}</span>
+                    <span><i class="fas fa-clock"></i> ${teacher.info.weeklyHours || 0}h</span>
+                `;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        function updateGlobalStats() {
+            const totalTeachers = allTeachers.length;
+            const totalLessons = allTeachers.reduce((sum, t) => sum + (t.lessons?.length || 0), 0);
+            const totalTPs = allTeachers.reduce((sum, t) => sum + (t.tps?.length || 0), 0);
+            const totalEvals = allTeachers.reduce((sum, t) => sum + (t.evaluations?.length || 0), 0);
+            
+            const container = document.getElementById('globalStats');
+            if (container) {
+                container.innerHTML = `
+                    <div class="stat-card"><div class="stat-value">${totalTeachers}</div><div class="stat-label">Enseignants</div></div>
+                    <div class="stat-card"><div class="stat-value">${totalLessons}</div><div class="stat-label">Total Leçons</div></div>
+                    <div class="stat-card"><div class="stat-value">${totalTPs}</div><div class="stat-label">Total TP</div></div>
+                    <div class="stat-card"><div class="stat-value">${totalEvals}</div><div class="stat-label">Total Évaluations</div></div>
+                `;
+            }
+            
+            const teachersContainer = document.getElementById('teachersList');
+            if (teachersContainer) {
+                if (allTeachers.length === 0) {
+                    teachersContainer.innerHTML = '<div class="text-center" style="color: var(--gray); padding: 20px;">Aucun enseignant enregistré</div>';
+                } else {
+                    teachersContainer.innerHTML = allTeachers.map(t => `
+                        <div class="file-item" style="cursor: pointer;" onclick="selectTeacherById('${t.id}')">
+                            <span><i class="fas fa-user"></i> <strong>${escapeHtml(t.info?.name || 'Sans nom')}</strong> - ${escapeHtml(t.info?.matricule || 'N°')}</span>
+                            <span class="badge badge-info">${t.lessons?.length || 0} leçons</span>
+                            <span class="badge badge-success">${t.evaluations?.length || 0} évals</span>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function selectTeacherById(id) {
+            currentTeacherId = id;
+            document.getElementById('teacherSelect').value = id;
+            loadTeacherToUI(id);
+            updateTeacherInfoDisplay();
+            document.querySelector('.tab[data-tab="tab-pedagogy"]').click();
+            showToast('Enseignant sélectionné', 'success');
+        }
+
+        function switchTeacher() {
+            let select = document.getElementById('teacherSelect');
+            let newId = select.value;
+            
+            if (currentTeacherId) saveCurrentTeacher();
+            
+            currentTeacherId = newId || null;
+            
+            if (currentTeacherId) {
+                loadTeacherToUI(currentTeacherId);
+            } else {
+                clearUI();
+            }
+            
+            updateTeacherInfoDisplay();
+            saveAllToLocalStorage();
+            showToast(currentTeacherId ? 'Enseignant chargé' : 'Aucun enseignant sélectionné', 'success');
         }
 
         function clearUI() {
@@ -593,13 +947,14 @@
             setVal('mainSubject', '');
             setVal('teacherClass', '');
             setVal('weeklyHours', '');
-            document.getElementById('lessonsList').innerHTML = '';
-            document.getElementById('tpList').innerHTML = '';
-            document.getElementById('evalsList').innerHTML = '';
             currentLessons = [];
             currentTPs = [];
             currentEvaluations = [];
+            refreshLessonsList();
+            refreshTPList();
+            refreshEvalsList();
             updateEvalStats();
+            updateDataStats();
         }
 
         function addNewTeacher() {
@@ -616,213 +971,188 @@
             updateTeacherSelect();
             loadTeacherToUI(newId);
             updateTeacherInfoDisplay();
+            updateGlobalStats();
             saveAllToLocalStorage();
-            toast('Nouvel enseignant créé', 'success');
+            showToast('Nouvel enseignant créé', 'success');
         }
 
         function deleteCurrentTeacher() {
             if (!currentTeacherId) {
-                toast('Aucun enseignant sélectionné', 'warning');
+                showToast('Aucun enseignant sélectionné', 'warning');
                 return;
             }
-            if (confirm('Supprimer cet enseignant ?')) {
+            if (confirm('Supprimer cet enseignant ? Cette action est irréversible.')) {
                 allTeachers = allTeachers.filter(t => t.id !== currentTeacherId);
                 currentTeacherId = null;
                 updateTeacherSelect();
                 clearUI();
                 updateTeacherInfoDisplay();
+                updateGlobalStats();
                 saveAllToLocalStorage();
-                toast('Enseignant supprimé', 'success');
+                showToast('Enseignant supprimé', 'success');
             }
         }
 
         function showAllTeachers() {
+            if (allTeachers.length === 0) {
+                showToast('Aucun enseignant enregistré', 'warning');
+                return;
+            }
             let list = allTeachers.map(t => `${t.info?.name || 'Sans nom'} - ${t.info?.matricule || 'N°'} (${t.lessons?.length || 0} leçons, ${t.evaluations?.length || 0} évaluations)`).join('\n');
-            alert('Liste des enseignants :\n' + (list || 'Aucun enseignant'));
+            alert('📋 Liste des enseignants :\n\n' + list);
         }
 
-        // ========== DONNÉES COURANTES ==========
-        let currentLessons = [];
-        let currentTPs = [];
-        let currentEvaluations = [];
-
-        function getVal(id) { return document.getElementById(id)?.value || ''; }
-        function setVal(id, val) { let el = document.getElementById(id); if (el) el.value = val || ''; }
-
-        // ========== PÉDAGOGIE ==========
+        // ========== CRUD Opérations ==========
         function addLesson() {
             let id = 'l_' + Date.now();
-            let html = `<div class="item-card" id="${id}">
-                <div class="item-header"><span class="item-title"><i class="fas fa-book"></i> Nouvelle leçon</span><span class="badge badge-info">${new Date().toLocaleDateString()}</span></div>
-                <div class="grid-2">
-                    <input type="text" class="l-title" placeholder="Titre">
-                    <input type="date" class="l-date" value="${new Date().toISOString().split('T')[0]}">
-                    <input type="text" class="l-subject" placeholder="Matière" value="${getVal('mainSubject')}">
-                    <input type="text" class="l-class" placeholder="Classe" value="${getVal('teacherClass')}">
-                </div>
-                <textarea class="l-objectives" rows="2" placeholder="Objectifs"></textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveLesson('${id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delLesson('${id}')"><i class="fas fa-trash"></i></button></div>
-            </div>`;
-            document.getElementById('lessonsList').insertAdjacentHTML('beforeend', html);
-            toast('Leçon ajoutée', 'success');
+            let newLesson = {
+                id: id,
+                title: '',
+                date: new Date().toISOString().split('T')[0],
+                subject: getVal('mainSubject'),
+                class: getVal('teacherClass'),
+                objectives: ''
+            };
+            currentLessons.push(newLesson);
+            refreshLessonsList();
+            saveCurrentTeacher();
+            saveAllToLocalStorage();
+            showToast('Leçon ajoutée', 'success');
         }
 
         function saveLesson(id) {
-            let el = document.getElementById(id);
+            let lessonDiv = document.getElementById(id);
+            if (!lessonDiv) return;
+            
             let lesson = {
-                id, title: el.querySelector('.l-title')?.value, date: el.querySelector('.l-date')?.value,
-                subject: el.querySelector('.l-subject')?.value, class: el.querySelector('.l-class')?.value,
-                objectives: el.querySelector('.l-objectives')?.value
+                id: id,
+                title: lessonDiv.querySelector('.l-title')?.value || '',
+                date: lessonDiv.querySelector('.l-date')?.value || '',
+                subject: lessonDiv.querySelector('.l-subject')?.value || '',
+                class: lessonDiv.querySelector('.l-class')?.value || '',
+                objectives: lessonDiv.querySelector('.l-objectives')?.value || ''
             };
-            let idx = currentLessons.findIndex(l => l.id === id);
-            if (idx !== -1) currentLessons[idx] = lesson;
-            else currentLessons.push(lesson);
-            saveCurrentTeacherToArray();
+            
+            let index = currentLessons.findIndex(l => l.id === id);
+            if (index !== -1) currentLessons[index] = lesson;
+            saveCurrentTeacher();
             saveAllToLocalStorage();
-            toast('Leçon sauvegardée', 'success');
+            showToast('Leçon sauvegardée', 'success');
         }
 
-        function delLesson(id) {
+        function deleteLesson(id) {
             if (confirm('Supprimer cette leçon ?')) {
-                document.getElementById(id)?.remove();
                 currentLessons = currentLessons.filter(l => l.id !== id);
-                saveCurrentTeacherToArray();
+                refreshLessonsList();
+                saveCurrentTeacher();
                 saveAllToLocalStorage();
-                toast('Leçon supprimée', 'success');
+                showToast('Leçon supprimée', 'success');
             }
         }
 
         function addTP() {
             let id = 'tp_' + Date.now();
-            let html = `<div class="item-card" id="${id}">
-                <div class="item-header"><span class="item-title"><i class="fas fa-flask"></i> Nouveau TP</span><span class="badge badge-warning">${new Date().toLocaleDateString()}</span></div>
-                <div class="grid-2">
-                    <input type="text" class="tp-title" placeholder="Titre">
-                    <input type="date" class="tp-date" value="${new Date().toISOString().split('T')[0]}">
-                    <input type="text" class="tp-subject" placeholder="Matière" value="${getVal('mainSubject')}">
-                    <input type="number" class="tp-duration" placeholder="Durée (h)" min="1" max="8" value="2">
-                </div>
-                <textarea class="tp-desc" rows="2" placeholder="Description"></textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveTP('${id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delTP('${id}')"><i class="fas fa-trash"></i></button></div>
-            </div>`;
-            document.getElementById('tpList').insertAdjacentHTML('beforeend', html);
-            toast('TP ajouté', 'success');
+            let newTP = {
+                id: id,
+                title: '',
+                date: new Date().toISOString().split('T')[0],
+                subject: getVal('mainSubject'),
+                duration: 2,
+                description: ''
+            };
+            currentTPs.push(newTP);
+            refreshTPList();
+            saveCurrentTeacher();
+            saveAllToLocalStorage();
+            showToast('TP ajouté', 'success');
         }
 
         function saveTP(id) {
-            let el = document.getElementById(id);
+            let tpDiv = document.getElementById(id);
+            if (!tpDiv) return;
+            
             let tp = {
-                id, title: el.querySelector('.tp-title')?.value, date: el.querySelector('.tp-date')?.value,
-                subject: el.querySelector('.tp-subject')?.value, duration: el.querySelector('.tp-duration')?.value,
-                description: el.querySelector('.tp-desc')?.value
+                id: id,
+                title: tpDiv.querySelector('.tp-title')?.value || '',
+                date: tpDiv.querySelector('.tp-date')?.value || '',
+                subject: tpDiv.querySelector('.tp-subject')?.value || '',
+                duration: tpDiv.querySelector('.tp-duration')?.value || 2,
+                description: tpDiv.querySelector('.tp-desc')?.value || ''
             };
-            let idx = currentTPs.findIndex(t => t.id === id);
-            if (idx !== -1) currentTPs[idx] = tp;
-            else currentTPs.push(tp);
-            saveCurrentTeacherToArray();
+            
+            let index = currentTPs.findIndex(t => t.id === id);
+            if (index !== -1) currentTPs[index] = tp;
+            saveCurrentTeacher();
             saveAllToLocalStorage();
-            toast('TP sauvegardé', 'success');
+            showToast('TP sauvegardé', 'success');
         }
 
-        function delTP(id) {
+        function deleteTP(id) {
             if (confirm('Supprimer ce TP ?')) {
-                document.getElementById(id)?.remove();
                 currentTPs = currentTPs.filter(t => t.id !== id);
-                saveCurrentTeacherToArray();
+                refreshTPList();
+                saveCurrentTeacher();
                 saveAllToLocalStorage();
-                toast('TP supprimé', 'success');
+                showToast('TP supprimé', 'success');
             }
         }
 
-        function restoreLesson(l) {
-            let html = `<div class="item-card" id="${l.id}"><div class="item-header"><span class="item-title"><i class="fas fa-book"></i> ${l.title || 'Leçon'}</span><span class="badge badge-info">${l.date || ''}</span></div>
-                <div class="grid-2"><input type="text" class="l-title" value="${l.title || ''}"><input type="date" class="l-date" value="${l.date || ''}">
-                <input type="text" class="l-subject" value="${l.subject || ''}"><input type="text" class="l-class" value="${l.class || ''}"></div>
-                <textarea class="l-objectives" rows="2">${l.objectives || ''}</textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveLesson('${l.id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delLesson('${l.id}')"><i class="fas fa-trash"></i></button></div></div>`;
-            document.getElementById('lessonsList').insertAdjacentHTML('beforeend', html);
-        }
-
-        function restoreTP(t) {
-            let html = `<div class="item-card" id="${t.id}"><div class="item-header"><span class="item-title"><i class="fas fa-flask"></i> ${t.title || 'TP'}</span><span class="badge badge-warning">${t.date || ''}</span></div>
-                <div class="grid-2"><input type="text" class="tp-title" value="${t.title || ''}"><input type="date" class="tp-date" value="${t.date || ''}">
-                <input type="text" class="tp-subject" value="${t.subject || ''}"><input type="number" class="tp-duration" value="${t.duration || 2}"></div>
-                <textarea class="tp-desc" rows="2">${t.description || ''}</textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveTP('${t.id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delTP('${t.id}')"><i class="fas fa-trash"></i></button></div></div>`;
-            document.getElementById('tpList').insertAdjacentHTML('beforeend', html);
-        }
-
-        // ========== ÉVALUATIONS ==========
         function addEvaluation() {
             let id = 'e_' + Date.now();
-            let html = `<div class="item-card" id="${id}">
-                <div class="item-header"><span class="item-title"><i class="fas fa-clipboard-list"></i> Nouvelle évaluation</span><span class="badge badge-success">${new Date().toLocaleDateString()}</span></div>
-                <div class="grid-3">
-                    <select class="e-type"><option>Devoir</option><option>Examen</option><option>Oral</option><option>TP</option></select>
-                    <input type="text" class="e-subject" placeholder="Matière" value="${getVal('mainSubject')}">
-                    <input type="date" class="e-date" value="${new Date().toISOString().split('T')[0]}">
-                </div>
-                <div class="grid-3">
-                    <input type="number" class="e-avg" step="0.5" placeholder="Moyenne /20">
-                    <input type="number" class="e-best" step="0.5" placeholder="Meilleure">
-                    <input type="number" class="e-worst" step="0.5" placeholder="Plus basse">
-                </div>
-                <div class="grid-2">
-                    <input type="number" class="e-students" placeholder="Nb élèves" value="25">
-                    <input type="number" class="e-coef" placeholder="Coefficient" value="1">
-                </div>
-                <textarea class="e-comments" rows="2" placeholder="Commentaires"></textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveEval('${id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delEval('${id}')"><i class="fas fa-trash"></i></button></div>
-            </div>`;
-            document.getElementById('evalsList').insertAdjacentHTML('afterbegin', html);
-            toast('Évaluation ajoutée', 'success');
-        }
-
-        function saveEval(id) {
-            let el = document.getElementById(id);
-            let evalData = {
-                id, type: el.querySelector('.e-type')?.value, subject: el.querySelector('.e-subject')?.value,
-                date: el.querySelector('.e-date')?.value, average: parseFloat(el.querySelector('.e-avg')?.value) || 0,
-                best: parseFloat(el.querySelector('.e-best')?.value) || 0, worst: parseFloat(el.querySelector('.e-worst')?.value) || 0,
-                students: parseInt(el.querySelector('.e-students')?.value) || 1, coefficient: parseInt(el.querySelector('.e-coef')?.value) || 1,
-                comments: el.querySelector('.e-comments')?.value
+            let newEval = {
+                id: id,
+                type: 'Devoir',
+                subject: getVal('mainSubject'),
+                date: new Date().toISOString().split('T')[0],
+                average: 0,
+                best: 0,
+                worst: 0,
+                students: 25,
+                coefficient: 1,
+                comments: ''
             };
-            let idx = currentEvaluations.findIndex(e => e.id === id);
-            if (idx !== -1) currentEvaluations[idx] = evalData;
-            else currentEvaluations.push(evalData);
+            currentEvaluations.unshift(newEval);
+            refreshEvalsList();
             updateEvalStats();
-            saveCurrentTeacherToArray();
+            saveCurrentTeacher();
             saveAllToLocalStorage();
-            toast('Évaluation sauvegardée', 'success');
+            showToast('Évaluation ajoutée', 'success');
         }
 
-        function delEval(id) {
+        function saveEvaluation(id) {
+            let evalDiv = document.getElementById(id);
+            if (!evalDiv) return;
+            
+            let evalData = {
+                id: id,
+                type: evalDiv.querySelector('.e-type')?.value || 'Devoir',
+                subject: evalDiv.querySelector('.e-subject')?.value || '',
+                date: evalDiv.querySelector('.e-date')?.value || '',
+                average: parseFloat(evalDiv.querySelector('.e-avg')?.value) || 0,
+                best: parseFloat(evalDiv.querySelector('.e-best')?.value) || 0,
+                worst: parseFloat(evalDiv.querySelector('.e-worst')?.value) || 0,
+                students: parseInt(evalDiv.querySelector('.e-students')?.value) || 1,
+                coefficient: parseInt(evalDiv.querySelector('.e-coef')?.value) || 1,
+                comments: evalDiv.querySelector('.e-comments')?.value || ''
+            };
+            
+            let index = currentEvaluations.findIndex(e => e.id === id);
+            if (index !== -1) currentEvaluations[index] = evalData;
+            updateEvalStats();
+            saveCurrentTeacher();
+            saveAllToLocalStorage();
+            showToast('Évaluation sauvegardée', 'success');
+        }
+
+        function deleteEvaluation(id) {
             if (confirm('Supprimer cette évaluation ?')) {
-                document.getElementById(id)?.remove();
                 currentEvaluations = currentEvaluations.filter(e => e.id !== id);
+                refreshEvalsList();
                 updateEvalStats();
-                saveCurrentTeacherToArray();
+                saveCurrentTeacher();
                 saveAllToLocalStorage();
-                toast('Évaluation supprimée', 'success');
+                showToast('Évaluation supprimée', 'success');
             }
-        }
-
-        function restoreEval(e) {
-            let html = `<div class="item-card" id="${e.id}"><div class="item-header"><span class="item-title"><i class="fas fa-clipboard-list"></i> ${e.type || 'Évaluation'}</span><span class="badge badge-success">${e.date || ''}</span></div>
-                <div class="grid-3"><select class="e-type">${e.type || 'Devoir'}</select>
-                <input type="text" class="e-subject" value="${e.subject || ''}"><input type="date" class="e-date" value="${e.date || ''}"></div>
-                <div class="grid-3"><input type="number" class="e-avg" step="0.5" value="${e.average || 0}">
-                <input type="number" class="e-best" step="0.5" value="${e.best || 0}"><input type="number" class="e-worst" step="0.5" value="${e.worst || 0}"></div>
-                <div class="grid-2"><input type="number" class="e-students" value="${e.students || 25}"><input type="number" class="e-coef" value="${e.coefficient || 1}"></div>
-                <textarea class="e-comments" rows="2">${e.comments || ''}</textarea>
-                <div class="item-actions mt-2"><button class="btn btn-success btn-sm" onclick="saveEval('${e.id}')"><i class="fas fa-save"></i> OK</button>
-                <button class="btn btn-danger btn-sm" onclick="delEval('${e.id}')"><i class="fas fa-trash"></i></button></div></div>`;
-            document.getElementById('evalsList').insertAdjacentHTML('beforeend', html);
         }
 
         function updateEvalStats() {
@@ -840,8 +1170,7 @@
             document.getElementById('successRate').innerHTML = totalStudents ? Math.round(pass / totalStudents * 100) : 0;
         }
 
-        function updateAllStats() {
-            updateEvalStats();
+        function updateDataStats() {
             document.getElementById('statLessons').innerHTML = currentLessons.length;
             document.getElementById('statTP').innerHTML = currentTPs.length;
             document.getElementById('statEvalsCount').innerHTML = currentEvaluations.length;
@@ -850,157 +1179,149 @@
         // ========== SAUVEGARDE ==========
         function saveAllToLocalStorage() {
             localStorage.setItem('allTeachersData', JSON.stringify(allTeachers));
-            document.getElementById('backupInfo').innerHTML = `<i class="fas fa-check-circle"></i> ${new Date().toLocaleString()}`;
+            document.getElementById('backupInfo').innerHTML = `<i class="fas fa-check-circle"></i> ${new Date().toLocaleString()} - ${allTeachers.length} enseignant(s)`;
         }
 
         function loadAllData() {
             let saved = localStorage.getItem('allTeachersData');
             if (saved) {
-                allTeachers = JSON.parse(saved);
-                if (allTeachers.length > 0) {
-                    currentTeacherId = allTeachers[0].id;
-                    loadTeacherToUI(currentTeacherId);
-                    updateTeacherSelect();
-                    updateTeacherInfoDisplay();
+                try {
+                    allTeachers = JSON.parse(saved);
+                    if (allTeachers.length > 0) {
+                        currentTeacherId = allTeachers[0].id;
+                        loadTeacherToUI(currentTeacherId);
+                        updateTeacherSelect();
+                        updateTeacherInfoDisplay();
+                    }
+                    showToast(`${allTeachers.length} enseignant(s) chargé(s)`, 'success');
+                } catch(e) {
+                    initDefaultData();
                 }
-                toast(`${allTeachers.length} enseignant(s) chargé(s)`, 'success');
             } else {
-                // Enseignant par défaut
-                let defaultTeacher = {
-                    id: 'teacher_default',
-                    info: { name: 'Enseignant exemple', matricule: 'EX123', school: 'Établissement Test', mainSubject: 'Mathématiques', class: '3ème A', weeklyHours: 18 },
-                    lessons: [],
-                    tps: [],
-                    evaluations: []
-                };
-                allTeachers = [defaultTeacher];
-                currentTeacherId = defaultTeacher.id;
-                loadTeacherToUI(currentTeacherId);
-                updateTeacherSelect();
-                updateTeacherInfoDisplay();
-                saveAllToLocalStorage();
+                initDefaultData();
             }
-            updateAllStats();
+            updateDataStats();
+            updateGlobalStats();
+        }
+
+        function initDefaultData() {
+            let defaultTeacher = {
+                id: 'teacher_default',
+                info: { name: 'Jean Dupont', matricule: 'EX12345', school: 'Lycée Victor Hugo', mainSubject: 'Mathématiques', class: '3ème A, Terminale C', weeklyHours: '18' },
+                lessons: [],
+                tps: [],
+                evaluations: []
+            };
+            allTeachers = [defaultTeacher];
+            currentTeacherId = defaultTeacher.id;
+            loadTeacherToUI(currentTeacherId);
+            updateTeacherSelect();
+            updateTeacherInfoDisplay();
+            saveAllToLocalStorage();
         }
 
         function setupAutoSave() {
             let inputs = document.querySelectorAll('#tab-pedagogy input, #tab-pedagogy select, #tab-pedagogy textarea');
-            inputs.forEach(i => {
-                i.addEventListener('change', () => { saveCurrentTeacherToArray(); saveAllToLocalStorage(); });
-                i.addEventListener('input', () => { saveCurrentTeacherToArray(); saveAllToLocalStorage(); });
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    saveCurrentTeacher();
+                    saveAllToLocalStorage();
+                });
+                input.addEventListener('input', () => {
+                    saveCurrentTeacher();
+                    saveAllToLocalStorage();
+                });
             });
         }
 
-        // ========== EXPORT/IMPORT ==========
+        // ========== EXPORT ==========
         function exportCurrentTeacher() {
             let teacher = getCurrentTeacher();
-            if (!teacher) { toast('Aucun enseignant sélectionné', 'warning'); return; }
+            if (!teacher) { showToast('Aucun enseignant sélectionné', 'warning'); return; }
+            let data = {
+                id: teacher.id,
+                info: teacher.info,
+                lessons: teacher.lessons,
+                tps: teacher.tps,
+                evaluations: teacher.evaluations
+            };
+            let blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(teacher, null, 2)], { type: 'application/json' }));
+            a.href = url;
             a.download = `enseignant_${teacher.info?.matricule || teacher.id}_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
-            URL.revokeObjectURL(a.href);
-            toast('Exporté', 'success');
-        }
-
-        function importTeacherData() {
-            let input = document.createElement('input');
-            input.type = 'file'; input.accept = '.json';
-            input.onchange = e => {
-                let f = e.target.files[0]; if (!f) return;
-                let r = new FileReader();
-                r.onload = ev => {
-                    try {
-                        let data = JSON.parse(ev.target.result);
-                        if (data.id) {
-                            // Remplacer ou ajouter
-                            let existing = allTeachers.findIndex(t => t.id === data.id);
-                            if (existing !== -1) allTeachers[existing] = data;
-                            else allTeachers.push(data);
-                            currentTeacherId = data.id;
-                            updateTeacherSelect();
-                            loadTeacherToUI(currentTeacherId);
-                            updateTeacherInfoDisplay();
-                            saveAllToLocalStorage();
-                            toast('Enseignant importé', 'success');
-                        } else {
-                            toast('Format JSON invalide', 'error');
-                        }
-                    } catch(err) { toast('Erreur fichier', 'error'); }
-                };
-                r.readAsText(f);
-            };
-            input.click();
+            URL.revokeObjectURL(url);
+            showToast('Exporté', 'success');
         }
 
         function exportAllTeachers() {
+            let blob = new Blob([JSON.stringify(allTeachers, null, 2)], { type: 'application/json' });
+            let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(allTeachers, null, 2)], { type: 'application/json' }));
+            a.href = url;
             a.download = `tous_enseignants_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
-            URL.revokeObjectURL(a.href);
-            toast('Export tous enseignants', 'success');
+            URL.revokeObjectURL(url);
+            showToast('Export de tous les enseignants réussi', 'success');
         }
 
-        function triggerImportAll() { document.getElementById('importFile').click(); }
-
-        function importAllTeachers(input) {
-            let f = input.files[0]; if (!f) return;
-            let r = new FileReader();
-            r.onload = ev => {
-                try {
-                    let data = JSON.parse(ev.target.result);
-                    if (Array.isArray(data)) {
-                        allTeachers = data;
-                        if (allTeachers.length > 0) currentTeacherId = allTeachers[0].id;
-                        else currentTeacherId = null;
-                        updateTeacherSelect();
-                        if (currentTeacherId) loadTeacherToUI(currentTeacherId);
-                        else clearUI();
-                        updateTeacherInfoDisplay();
-                        saveAllToLocalStorage();
-                        toast(`${allTeachers.length} enseignant(s) importé(s)`, 'success');
-                    } else {
-                        toast('Format JSON invalide (doit être un tableau)', 'error');
-                    }
-                } catch(err) { toast('Erreur fichier', 'error'); }
-            };
-            r.readAsText(f);
-            input.value = '';
-        }
-
-        // ========== EXPORT EXCEL ==========
         function exportPedagogyExcel() {
-            let ws = [["Type", "Titre", "Date", "Matière", "Classe", "Contenu"]];
-            currentLessons.forEach(l => ws.push(["Leçon", l.title, l.date, l.subject, l.class, l.objectives]));
-            currentTPs.forEach(t => ws.push(["TP", t.title, t.date, t.subject, "", t.description]));
+            let wsData = [["Type", "Titre", "Date", "Matière", "Classe", "Contenu"]];
+            currentLessons.forEach(l => wsData.push(["Leçon", l.title, l.date, l.subject, l.class, l.objectives]));
+            currentTPs.forEach(t => wsData.push(["TP", t.title, t.date, t.subject, "", t.description]));
+            let ws = XLSX.utils.aoa_to_sheet(wsData);
             let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws), "Pédagogie");
+            XLSX.utils.book_append_sheet(wb, ws, "Pédagogie");
             XLSX.writeFile(wb, `pedagogie_${Date.now()}.xlsx`);
-            toast('Excel exporté', 'success');
+            showToast('Excel exporté', 'success');
         }
 
         function exportEvalsExcel() {
-            let ws = [["Type", "Matière", "Date", "Moyenne", "Meilleure", "Plus basse", "Élèves", "Coeff", "Commentaires"]];
-            currentEvaluations.forEach(e => ws.push([e.type, e.subject, e.date, e.average, e.best, e.worst, e.students, e.coefficient, e.comments]));
+            let wsData = [["Type", "Matière", "Date", "Moyenne", "Meilleure", "Plus basse", "Élèves", "Coeff", "Commentaires"]];
+            currentEvaluations.forEach(e => wsData.push([e.type, e.subject, e.date, e.average, e.best, e.worst, e.students, e.coefficient, e.comments]));
+            let ws = XLSX.utils.aoa_to_sheet(wsData);
             let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws), "Évaluations");
+            XLSX.utils.book_append_sheet(wb, ws, "Évaluations");
             XLSX.writeFile(wb, `evaluations_${Date.now()}.xlsx`);
-            toast('Excel exporté', 'success');
+            showToast('Excel exporté', 'success');
         }
 
-        function toast(msg, type = 'success') {
-            let t = document.getElementById('toast');
-            let span = document.getElementById('toastMsg');
-            span.innerHTML = msg;
-            t.className = 'toast';
-            if (type === 'error') { t.classList.add('error'); }
-            else { t.classList.add('success'); }
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
+        // ========== UTILITAIRES ==========
+        function getVal(id) { return document.getElementById(id)?.value || ''; }
+        function setVal(id, val) { let el = document.getElementById(id); if (el) el.value = val || ''; }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
 
-        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        function showToast(message, type = 'success') {
+            let toast = document.getElementById('toast');
+            let msgSpan = document.getElementById('toastMsg');
+            msgSpan.innerHTML = message;
+            toast.className = 'toast';
+            if (type === 'error') toast.classList.add('error');
+            else if (type === 'warning') toast.classList.add('warning');
+            else toast.classList.add('success');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Exposer les fonctions globales
+        window.saveLesson = saveLesson;
+        window.deleteLesson = deleteLesson;
+        window.saveTP = saveTP;
+        window.deleteTP = deleteTP;
+        window.saveEvaluation = saveEvaluation;
+        window.deleteEvaluation = deleteEvaluation;
+        window.removeFile = removeFile;
+        window.selectTeacherById = selectTeacherById;
     </script>
 </body>
 </html>
